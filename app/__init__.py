@@ -20,3 +20,9 @@ CORS(
     supports_credentials=AppConfig.Access_Control_Allow_Credentials,
 )
 
+from app.api.masking.views import bp as api_masking  # noqa:
+from app.api.test.views import bp as api_test  # noqa:
+
+app.register_blueprint(api_masking)
+app.register_blueprint(api_test)
+

@@ -46,7 +46,7 @@ class PostgresConfig(BaseSetting):
     USER = SettingField("POSTGRES_USER", default="admin")
     PASSWORD = SettingField("POSTGRES_PASSWORD", default="admin")
     DBNAME = SettingField("POSTGRES_DB", default="app")
-    AUTO_CREATE = SettingField("PIM_POSTGRES_AUTO_CREATE", bool, default=False)
+    AUTO_CREATE = SettingField("POSTGRES_AUTO_CREATE", bool, default=False)
 
     # ssl settings
     SSL_CERT = SettingField("POSTGRES_SSL_CERT", default="")
@@ -62,3 +62,4 @@ class AppConfig(BaseSetting):
     SQLALCHEMY_DATABASE_URI = SqlAlchemyBuilder(PostgresConfig)
     # SQLALCHEMY_ECHO = True
     Access_Control_Allow_Credentials = True
+    DEBUG = SettingField("DEBUG", default=True)
