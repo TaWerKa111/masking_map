@@ -2,8 +2,8 @@ from flask_migrate import Migrate, MigrateCommand
 
 from flask_script import Manager
 
-from app import app
-from app.management import commands_classes, sub_command_usage
+from application import app
+from application.management import commands_classes, sub_command_usage
 
 # Create manager
 manager = Manager(app)

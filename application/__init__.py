@@ -20,9 +20,13 @@ CORS(
     supports_credentials=AppConfig.Access_Control_Allow_Credentials,
 )
 
-from app.api.masking.views import bp as api_masking  # noqa:
-from app.api.test.views import bp as api_test  # noqa:
+from application.api.masking.views import bp as api_masking  # noqa:
+from application.api.test.views import bp as api_test  # noqa:
+from application.api.swagger.views import bp as api_swagger  # noqa:
+from application.api.swagger.views import swagger_ui_blueprint as api_swagger_ui  # noqa:
 
 app.register_blueprint(api_masking)
 app.register_blueprint(api_test)
+app.register_blueprint(api_swagger)
+app.register_blueprint(api_swagger_ui)
 

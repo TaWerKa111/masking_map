@@ -20,7 +20,6 @@ from sqlalchemy.orm import (
     relationship,
     backref,
     declarative_base,
-    declared_attr
 )
 from sqlalchemy.sql.sqltypes import DateTime, Date
 from sqlalchemy.ext.mutable import MutableDict
