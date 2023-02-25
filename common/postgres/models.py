@@ -1,6 +1,7 @@
 import hashlib
 import enum
 
+from sqlalchemy.dialects import postgresql
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -71,12 +72,29 @@ class Protection(Base):
         foreign_keys=[id_type_protection],
         post_update=True
     )
-    protections = relationship(
+    works = relationship(
         "TypeWork",
         lazy="dynamic",
         uselist=True,
         back_populates="protections",
         secondary="type_work_protection"
+    )
+
+
+class RulesOfProtection(Base):
+    __tablename__ = "rules_of_protection"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255))
+    any_rules = Column(MutableDict.as_mutable(postgresql.JSONB))
+    id_protection = Column(Integer, ForeignKey("protection.id"))
+
+    # relationship
+    protections = relationship(
+        "Protection",
+        backref=backref("rules", uselist=True),
+        foreign_keys=[id_protection],
+        post_update=True
     )
 
 

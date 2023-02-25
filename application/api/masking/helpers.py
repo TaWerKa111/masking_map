@@ -137,3 +137,21 @@ def get_mn_object_list():
 
     result = db.session.query(MNObject).all()
     return result
+
+
+def check_generate_masking_plan(id_object, id_type_work):
+    """
+
+    :param id_object:
+    :param id_type_work:
+    :return:
+    """
+
+    type_work = db.session().query(TypeWork).get(id_type_work)
+    mn_object = db.session().query(MNObject).get(id_object)
+
+    for protection in type_work.protections:
+        if protection.id == mn_object.id_protection:
+            return True
+
+    return False

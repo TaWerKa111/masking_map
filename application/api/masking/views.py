@@ -12,14 +12,14 @@ from application.api.masking.schemas import (
     TypeWorkSchema,
     TypeProtectionSchema,
     ProtectionSchema,
-    MNObjectSchema,
+    MNObjectSchema, GenerateMaskingPlanSchema,
 )
 from application.api.helpers.schemas import BinaryResponseSchema
 from application.api.masking.helpers import (
     get_protection_list,
     get_mn_object_list,
     get_type_work_list,
-    get_type_protection_list,
+    get_type_protection_list, check_generate_masking_plan,
 )
 
 
@@ -420,3 +420,62 @@ def update_mn_object_view():
 
     :return:
     """
+
+
+@bp.route("/generate-masking/")
+def generate_masking_view():
+    """
+
+    :return:
+    ---
+    get:
+        summary: Сгенерировать карту маскирования
+        description: Генерация карты маскирования
+        parameters:
+            -   in: query
+                description: Параметры
+                schema: GenerateMaskingPlanSchema
+        responses:
+            '200':
+                description: Результат проверки
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+            '400':
+                description: Карта не нужна
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - masking
+    """
+
+    data = dict()
+    data["id_object"] = request.args.get("id_object")
+    data["id_type_work"] = request.args.get("id_type_work")
+
+    try:
+        data_for_masking = GenerateMaskingPlanSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(f"Validation error - {err}")
+        return BinaryResponseSchema().dump(
+            {
+                "message": "",
+                "result": False
+            }
+        ), http.HTTPStatus.BAD_REQUEST
+
+    is_should_generate = check_generate_masking_plan(
+        **data_for_masking
+    )
+
+    if is_should_generate:
+        return BinaryResponseSchema().dump({
+            "message": "Возможно сделать карту маскирования!",
+            "result": True
+        }), http.HTTPStatus.OK
+
+    return BinaryResponseSchema().dump({
+            "message": "Нет. Невозможно сделать карту маскирования!",
+            "result": False
+        }), http.HTTPStatus.BAD_REQUEST

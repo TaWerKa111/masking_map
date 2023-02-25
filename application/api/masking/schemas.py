@@ -7,6 +7,8 @@ from application.api.masking.helpers import (
     add_type_protection,
     add_type_work_protection,
 )
+from application.api.masking.validators import is_not_exist_mn_object, \
+    is_not_exist_type_work
 
 
 class AddTypeWorkSchema(Schema):
@@ -85,3 +87,9 @@ class MNObjectSchema(Schema):
     name = fields.String(example="")
     id_parent = fields.Integer()
     id_protection = fields.Integer()
+
+
+class GenerateMaskingPlanSchema(Schema):
+
+    id_object = fields.Integer(validate=[is_not_exist_mn_object])
+    id_type_work = fields.Integer(validate=[is_not_exist_type_work])
