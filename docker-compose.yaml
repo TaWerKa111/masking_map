@@ -5,18 +5,30 @@ services:
   app:
     image: transneft-app:1.0
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     platform: linux/amd64
     ports:
       - "5000:5000"
     volumes:
-      - ./application/:/transneft/application/
-      - ./common/:/common/
+      - ./backend/application/:/transneft/application/
+      - ./backend/common/:/common/
+      - masking_maps:/transneft/masking_maps/
     env_file:
       - ./.env.example
     depends_on:
       - db
+
+  client:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:80'
+#    links:
+#      - api
+    depends_on:
+      - app
 
   # The DataBase
   db:
@@ -33,3 +45,4 @@ services:
 
 volumes:
   app_postgres:
+  masking_maps:

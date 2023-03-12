@@ -12,14 +12,15 @@ from application.api.masking.schemas import (
     TypeWorkSchema,
     TypeProtectionSchema,
     ProtectionSchema,
-    MNObjectSchema, GenerateMaskingPlanSchema,
+    MNObjectSchema, GenerateMaskingPlanSchema, GetTypeWorkListSchema,
 )
 from application.api.helpers.schemas import BinaryResponseSchema
 from application.api.masking.helpers import (
     get_protection_list,
     get_mn_object_list,
     get_type_work_list,
-    get_type_protection_list, check_generate_masking_plan,
+    get_type_protection_list,
+    check_generate_masking_plan,
 )
 
 
@@ -35,6 +36,9 @@ def get_type_work_view():
     get:
         summary: Получить список типов работ
         description: Получить список типов работ
+        parameters:
+            -   in: query
+                schema: GetTypeWorkListSchema
         responses:
             '200':
                 description: Список типов работ
@@ -51,7 +55,26 @@ def get_type_work_view():
         tags:
             - masking
     """
-    type_work_list = get_type_work_list()
+    data = dict()
+    data["ids_type_protection[]"] = request.args.getlist(
+        "ids_type_protection[]")
+    data["ids_type_mn_object[]"] = request.args.getlist(
+        "ids_type_mn_object[]")
+    data["name_type_work"] = request.args.get("name_type_work")
+    try:
+        type_work_list = GetTypeWorkListSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(f"ValidationError - {err}")
+        return (
+            BinaryResponseSchema().dump(
+                {
+                    "message": "Неверные входные данные!",
+                    "result": False
+                }
+            ),
+            http.HTTPStatus.BAD_REQUEST
+        )
+    # type_work_list = get_type_work_list()
     return (
         jsonify(TypeWorkSchema().dump(type_work_list, many=True)),
         http.HTTPStatus.BAD_REQUEST,
@@ -330,6 +353,9 @@ def get_mn_object_view():
     get:
         summary: Получить список объектов
         description: Получить список объектов
+        parameters:
+            -   in: query
+                schema: GetMNObjectListSchema
         responses:
             '200':
                 description: Список объектов
@@ -347,7 +373,28 @@ def get_mn_object_view():
             - masking
     """
 
-    mn_object_list = get_mn_object_list()
+    data = dict()
+    data["ids_type_protection[]"] = request.args.getlist(
+        "ids_type_protection[]")
+    data["ids_type_mn_object[]"] = request.args.getlist(
+        "ids_type_mn_object[]")
+    data["name_mn_object"] = request.args.get("name_mn_object")
+
+    try:
+        mn_object_list = GetTypeWorkListSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(f"ValidationError - {err}")
+        return (
+            BinaryResponseSchema().dump(
+                {
+                    "message": "Неверные входные данные!",
+                    "result": False
+                }
+            ),
+            http.HTTPStatus.BAD_REQUEST
+        )
+
+    # mn_object_list = get_mn_object_list()
 
     return jsonify(
         MNObjectSchema().dump(mn_object_list, many=True),

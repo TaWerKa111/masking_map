@@ -6,9 +6,12 @@ from application.api.masking.helpers import (
     add_mn_object,
     add_type_protection,
     add_type_work_protection,
+    get_type_work_list,
 )
-from application.api.masking.validators import is_not_exist_mn_object, \
+from application.api.masking.validators import (
+    is_not_exist_mn_object,
     is_not_exist_type_work
+)
 
 
 class AddTypeWorkSchema(Schema):
@@ -27,6 +30,22 @@ class AddTypeWorkSchema(Schema):
 class TypeWorkSchema(Schema):
     id = fields.Integer(example=1)
     name = fields.String(example="")
+
+
+class GetTypeWorkListSchema(Schema):
+    ids_type_protection = fields.List(
+        fields.Integer, example=[1], data_key="ids_type_protection[]")
+    ids_type_mn_object = fields.List(
+        fields.Integer, example=[1], data_key="ids_type_mn_object[]")
+    name_type_work = fields.String(example="Work 1")
+
+    @post_load
+    def get_filter_type_work(self, data, **kwargs):
+        get_type_work_list(
+            name=data.get("name_type_work"),
+            ids_type_mn_object=data.get("ids_type_mn_object"),
+            ids_type_protection=data.get("ids_type_protection"),
+        )
 
 
 class AddProtectionSchema(Schema):
@@ -87,6 +106,22 @@ class MNObjectSchema(Schema):
     name = fields.String(example="")
     id_parent = fields.Integer()
     id_protection = fields.Integer()
+
+
+class GetMNObjectListSchema(Schema):
+    ids_type_protection = fields.List(
+        fields.Integer, example=[1], data_key="ids_type_protection[]")
+    ids_type_mn_object = fields.List(
+        fields.Integer, example=[1], data_key="ids_type_mn_object[]")
+    name_mn_object = fields.String(example="example")
+
+    @post_load
+    def get_mn_object_list(self, data, **kwargs):
+        get_type_work_list(
+            name=data.get("name_protection"),
+            ids_type_mn_object=data.get("ids_type_mn_object"),
+            ids_type_protection=data.get("ids_type_protection"),
+        )
 
 
 class GenerateMaskingPlanSchema(Schema):

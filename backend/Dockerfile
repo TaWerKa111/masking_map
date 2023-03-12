@@ -17,9 +17,9 @@ RUN set -eux; \
 
 RUN apt update && apt -y install postgresql-client
 
-COPY contrib/docker-entrypoint.sh /docker-entrypoint.sh
-ADD contrib/docker-entrypoint.d /docker-entrypoint.d/
-COPY contrib/wait-for-it /wait-for-it/
+COPY ./contrib/docker-entrypoint.sh /docker-entrypoint.sh
+ADD ./contrib/docker-entrypoint.d /docker-entrypoint.d/
+COPY ./contrib/wait-for-it /wait-for-it/
 RUN set -eux; \
         chmod 0700 /docker-entrypoint.sh; \
         chmod 0700 /docker-entrypoint.d/*; \

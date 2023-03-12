@@ -1,0 +1,83 @@
+<html lang="ru">
+<header>
+
+</header>
+<link rel="stylesheet" href="../styles/main.css">
+<div>
+    <h1>Форма карты маскирования защит МПСА</h1>
+    <p class="right" >Приложение № {{number_pril}}</p>
+    <p class="right">к проекту разрешения на производство работ</p>
+    <p class="right">№{{number_project}} от {{date}}г.</p>
+    <h1>Карта маскирования защит ЦСПА НПС {{name_nps}}</h1>
+    <table class="iksweb">
+        <tbody>
+            <tr>
+                <td rowspan="2">№</td>
+                <td rowspan="2">Наименование</td>
+                <td colspan="2">Установка</td>
+                <td colspan="2">Снятие</td>
+            </tr>
+            <tr>
+                <td>выполнение</td>
+                <td>проверка</td>
+                <td>выполнение</td>
+                <td>проверка</td>
+            </tr>
+            <tr>
+                <td colspan="6" class="center">На период производства работ на АРМ МПСА устанавливается ражим "Маскирования на следующие защиты"</td>
+            </tr>
+            <tr>
+                <td colspan="6" class="center">Общестанционные защиты</td>
+            </tr>
+            {% for protection in protection_cspa %}
+                <tr>
+                    <td>1.{{loop.index}}</td>
+                    <td>{{protection["name"]}}</td>
+                    <td></td>
+                    <td></td>
+                    {% if protection["is_no_demask"] %}
+                        <td colspan="2">Демаскирование запрещено!</td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="6" class="center">Агрегатные защиты</td>
+            </tr>
+            <tr>
+                {% for protection in protection_agreg %}
+                    <tr>
+                        <td>1.{{loop.index}}</td>
+                        <td>{{protection["name"]}}</td>
+                        <td></td>
+                        <td></td>
+                        {% if protection["is_no_demask"] %}
+                            <td colspan="2">Демаскирование запрещено!</td>
+                        {% else %}
+                            <td></td>
+                            <td></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            <tr>
+                <td></td>
+                <td>выполнил </td>
+                <td>подпись/дата</td>
+                <td></td>
+                <td>подпись/дата</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>проверил</td>
+                <td></td>
+                <td>подпись/дата</td>
+                <td></td>
+                <td>подпись/дата</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</html>
