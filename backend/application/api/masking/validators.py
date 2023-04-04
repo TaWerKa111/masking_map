@@ -1,7 +1,7 @@
 from marshmallow import ValidationError
 
 from application import db
-from common.postgres.models import TypeWork, MNObject
+from common.postgres.models import TypeWork, Location
 
 
 def is_not_exist_type_work(id_type_work):
@@ -18,8 +18,8 @@ def is_not_exist_type_work(id_type_work):
 def is_not_exist_mn_object(id_object):
 
     type_work = (
-        db.session().query(MNObject)
-        .filter(MNObject.id == id_object).first()
+        db.session().query(Location)
+        .filter(Location.id == id_object).first()
     )
 
     if not type_work:

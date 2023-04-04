@@ -8,7 +8,7 @@ from flask import current_app
 from application import app
 
 
-def add_security_scheme(documentation):
+def add_security_scheme(documentation: APISpec) -> None:
     """
     Добавление схем безопасности.
 
@@ -24,7 +24,7 @@ def add_security_scheme(documentation):
     documentation.components.security_scheme("roleAuth", role_schema)
 
 
-def add_responses(documentation):
+def add_responses(documentation: APISpec) -> None:
     """
     Добавление часто встречаемых кодов ответов!
     @param documentation: ApiSpec: документация к приложению
@@ -132,7 +132,7 @@ def add_responses(documentation):
     documentation.components.response("Forbidden", response_403)
 
 
-def add_view_to_docs(documentation):
+def add_view_to_docs(documentation: APISpec) -> None:
     """
     Добавление методов приложения в документацию,
     описание к ним берется из их doc-strings.
@@ -148,10 +148,10 @@ def add_view_to_docs(documentation):
                 documentation.path(view=view_fn)
 
 
-def write_docs_to_file(documentation):
+def write_docs_to_file(documentation: APISpec) -> None:
     """
     Запись документации в yaml файл.
-    @param documentation: FlaskApiSpec: документация к приложению
+    @param documentation: APISpec: документация к приложению
     @return: None
     """
     # Запись документации в yaml файл
@@ -166,7 +166,7 @@ def write_docs_to_file(documentation):
         )
 
 
-def create_spec():
+def create_spec() -> APISpec:
     """
     Создание документации и сохранение ее в yaml файл.
 
@@ -179,7 +179,7 @@ def create_spec():
         openapi_version="3.0.3",
         servers=[
             {
-                "url": "http://localhost:5000/",
+                "url": "http://localhost:5001/",
                 "description": "Тестовый сервер",
             }
         ],

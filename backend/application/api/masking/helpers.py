@@ -1,14 +1,21 @@
-from flask import current_app
+import datetime
+import os
+import uuid
 
+from flask import current_app, render_template
+from weasyprint import HTML, CSS
+
+from application.api.helpers.exceptions import SqlAlchemyException
 from common.postgres.models import (
     TypeWork,
     Protection,
     TypeProtection,
     TypeWorkProtection,
-    MNObject, TypeMnObject, StatusProtection,
+    Location, TypeLocation, StatusProtection, MaskingMapFile,
 )
 
 from application import db
+from config import AppConfig
 
 
 def session_add(session, obj):
@@ -28,6 +35,7 @@ def session_add(session, obj):
             f"Не удалось добавить объект в базу данных. {err}"
         )
         session.rollback()
+        raise SqlAlchemyException("Не удалось добавить объект в БД!")
 
 
 def add_type_work(name):
@@ -50,8 +58,8 @@ def get_type_work_list(
 
     query = (
         db.session().query(TypeWork)
-        .join(MNObject)
-        .join(Protection)
+        # .outerjoin(MNObject)
+        .outerjoin(Protection, TypeWork.id == Protection.id)
     )
 
     if name:
@@ -59,13 +67,14 @@ def get_type_work_list(
         query = query.filter(TypeWork.name.ilike(search_name))
 
     if ids_type_protection:
-        query = query.filter(MNObject.id_type.in_(ids_type_mn_object))
+        query = query.filter(Location.id_type.in_(ids_type_mn_object))
 
     if ids_type_mn_object:
         query = query.filter(
             Protection.id_type_protection.in_(ids_type_protection))
 
     result = query.all()
+    current_app.logger.debug(f"res - {result}")
     return result
 
 
@@ -135,7 +144,7 @@ def add_mn_object(name, id_protection, id_parent=None):
     :return:
     """
 
-    mn_object = MNObject(
+    mn_object = Location(
         name=name, id_protection=id_protection, id_parent=id_parent
     )
 
@@ -150,28 +159,28 @@ def get_mn_object_list(
     """
 
     query = (
-        db.session().query(MNObject)
-        .join(TypeMnObject)
-        .join(Protection)
+        db.session().query(Location)
+        # .outerjoin(TypeMnObject)
+        .join(Protection, Location.id_protection == Protection.id)
     )
 
     if name:
         search_name = f"%{name}%"
-        query = query.filter(MNObject.name.ilike(search_name))
+        query = query.filter(Location.name.ilike(search_name))
 
     if ids_type_protection:
-        query = query.filter(MNObject.id_type.in_(ids_type_mn_object))
+        query = query.filter(Location.id_type.in_(ids_type_mn_object))
 
     if ids_type_mn_object:
         query = query.filter(
             Protection.id_type_protection.in_(ids_type_protection))
-
+    current_app.logger.debug(f"query - {query}")
     # result = db.session.query(MNObject).all()
     result = query.all()
     return result
 
 
-def check_generate_masking_plan(id_object, id_type_work):
+def check_generate_masking_plan(id_object, id_type_work) -> uuid.UUID or None:
     """
 
     :param id_object:
@@ -180,17 +189,39 @@ def check_generate_masking_plan(id_object, id_type_work):
     """
 
     type_work = db.session().query(TypeWork).get(id_type_work)
-    mn_object = db.session().query(MNObject).get(id_object)
+    mn_object = db.session().query(Location).get(id_object)
 
     for protection in type_work.protections:
         if protection.id == mn_object.id_protection:
-            return True
+            masking_uuid = uuid.uuid4()
+            masking_data = {
+                "number_pril": "",
+                "number_project": "",
+                "date": datetime.date.today().strftime("%d.%m.%Y"),
+                "name_nps": "",
+                "protection_cspa": [
+                    {
+                        "name": protection.name,
+                        "is_no_demask": False
+                    }
+                ]
+            }
 
-    return False
+            masking_map = MaskingMapFile(
+                description="",
+                filename="",
+                data_masking=masking_data,
+                masking_uuid=masking_uuid
+            )
+            db.session.add(masking_map)
+            db.session.commit()
+            return masking_uuid
+
+    return None
 
 
 def add_type_mn_object(name):
-    type_mn_object = TypeMnObject(
+    type_mn_object = TypeLocation(
         name
     )
     session_add(db.session, type_mn_object)
@@ -198,7 +229,7 @@ def add_type_mn_object(name):
 
 
 def get_type_mn_object_list():
-    type_object_list = db.session.query(TypeMnObject).all()
+    type_object_list = db.session.query(TypeLocation).all()
 
     return type_object_list
 
@@ -214,3 +245,28 @@ def add_status_protection(name):
 def get_status_protection_list():
     status_protection_list = db.session.query(StatusProtection).all()
     return status_protection_list
+
+
+def render_masking_map(map_uuid) -> str:
+    file_params = db.session.query(MaskingMapFile).filter(
+        MaskingMapFile.masking_uuid == map_uuid
+    ).first()
+
+    render_file = render_template(
+        "masking_map/mpsa.html", **file_params.data_masking
+    )
+    return render_file
+
+
+def generate_file(map_uuid) -> str:
+    render_file = render_masking_map(map_uuid)
+
+    # css = CSS("common/templates/styles/main.css")
+    html = HTML(string=render_file)
+    filename = os.path.join(AppConfig.FILES_PATHS.MAP_FILES_DIR_PATH, f"{map_uuid}.pdf")
+    current_app.logger.debug(f"filename - {filename}")
+    html.write_pdf(filename, stylesheets=[])
+
+    return filename
+
+

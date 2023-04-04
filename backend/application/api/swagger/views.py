@@ -18,10 +18,10 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 
 
 @bp.route("/swagger/")
-def create_swagger_spec():
+def create_swagger_spec() -> tuple[dict, int]:
     """
     Создание swagger документации и отправка ее в формате JSON.
-    @return: JSON
+    @return: tuple[JSON, int]
     """
 
     spec = create_spec()

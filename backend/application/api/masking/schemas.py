@@ -1,12 +1,13 @@
 from marshmallow import Schema, fields, post_load, EXCLUDE
 
+from application.api.helpers.schemas import BinaryResponseSchema
 from application.api.masking.helpers import (
     add_protection,
     add_type_work,
     add_mn_object,
     add_type_protection,
     add_type_work_protection,
-    get_type_work_list,
+    get_type_work_list, get_mn_object_list,
 )
 from application.api.masking.validators import (
     is_not_exist_mn_object,
@@ -34,14 +35,14 @@ class TypeWorkSchema(Schema):
 
 class GetTypeWorkListSchema(Schema):
     ids_type_protection = fields.List(
-        fields.Integer, example=[1], data_key="ids_type_protection[]")
+        fields.Integer, example=[1], data_key="ids_type_protection[]", allow_none=True)
     ids_type_mn_object = fields.List(
-        fields.Integer, example=[1], data_key="ids_type_mn_object[]")
-    name_type_work = fields.String(example="Work 1")
+        fields.Integer, example=[1], data_key="ids_type_mn_object[]", allow_none=True)
+    name_type_work = fields.String(example="Work 1", allow_none=True)
 
     @post_load
     def get_filter_type_work(self, data, **kwargs):
-        get_type_work_list(
+        return get_type_work_list(
             name=data.get("name_type_work"),
             ids_type_mn_object=data.get("ids_type_mn_object"),
             ids_type_protection=data.get("ids_type_protection"),
@@ -113,11 +114,11 @@ class GetMNObjectListSchema(Schema):
         fields.Integer, example=[1], data_key="ids_type_protection[]")
     ids_type_mn_object = fields.List(
         fields.Integer, example=[1], data_key="ids_type_mn_object[]")
-    name_mn_object = fields.String(example="example")
+    name_mn_object = fields.String(example="example", allow_none=True)
 
     @post_load
     def get_mn_object_list(self, data, **kwargs):
-        get_type_work_list(
+        return get_mn_object_list(
             name=data.get("name_protection"),
             ids_type_mn_object=data.get("ids_type_mn_object"),
             ids_type_protection=data.get("ids_type_protection"),
@@ -128,3 +129,11 @@ class GenerateMaskingPlanSchema(Schema):
 
     id_object = fields.Integer(validate=[is_not_exist_mn_object])
     id_type_work = fields.Integer(validate=[is_not_exist_type_work])
+
+
+class MaskingResponseFileSchema(BinaryResponseSchema):
+    masking_uuid = fields.UUID()
+
+
+class TypeMnObjectSchema(Schema):
+    name = fields.Str(example="защита 1")

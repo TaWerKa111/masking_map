@@ -29,6 +29,7 @@ RUN set -eux; \
 # copy project
 ADD . transneft
 WORKDIR transneft/
+RUN mkdir "./map_files/"
 
 CMD ["python", "manage.py", "runserver", "--host=0.0.0.0"]
 

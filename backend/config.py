@@ -56,10 +56,23 @@ class PostgresConfig(BaseSetting):
     )
 
 
+class FilesData(BaseSetting):
+    MAP_FILES_DIR_PATH = "/transneft/map_files/"
+
+
+class Role(BaseSetting):
+    ADMIN = "admin"
+    USER = "user"
+    EXPERT = "expert"
+
+
 class AppConfig(BaseSetting):
     # Postgres settings
     POSTGRES = PostgresConfig
     SQLALCHEMY_DATABASE_URI = SqlAlchemyBuilder(PostgresConfig)
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
     # SQLALCHEMY_ECHO = True
     Access_Control_Allow_Credentials = True
     DEBUG = SettingField("DEBUG", default=True)
+    FILES_PATHS = FilesData
+    ROLE = Role
