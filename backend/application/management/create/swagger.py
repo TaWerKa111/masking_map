@@ -4,7 +4,7 @@ from flask import Blueprint, current_app
 
 from application.api.swagger.helpers import create_spec
 
-bp = Blueprint("create", __name__)
+bp = Blueprint("create_swagger", __name__)
 
 
 @bp.cli.command("swagger")

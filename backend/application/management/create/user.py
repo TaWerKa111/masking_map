@@ -8,18 +8,18 @@ from flask import Blueprint, current_app
 
 from config import AppConfig
 
-bp = Blueprint("create", __name__)
+bp = Blueprint("create_user", __name__)
 
 
 @bp.cli.command("user")
 @click.option(
-    "--login", "-L", required=True, is_flag=True, help="Login of user"
+    "--login", "-L", required=True, help="Login of user"
 )
 @click.option(
-    "--password", "-P", requered=True, is_flag=True, help="password of user"
+    "--password", "-P", required=True, help="password of user"
 )
 @click.option(
-    "--role", "-R", rquired=False, help="role of user"
+    "--role", "-R", required=False, help="role of user"
 )
 def create_user(
         login: str, password: str, role: str = AppConfig.ROLE.ADMIN) -> None:
