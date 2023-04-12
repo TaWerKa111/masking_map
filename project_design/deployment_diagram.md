@@ -4,4 +4,4 @@
 https://online.visual-paradigm.com/w/ixszxxdt/diagrams/#G1bKryAoBTsWMKqW6jX34GTINOQvePsU6U
 
 Схема
-![img.png](images/deployment_diagram.png)
+![img.png](images/deployment_dr.png)
