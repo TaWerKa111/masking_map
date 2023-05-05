@@ -66,6 +66,13 @@ class Role(BaseSetting):
     EXPERT = "expert"
 
 
+class TypeCriteria(BaseSetting):
+    location = "location"
+    type_work = "type_work"
+    type_location = "type_location"
+    question = "question"
+
+
 class AppConfig(BaseSetting):
     # Postgres settings
     POSTGRES = PostgresConfig

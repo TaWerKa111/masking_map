@@ -102,6 +102,8 @@ class Protection(Base):
     id_status = Column(
         Integer, ForeignKey("protection_status.id"), nullable=True
     )
+    id_location = Column(
+        Integer, ForeignKey("location.id"), nullable=True)
 
     # relationship
     type_protection = relationship(
@@ -129,6 +131,7 @@ class Protection(Base):
         back_populates="protections",
         secondary="rule_protection"
     )
+    protection = relationship("Location", backref="protections")
 
 
 class TypeProtection(Base):
@@ -160,8 +163,6 @@ class Location(Base, TimestampsMixin):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    id_protection = Column(
-        Integer, ForeignKey("protection.id"), nullable=True)
     id_parent = Column(
         Integer, ForeignKey("location.id"), nullable=True, index=True)
     id_type = Column(
@@ -174,8 +175,7 @@ class Location(Base, TimestampsMixin):
     # relationship
     parent = relationship(
         "Location", backref="child", remote_side=id)
-    protection = relationship("Protection", backref="locations")
-    type_object = relationship(
+    type_location = relationship(
         "TypeLocation", backref="locations")
     criteria = relationship(
         "Criteria",
@@ -197,7 +197,7 @@ class TypeLocation(Base):
         "Criteria",
         lazy="select",
         uselist=True,
-        back_populates="type_locations",
+        back_populates="locations_type",
         secondary="criteria_location_type"
     )
 
@@ -228,11 +228,11 @@ class User(Base, TimestampsMixin):
 class MaskingMapFile(Base):
     __tablename__ = "masking_map_file"
 
-    # id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     filename = Column(String(255), nullable=True)
     description = Column(String(255), nullable=True)
     masking_uuid = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+        UUID(as_uuid=True), default=uuid.uuid4)
     data_masking = Column(
         MutableDict.as_mutable(postgresql.JSONB)
     )
@@ -242,11 +242,18 @@ class MaskingMapFile(Base):
 
 
 class Criteria(Base):
+    class TypeCriteria(enum.Enum):
+        location = "location"
+        type_work = "type_work"
+        type_location = "type_location"
+        question = "question"
+
     __tablename__ = "criteria"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    id_type_criteria = Column(Integer, ForeignKey("criteria_type.id"))
+    type_criteria = Column(
+        Enum(TypeCriteria, values_callable=lambda obj: [x.value for x in obj]))
 
     # relationships
     locations = relationship(
@@ -277,11 +284,6 @@ class Criteria(Base):
         back_populates="criteria",
         secondary="rule_criteria"
     )
-    type_criteria = relationship(
-        "TypeCriteria",
-        lazy="select",
-        backref=backref("criteria", uselist=True),
-    )
     questions = relationship(
         "Question",
         lazy="select",
@@ -289,13 +291,6 @@ class Criteria(Base):
         back_populates="criteria",
         secondary="question_criteria"
     )
-
-
-class TypeCriteria(Base):
-    __tablename__ = "criteria_type"
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255))
 
 
 class CriteriaLocation(Base):
@@ -311,7 +306,7 @@ class CriteriaTypeLocation(Base):
 
     id = Column(Integer, primary_key=True)
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
-    id_type_location = Column(Integer, ForeignKey("type_location.id"))
+    id_type_location = Column(Integer, ForeignKey("location_type.id"))
 
 
 class CriteriaTypeWork(Base):
@@ -319,7 +314,7 @@ class CriteriaTypeWork(Base):
 
     id = Column(Integer, primary_key=True)
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
-    id_type_location = Column(Integer, ForeignKey("type_work.id"))
+    id_type_work = Column(Integer, ForeignKey("type_work.id"))
 
 
 class CriteriaRule(Base):
@@ -332,7 +327,6 @@ class CriteriaRule(Base):
     id = Column(Integer, primary_key=True)
     id_rule = Column(Integer, ForeignKey("rule.id"))
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
-    value = Column(Integer)
 
 
 class Rule(Base):
@@ -392,8 +386,8 @@ class Question(Base):
     )
 
 
-class QuestionResponse(Base):
-    __tablename__ = "question_response"
+class QuestionAnswer(Base):
+    __tablename__ = "question_answer"
 
     id = Column(Integer, primary_key=True)
     text = Column(String(255))
@@ -403,7 +397,7 @@ class QuestionResponse(Base):
     questions = relationship(
         "Question",
         lazy="select",
-        backref=backref("responses", uselist=True)
+        backref=backref("answers", uselist=True)
     )
 
 
@@ -413,3 +407,5 @@ class CriteriaQuestion(Base):
     id = Column(Integer, primary_key=True)
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
     id_question = Column(Integer, ForeignKey("question.id"))
+    id_right_answer = Column(Integer)
+

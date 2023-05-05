@@ -1,5 +1,6 @@
-from flask.cli import cli
+from flask.cli import main, cli
+from app import app
 
 
 if __name__ == "__main__":
-    cli()
+    main(app)

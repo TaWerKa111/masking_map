@@ -1,0 +1,49 @@
+
+.navButton:hover{
+    text-decoration: underline;
+    color: #309BEC;
+}
+
+body {
+    background-color: #FFF;
+}
+
+label{
+    margin-right: 10px;
+}
+
+button {
+    padding: 5px;
+}
+
+.main-content {
+    margin-bottom: 40px;
+}
+
+.downloadButton {
+    margin: 1%;
+    padding: 100px;
+    border-radius: 25px;
+}
+
+.itemOfQuestions {
+    cursor: pointer;
+    background-color: #1B527C;
+    border-radius: 5px;
+    width: 80%;
+    height: 3%;
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+    margin: 10px;
+}
+
+.itemOfQuestions:hover{
+    background-color: #309BEC;
+}
+
+.filterGroup {
+    background-color: #1B527C;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}

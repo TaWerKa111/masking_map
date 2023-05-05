@@ -84,12 +84,17 @@ components:
       description: "\u041E\u0448\u0438\u0431\u043A\u0430 \u0430\u0432\u0442\u043E\u0440\
         \u0438\u0437\u0430\u0446\u0438\u0438!"
   schemas:
-    AddMNObject:
+    AddDepartament:
       properties:
-        id_parent:
+        name:
+          type: string
+      type: object
+    AddProtection:
+      properties:
+        id_location:
           example: 1
           type: integer
-        id_protection:
+        id_type_protection:
           example: 1
           type: integer
         name:
@@ -97,14 +102,37 @@ components:
             \u0430\u0442\u0430 \u21161"
           type: string
       type: object
-    AddProtection:
+    AddQuestion:
       properties:
-        id_type_protection:
-          example: 1
+        answers:
+          items:
+            $ref: '#/components/schemas/QuestionAnswer'
+          type: array
+        text:
+          type: string
+      type: object
+    AddRule:
+      properties:
+        location_id:
           type: integer
         name:
-          example: "\u0417\u0430\u0449\u0438\u0442\u0430 \u0430\u0433\u0440\u0435\u0433\
-            \u0430\u0442\u0430 \u21161"
+          type: string
+        protections:
+          items:
+            $ref: '#/components/schemas/RuleProtection'
+          type: array
+        questions:
+          items:
+            $ref: '#/components/schemas/AddQuestion'
+          type: array
+        type_location_id:
+          type: integer
+        type_work_id:
+          type: integer
+      type: object
+    AddTypeLocation:
+      properties:
+        name:
           type: string
       type: object
     AddTypeProtection:
@@ -116,6 +144,9 @@ components:
       type: object
     AddTypeWork:
       properties:
+        departament_id:
+          example: 1
+          type: integer
         name:
           example: "\u041E\u0433\u043D\u0435\u0432\u044B\u0435 \u0440\u0430\u0431\u043E\
             \u0442\u044B"
@@ -130,6 +161,22 @@ components:
           example: false
           type: boolean
       type: object
+    Criteria:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypeCriteria'
+      type: object
+    Departament:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
     FileMasking:
       properties:
         id:
@@ -137,12 +184,43 @@ components:
         name:
           type: integer
       type: object
+    GenerateMaskingPlan:
+      properties:
+        location_id:
+          type: integer
+        questions:
+          items:
+            $ref: '#/components/schemas/Question'
+          type: array
+        type_work_id:
+          type: integer
+      type: object
     ListFileMasking:
       properties:
+        files:
+          $ref: '#/components/schemas/FileMasking'
         pagination:
           $ref: '#/components/schemas/PaginationResponse'
-        result:
-          $ref: '#/components/schemas/FileMasking'
+      type: object
+    Location:
+      properties:
+        id:
+          example: 1
+          type: integer
+        id_parent:
+          type: integer
+        name:
+          example: ''
+          type: string
+      type: object
+    LocationList:
+      properties:
+        locations:
+          items:
+            $ref: '#/components/schemas/Location'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
       type: object
     Login:
       properties:
@@ -151,19 +229,6 @@ components:
           type: string
         password:
           example: '12345678'
-          type: string
-      type: object
-    MNObject:
-      properties:
-        id:
-          example: 1
-          type: integer
-        id_parent:
-          type: integer
-        id_protection:
-          type: integer
-        name:
-          example: ''
           type: string
       type: object
     PaginationResponse:
@@ -192,6 +257,89 @@ components:
           example: ''
           type: string
       type: object
+    ProtectionList:
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+        protections:
+          items:
+            $ref: '#/components/schemas/Protection'
+          type: array
+      type: object
+    Question:
+      properties:
+        answer_id:
+          type: integer
+        id:
+          type: integer
+      type: object
+    QuestionAnswer:
+      properties:
+        id:
+          readOnly: true
+          type: integer
+        is_right_answer:
+          type: boolean
+        text:
+          type: string
+      type: object
+    RelationshipLocationLocation:
+      properties:
+        location_id:
+          type: integer
+        location_ids:
+          items:
+            type: integer
+          type: array
+      type: object
+    RelationshipLocationProtection:
+      properties:
+        location_id:
+          type: integer
+        protection_ids:
+          items:
+            type: integer
+          type: array
+      type: object
+    Rule:
+      properties:
+        criteria:
+          items:
+            $ref: '#/components/schemas/Criteria'
+          type: array
+        id:
+          type: integer
+        name:
+          type: string
+        protections:
+          items:
+            $ref: '#/components/schemas/Protection'
+          type: array
+      type: object
+    RuleProtection:
+      properties:
+        is_demasking:
+          type: boolean
+        is_masking:
+          type: boolean
+        protection_id:
+          type: integer
+      type: object
+    TypeCriteria:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+    TypeLocation:
+      properties:
+        id:
+          type: integer
+        name:
+          example: "\u0437\u0430\u0449\u0438\u0442\u0430 1"
+          type: string
+      type: object
     TypeProtection:
       properties:
         id:
@@ -203,11 +351,88 @@ components:
       type: object
     TypeWork:
       properties:
+        departament:
+          $ref: '#/components/schemas/Departament'
         id:
           example: 1
           type: integer
         name:
           example: ''
+          type: string
+      type: object
+    UpdateDepartament:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+    UpdateLocation:
+      properties:
+        id:
+          type: integer
+        id_parent:
+          type: integer
+        name:
+          type: string
+      type: object
+    UpdateProtection:
+      properties:
+        id:
+          type: integer
+        id_location:
+          example: 1
+          type: integer
+        id_type_protection:
+          example: 1
+          type: integer
+        name:
+          example: "\u0417\u0430\u0449\u0438\u0442\u0430 \u0430\u0433\u0440\u0435\u0433\
+            \u0430\u0442\u0430 \u21161"
+          type: string
+      type: object
+    UpdateRule:
+      properties:
+        id:
+          type: integer
+        location_id:
+          type: integer
+        name:
+          type: string
+        protections:
+          items:
+            $ref: '#/components/schemas/RuleProtection'
+          type: array
+        questions:
+          items:
+            $ref: '#/components/schemas/AddQuestion'
+          type: array
+        type_location_id:
+          type: integer
+        type_work_id:
+          type: integer
+      type: object
+    UpdateTypeLocation:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+    UpdateTypeProtection:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+    UpdateTypeWork:
+      properties:
+        departament_id:
+          type: integer
+        id:
+          type: integer
+        name:
           type: string
       type: object
   securitySchemes:
@@ -235,18 +460,13 @@ paths:
         \u0441\u043E\u043A \u0442\u0438\u043F\u043E\u0432 \u0440\u0430\u0431\u043E\
         \u0442"
       parameters:
-      - explode: true
-        in: query
-        name: ids_type_mn_object[]
+      - in: query
+        name: name_type_work
         required: false
         schema:
-          example:
-          - 1
-          items:
-            type: integer
+          example: Work 1
           nullable: true
-          type: array
-        style: form
+          type: string
       - explode: true
         in: query
         name: ids_type_protection[]
@@ -259,13 +479,18 @@ paths:
           nullable: true
           type: array
         style: form
-      - in: query
-        name: name_type_work
+      - explode: true
+        in: query
+        name: ids_type_mn_object[]
         required: false
         schema:
-          example: Work 1
+          example:
+          - 1
+          items:
+            type: integer
           nullable: true
-          type: string
+          type: array
+        style: form
       responses:
         '200':
           content:
@@ -319,18 +544,170 @@ paths:
         \u0442"
       tags:
       - masking
-  /api/masking/protection/:
-    get:
-      description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
-        \u0441\u043E\u043A \u0437\u0430\u0449\u0438\u0442"
+    put:
+      description: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0442\u0438\u043F\
+        \ \u0440\u0430\u0431\u043E\u0442\u044B"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTypeWork'
       responses:
         '200':
           content:
             app/json:
               schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0414\u0430\u043D\u043D\u044B\u0435 \u0443\u0441\u043F\u0435\
+            \u0448\u043D\u043E \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u044B"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043F\
+            \u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
+            \u0435!"
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0442\u0438\u043F\
+        \ \u0440\u0430\u0431\u043E\u0442\u044B"
+      tags:
+      - masking
+  /api/masking/departament-type-work/:
+    get:
+      description: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0435 \u0441\u043F\
+        \u0438\u0441\u043A\u0430 \u043E\u0442\u0434\u0435\u043B\u043E\u0432, \u0432\
+        \u044B\u043F\u043E\u043B\u043D\u044F\u044E\u0449\u0438\u0435 \u0440\u0430\u0437\
+        \u043B\u0438\u0447\u043D\u044B\u0435 \u0440\u0430\u0431\u043E\u0442\u044B"
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
                 items:
-                  $ref: '#/components/schemas/Protection'
+                  $ref: '#/components/schemas/Departament'
                 type: array
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0434\u0435\
+            \u043B\u043E\u0432"
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0432\
+            \u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u0437\u0430\u043F\
+            \u0440\u043E\u0441\u0430"
+      summary: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u043E\u0442\u0434\
+        \u0435\u043B\u044B"
+      tags:
+      - masking
+    post:
+      description: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043E\u0442\u0434\
+        \u0435\u043B, \u0432\u044B\u043F\u043E\u043B\u043D\u044F\u044E\u0449\u0438\
+        \u0439 \u0440\u0430\u0437\u043B\u0438\u0447\u043D\u044B\u0435 \u0440\u0430\
+        \u0431\u043E\u0442\u044B"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDepartament'
+        description: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0434\u0435\
+            \u043B\u043E\u0432"
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0432\
+            \u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u0437\u0430\u043F\
+            \u0440\u043E\u0441\u0430"
+      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043E\u0442\u0434\
+        \u0435\u043B"
+      tags:
+      - masking
+    put:
+      description: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043D\u0430\u0437\
+        \u0432\u0430\u043D\u0438\u0435 \u043E\u0442\u0434\u0435\u043B\u0430, \u0432\
+        \u044B\u043F\u043E\u043B\u043D\u044F\u044E\u0449\u0435\u0433\u043E \u0440\u0430\
+        \u0437\u043B\u0438\u0447\u043D\u044B\u0435 \u0440\u0430\u0431\u043E\u0442\u044B"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepartament'
+        description: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0434\u0435\
+            \u043B\u043E\u0432"
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0432\
+            \u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u0437\u0430\u043F\
+            \u0440\u043E\u0441\u0430"
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043D\u0430\u0437\
+        \u0432\u0430\u043D\u0438\u0435 \u043E\u0442\u0434\u0435\u043B\u0430"
+      tags:
+      - masking
+  /api/masking/protection/:
+    get:
+      description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
+        \u0441\u043E\u043A \u0437\u0430\u0449\u0438\u0442"
+      parameters:
+      - in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          example: 1
+          minimum: 0
+          type: integer
+      - in: query
+        name: name
+        required: false
+        schema:
+          type: string
+      - explode: true
+        in: query
+        name: type_protections_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          example: 10
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectionList'
           description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u0449\u0438\
             \u0442"
         '400':
@@ -378,11 +755,45 @@ paths:
         \u0438\u0442\u0443"
       tags:
       - masking
+    put:
+      description: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0437\u0430\u0449\
+        \u0438\u0442\u0443"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProtection'
+      responses:
+        '200':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/Protection'
+          description: "\u0414\u0430\u043D\u043D\u044B\u0435 \u0443\u0441\u043F\u0435\
+            \u0448\u043D\u043E \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u044B"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\
+            \u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
+            \u0435!"
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0437\u0430\u0449\
+        \u0438\u0442\u0443"
+      tags:
+      - masking
   /api/masking/type-protection/:
     get:
       description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
         \u0441\u043E\u043A \u0442\u0438\u043F\u043E\u0432 \u0437\u0430\u0449\u0438\
         \u0442"
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           content:
@@ -439,10 +850,143 @@ paths:
         \ \u0437\u0430\u0449\u0438\u0442"
       tags:
       - masking
-  /api/masking/mn-object/:
+    put:
+      description: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0442\u0438\u043F\
+        \ \u0437\u0430\u0449\u0438\u0442"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTypeProtection'
+      responses:
+        '200':
+          content:
+            app/json:
+              examples:
+                Good:
+                  value:
+                    message: good
+                    result: true
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0414\u0430\u043D\u043D\u044B\u0435 \u0443\u0441\u043F\u0435\
+            \u0448\u043D\u043E \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u044B"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\
+            \u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
+            \u0435!"
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0442\u0438\u043F\
+        \ \u0437\u0430\u0449\u0438\u0442"
+      tags:
+      - masking
+  /api/masking/location/:
+    get:
+      description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0438\u043D\u0444\
+        \u043E\u0440\u043C\u0430\u0446\u0438\u044E \u043F\u043E \u043A\u043E\u043D\
+        \u043A\u0440\u0435\u0442\u043D\u043E\u0439 \u043B\u043E\u043A\u0430\u0446\u0438\
+        \u0438"
+      parameters:
+      - in: query
+        name: id
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0431\u044A\u0435\
+            \u043A\u0442\u043E\u0432"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043F\
+            \u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
+            \u0435!"
+      summary: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0438\u043D\u0444\
+        \u043E\u0440\u043C\u0430\u0446\u0438\u044E \u043F\u043E \u043A\u043E\u043D\
+        \u043A\u0440\u0435\u0442\u043D\u043E\u0439 \u043B\u043E\u043A\u0430\u0446\u0438\
+        \u0438"
+      tags:
+      - masking
+    post:
+      description: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043B\u043E\u043A\
+        \u0430\u0446\u0438\u044E"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/AddMNObjectSchema'
+      responses:
+        '200':
+          content:
+            app/json:
+              examples:
+                Good:
+                  value:
+                    message: good
+                    result: true
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0414\u0430\u043D\u043D\u044B\u0435 \u0443\u0441\u043F\u0435\
+            \u0448\u043D\u043E \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u044B"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\
+            \u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
+            \u0435!"
+      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043B\u043E\u043A\
+        \u0430\u0446\u0438\u044E"
+      tags:
+      - masking
+    put:
+      description: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043B\u043E\u043A\
+        \u0430\u0446\u0438\u044E"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocation'
+      responses:
+        '200':
+          content:
+            app/json:
+              examples:
+                Good:
+                  value:
+                    message: good
+                    result: true
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0414\u0430\u043D\u043D\u044B\u0435 \u0443\u0441\u043F\u0435\
+            \u0448\u043D\u043E \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u044B"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\
+            \u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
+            \u0435!"
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043B\u043E\u043A\
+        \u0430\u0446\u0438\u044E"
+      tags:
+      - masking
+  /api/masking/location-list/:
     get:
       description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
-        \u0441\u043E\u043A \u043E\u0431\u044A\u0435\u043A\u0442\u043E\u0432"
+        \u0441\u043E\u043A \u043B\u043E\u043A\u0430\u0446\u0438\u0439"
       parameters:
       - explode: true
         in: query
@@ -467,20 +1011,33 @@ paths:
           type: array
         style: form
       - in: query
-        name: name_mn_object
+        name: page
+        required: false
+        schema:
+          default: 1
+          example: 1
+          minimum: 0
+          type: integer
+      - in: query
+        name: name
         required: false
         schema:
           example: example
           nullable: true
           type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          example: 10
+          type: integer
       responses:
         '200':
           content:
             app/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/MNObject'
-                type: array
+                $ref: '#/components/schemas/LocationList'
           description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0431\u044A\u0435\
             \u043A\u0442\u043E\u0432"
         '400':
@@ -492,79 +1049,10 @@ paths:
             \u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
             \u0435!"
       summary: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
-        \u0441\u043E\u043A \u043E\u0431\u044A\u0435\u043A\u0442\u043E\u0432"
+        \u0441\u043E\u043A \u043B\u043E\u043A\u0430\u0446\u0438\u0439"
       tags:
       - masking
-    post:
-      description: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043E\u0431\u044A\
-        \u0435\u043A\u0442"
-      requestBody:
-        content:
-          app/json:
-            schema:
-              $ref: '#/components/schemas/AddMNObject'
-      responses:
-        '200':
-          content:
-            app/json:
-              examples:
-                Good:
-                  value:
-                    message: good
-                    result: true
-              schema:
-                $ref: '#/components/schemas/BinaryResponse'
-          description: "\u0414\u0430\u043D\u043D\u044B\u0435 \u0443\u0441\u043F\u0435\
-            \u0448\u043D\u043E \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u044B"
-        '400':
-          content:
-            app/json:
-              schema:
-                $ref: '#/components/schemas/BinaryResponse'
-          description: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0434\
-            \u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\
-            \u0435!"
-      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043E\u0431\u044A\
-        \u0435\u043A\u0442"
-      tags:
-      - masking
-  /api/masking/generate-masking/:
-    get:
-      description: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043A\u0430\
-        \u0440\u0442\u044B \u043C\u0430\u0441\u043A\u0438\u0440\u043E\u0432\u0430\u043D\
-        \u0438\u044F"
-      parameters:
-      - in: query
-        name: id_type_work
-        required: false
-        schema:
-          type: integer
-      - in: query
-        name: id_object
-        required: false
-        schema:
-          type: integer
-      responses:
-        '200':
-          content:
-            app/json:
-              schema:
-                $ref: '#/components/schemas/BinaryResponse'
-          description: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043F\
-            \u0440\u043E\u0432\u0435\u0440\u043A\u0438"
-        '400':
-          content:
-            app/json:
-              schema:
-                $ref: '#/components/schemas/BinaryResponse'
-          description: "\u041A\u0430\u0440\u0442\u0430 \u043D\u0435 \u043D\u0443\u0436\
-            \u043D\u0430"
-      summary: "\u0421\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\
-        \u0442\u044C \u043A\u0430\u0440\u0442\u0443 \u043C\u0430\u0441\u043A\u0438\
-        \u0440\u043E\u0432\u0430\u043D\u0438\u044F"
-      tags:
-      - masking
-  /api/masking/type-object/:
+  /api/masking/type-location/:
     get:
       responses:
         '200':
@@ -572,7 +1060,7 @@ paths:
             app/pdf:
               schema:
                 items:
-                  $ref: '#/components/schemas/None'
+                  $ref: '#/components/schemas/TypeLocation'
                 type: array
           description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0442\u0438\u043F\u043E\
             \u0432 \u043E\u0431\u044A\u0435\u043A\u0442\u043E\u0432"
@@ -588,6 +1076,116 @@ paths:
         \u043A\u0442\u043E\u0432"
       tags:
       - masking
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTypeLocation'
+        description: null
+      responses:
+        '200':
+          content:
+            app/pdf:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0442\u0438\u043F\u043E\
+            \u0432 \u043E\u0431\u044A\u0435\u043A\u0442\u043E\u0432"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041F\u043B\u043E\u0445\u043E\u0439 \u0437\u0430\u043F\u0440\
+            \u043E\u0441"
+      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0442\u0438\u043F\
+        \ \u043B\u043E\u043A\u0430\u0446\u0438\u0439"
+      tags:
+      - masking
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTypeLocation'
+        description: null
+      responses:
+        '200':
+          content:
+            app/pdf:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0442\u0438\u043F\u043E\
+            \u0432 \u043E\u0431\u044A\u0435\u043A\u0442\u043E\u0432"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041F\u043B\u043E\u0445\u043E\u0439 \u0437\u0430\u043F\u0440\
+            \u043E\u0441"
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0442\u0438\u043F\
+        \ \u043B\u043E\u043A\u0430\u0446\u0438\u0439"
+      tags:
+      - masking
+  /api/masking/relationship/location-location/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipLocationLocation'
+        description: null
+      responses:
+        '200':
+          content:
+            app/pdf:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u0434\
+            \u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F \u0441\u0432\u044F\
+            \u0437\u0438"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041F\u043B\u043E\u0445\u043E\u0439 \u0437\u0430\u043F\u0440\
+            \u043E\u0441"
+      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0441\u0432\u044F\
+        \u0437\u044C \u043C\u0435\u0436\u0434\u0443 \u043B\u043E\u043A\u0430\u0446\
+        \u0438\u0435\u0439 \u0438 \u043B\u043E\u043A\u0430\u0446\u0438\u0435\u0439"
+      tags:
+      - relationship
+  /api/masking/relationship/location-protection/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipLocationProtection'
+        description: null
+      responses:
+        '200':
+          content:
+            app/pdf:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u0434\
+            \u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F \u0441\u0432\u044F\
+            \u0437\u0438"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041F\u043B\u043E\u0445\u043E\u0439 \u0437\u0430\u043F\u0440\
+            \u043E\u0441"
+      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0441\u0432\u044F\
+        \u0437\u044C \u043C\u0435\u0436\u0434\u0443 \u043B\u043E\u043A\u0430\u0446\
+        \u0438\u0435\u0439 \u0438 \u0437\u0430\u0449\u0438\u0442\u043E\u0439"
+      tags:
+      - relationship
   /test/hello/: {}
   /api/auth/login/:
     post:
@@ -700,19 +1298,19 @@ paths:
         \u0438\u044F"
       parameters:
       - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
-          type: integer
-      - in: query
         name: page
         required: false
         schema:
           default: 1
           example: 1
           minimum: 0
+          type: integer
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          example: 10
           type: integer
       responses:
         '200':
@@ -733,6 +1331,178 @@ paths:
         \u043F\u0438\u0441\u043E\u043A \u043A\u0430\u0440\u0442"
       tags:
       - map_files
+  /api/files/generate-masking/:
+    post:
+      description: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043A\u0430\
+        \u0440\u0442\u044B \u043C\u0430\u0441\u043A\u0438\u0440\u043E\u0432\u0430\u043D\
+        \u0438\u044F"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateMaskingPlan'
+        description: "\u041F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B"
+      responses:
+        '200':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043F\
+            \u0440\u043E\u0432\u0435\u0440\u043A\u0438"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041A\u0430\u0440\u0442\u0430 \u043D\u0435 \u043D\u0443\u0436\
+            \u043D\u0430"
+      summary: "\u0421\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\
+        \u0442\u044C \u043A\u0430\u0440\u0442\u0443 \u043C\u0430\u0441\u043A\u0438\
+        \u0440\u043E\u0432\u0430\u043D\u0438\u044F"
+      tags:
+      - map_files
+  /api/rule/rule/:
+    post:
+      description: "\u0414\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u043F\
+        \u0440\u0430\u0432\u0438\u043B\u0430"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/AddRule'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: null
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: null
+      summary: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043F\u0440\u0430\
+        \u0432\u0438\u043B\u043E \u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\
+        \u043D\u0438\u044F \u043A\u0430\u0440\u0442 \u043C\u0430\u0441\u043A\u0438\
+        \u0440\u043E\u0432\u0430\u043D\u0438\u044F"
+      tags:
+      - rule
+    get:
+      description: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0435 \u043F\u0440\
+        \u0430\u0432\u0438\u043B"
+      parameters:
+      - in: query
+        name: rule_id
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0434\u0435\
+            \u043B\u043E\u0432"
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0432\
+            \u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u0437\u0430\u043F\
+            \u0440\u043E\u0441\u0430"
+      summary: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u043F\u0440\u0430\
+        \u0432\u0438\u043B\u043E \u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\
+        \u043D\u0438\u044F \u043A\u0430\u0440\u0442 \u043C\u0430\u0441\u043A\u0438\
+        \u0440\u043E\u0432\u0430\u043D\u0438\u044F"
+      tags:
+      - rule
+    put:
+      description: "\u0418\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043F\u0440\
+        \u0430\u0432\u0438\u043B\u0430"
+      requestBody:
+        content:
+          app/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRule'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: null
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: null
+      summary: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u0440\u0430\
+        \u0432\u0438\u043B\u043E \u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\
+        \u043D\u0438\u044F \u043A\u0430\u0440\u0442 \u043C\u0430\u0441\u043A\u0438\
+        \u0440\u043E\u0432\u0430\u043D\u0438\u044F"
+      tags:
+      - rule
+  /api/rule/rules/:
+    get:
+      description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
+        \u0441\u043E\u043A \u043F\u0440\u0430\u0432\u0438\u043B"
+      parameters:
+      - in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          example: 1
+          minimum: 0
+          type: integer
+      - in: query
+        name: name
+        required: false
+        schema:
+          type: string
+      - explode: true
+        in: query
+        name: rule_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          example: 10
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Rule'
+                type: array
+          description: null
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0432\
+            \u044B\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0438 \u0437\u0430\u043F\
+            \u0440\u043E\u0441\u0430"
+      summary: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
+        \u0441\u043E\u043A \u043F\u0440\u0430\u0432\u0438\u043B"
+      tags:
+      - rule
 servers:
 - description: "\u0422\u0435\u0441\u0442\u043E\u0432\u044B\u0439 \u0441\u0435\u0440\
     \u0432\u0435\u0440"
