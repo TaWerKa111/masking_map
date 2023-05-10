@@ -54,6 +54,17 @@ export default function LocationProtection() {
         }
     };
 
+    const addClick = () => {
+        let rel_protection = {
+            location_id: selectedItem.id,
+            protection_ids: selectedProtections.map((item) => item.id),
+        };
+        console.log("rel_prot", rel_protection);
+        apiInst
+            .post("/masking/relationship/location-protection/", rel_protection)
+            .catch((e) => console.log(e));
+    };
+
     return (
         <div className="container">
             <div className="row">
@@ -75,7 +86,7 @@ export default function LocationProtection() {
                             <li key={index}>{item.name}</li>
                         ))}
                     </ul>
-                    <button>Добавить связь</button>
+                    <button onClick={addClick}>Добавить связь</button>
                 </div>
             </div>
             <div className="row">
@@ -91,7 +102,10 @@ export default function LocationProtection() {
                     <div className="list-scroll-container">
                         <ul className="list">
                             {filteredListLocation.map((item, index) => (
-                                <div className="check-item" onClick={() => handleListItemClick(item)}>
+                                <div
+                                    className="check-item"
+                                    onClick={() => handleListItemClick(item)}
+                                >
                                     {item.name}
                                 </div>
                             ))}

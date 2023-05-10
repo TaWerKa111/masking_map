@@ -16,13 +16,12 @@ export default function TypeLocations() {
 
     useEffect(() => {
         let params = {};
-        console.log("loc", typeLocations);
-        // apiInst
-        //     .get("/locations/", {params})
-        //     .then((resp) => {
-        //         setLocations(resp.data);
-        //     })
-        //     .catch(e => console.log(e));
+        apiInst
+            .get("/masking/type-location/", { params })
+            .then((resp) => {
+                setTypeLocations(resp.data);
+            })
+            .catch((e) => console.log(e));
     }, []);
 
     const onClickDelete = (event, key) => {
@@ -39,8 +38,23 @@ export default function TypeLocations() {
     const deleteClick = (event, key) => {
         console.log("delete el", key);
     };
+
     const editClick = (value) => {
         console.log("edit el", value);
+        apiInst
+            .post("/masking/type-location/", value)
+            .catch((e) => console.log(e));
+    };
+
+    const addClick = (value) => {
+        console.log("value", value);
+        let type_location = {
+            name: value.name,
+        };
+        console.log(type_location);
+        apiInst
+            .post("/masking/type-location/", type_location)
+            .catch((e) => console.log(e));
     };
 
     return (
@@ -50,6 +64,7 @@ export default function TypeLocations() {
                     <AddElementButton
                         type_form="simple"
                         name={"Добавить тип локации"}
+                        onSubmit={addClick}
                     ></AddElementButton>
                 </div>
             </div>
@@ -79,7 +94,7 @@ export default function TypeLocations() {
                                         className="btn"
                                         onSubmit={editClick}
                                         name={"Изменить"}
-                                        value={typeLocation.name}
+                                        value={typeLocation}
                                     ></AddElementButton>
                                     <button
                                         className="btn"

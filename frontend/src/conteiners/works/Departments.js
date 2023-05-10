@@ -12,11 +12,36 @@ export default function Departments() {
     const [departments, setDepartments] = useState([{ name: "type1", id: 1 }]);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        let params = {};
+        apiInst
+            .get("/masking/departament-type-work/", { params })
+            .then((resp) => {
+                setDepartments(resp.data);
+            })
+            .catch((e) => console.log(e));
+    }, []);
+
     const deleteClick = (event, key) => {
         console.log("delete el", key);
     };
+
     const editClick = (value) => {
-        console.log("edit el", value);
+        console.log("value", value);
+        apiInst
+            .put("/masking/departament-type-work/", value)
+            .catch((e) => console.log(e));
+    };
+
+    const addClick = (value) => {
+        console.log("value", value);
+        let departament = {
+            name: value.name,
+        };
+        console.log(departament);
+        apiInst
+            .post("/masking/departament-type-work/", departament)
+            .catch((e) => console.log(e));
     };
 
     return (
@@ -26,6 +51,7 @@ export default function Departments() {
                     <AddElementButton
                         name={"Добавить тип отдел"}
                         type_form="simple"
+                        onSubmit={addClick}
                     ></AddElementButton>
                 </div>
             </div>
@@ -55,7 +81,7 @@ export default function Departments() {
                                         className="btn"
                                         onSubmit={editClick}
                                         name={"Изменить"}
-                                        value={department.name}
+                                        value={department}
                                     ></AddElementButton>
                                     <button
                                         className="btn"

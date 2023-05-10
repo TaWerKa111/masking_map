@@ -119,10 +119,11 @@ function App() {
                         path="/logout/"
                         element={<Logout onLogout={handleLogout} />}
                     />
-                    <Route exact path="/expert/"
-                        element={<ExpertInstraction/>}
-                    >
-                    </Route>
+                    <Route
+                        exact
+                        path="/expert/"
+                        element={<ExpertInstraction />}
+                    ></Route>
                     <Route path="/expert/rules/" element={<Rules />}></Route>
                     <Route
                         path="/expert/type-works/"

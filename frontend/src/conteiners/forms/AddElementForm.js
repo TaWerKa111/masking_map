@@ -1,32 +1,38 @@
 import React, { useState } from "react";
 
 function AddSimpleElementForm(props) {
-    const [name, setName] = useState(props.value);
+    const [value, setValue] = useState(
+        !props.value ? { name: "" } : props.value
+    );
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        props.onSubmit(name);
+        props.onSubmit(value);
+        props.onClose();
     };
 
     const handleChange = (event) => {
-        setName(event.target.value);
-        console.log("name", event.target.value);
+        let temp_value = Object.assign({}, value);
+        temp_value[event.target.name] = event.target.value;
+        setValue(temp_value);
+        console.log("temp", event.target.value);
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <div class="form-group form-add-el">
-                <label className="">
-                    Название:
-                </label>
+                <label className="">Название:</label>
                 <input
                     type="text"
-                    value={name}
+                    name="name"
+                    value={value.name}
                     onChange={(e) => handleChange(e)}
                     className=""
                 />
             </div>
-            <button type="submit" className="btn btn-primary">{props.btnName}</button>
+            <button type="submit" className="btn btn-primary">
+                {props.btnName}
+            </button>
         </form>
     );
 }
@@ -259,6 +265,7 @@ function AddConditionElementForm(props) {
 function AddElementButton(props) {
     const [showForm, setShowForm] = useState(false);
     let name = !props.name ? "Добавить" : props.name;
+
     const handleClick = () => {
         setShowForm(!showForm);
     };
@@ -266,12 +273,15 @@ function AddElementButton(props) {
     if (props.type_form == "simple") {
         return (
             <div>
-                <button onClick={handleClick} className="btn btn-primary">{name}</button>
+                <button onClick={handleClick} className="btn btn-primary">
+                    {name}
+                </button>
                 {showForm && (
                     <AddSimpleElementForm
                         btnName={name}
                         onSubmit={props.onSubmit}
                         value={props.value}
+                        onClose={handleClick}
                     />
                 )}
             </div>
@@ -279,7 +289,9 @@ function AddElementButton(props) {
     } else if (["work", "loc"].includes(props.type_form)) {
         return (
             <div>
-                <button onClick={handleClick} className="btn btn-primary">{name}</button>
+                <button onClick={handleClick} className="btn btn-primary">
+                    {name}
+                </button>
                 {showForm && (
                     <AddLocAndWorkElementForm
                         btnName={name}
@@ -293,7 +305,12 @@ function AddElementButton(props) {
     } else if (props.type_form == "protection") {
         return (
             <div>
-                <button onClick={handleClick} className="btn btn-primary float-end">{name}</button>
+                <button
+                    onClick={handleClick}
+                    className="btn btn-primary float-end"
+                >
+                    {name}
+                </button>
                 {showForm && (
                     <AddProtectionElementForm
                         btnName={name}
@@ -307,7 +324,12 @@ function AddElementButton(props) {
     } else if (props.type_form == "condition") {
         return (
             <div>
-                <button onClick={handleClick} className="btn btn-primary float-end">{name}</button>
+                <button
+                    onClick={handleClick}
+                    className="btn btn-primary float-end"
+                >
+                    {name}
+                </button>
                 {showForm && (
                     <AddConditionElementForm
                         btnName={name}
@@ -321,7 +343,9 @@ function AddElementButton(props) {
 
     return (
         <div>
-            <button onClick={handleClick} className="btn btn-primary">{name}</button>
+            <button onClick={handleClick} className="btn btn-primary">
+                {name}
+            </button>
             {showForm && (
                 <AddSimpleElementForm
                     btnName={name}

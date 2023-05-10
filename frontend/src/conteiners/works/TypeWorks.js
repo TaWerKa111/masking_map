@@ -27,9 +27,15 @@ export default function TypeWorks() {
     useEffect(() => {
         let params = {};
         apiInst
-            .get("/type-work/", { params })
+            .get("/masking/type-work/", { params })
             .then((resp) => {
                 setTypeWorks(resp.data);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/departament-type-work/", { params })
+            .then((resp) => {
+                setDepartments(resp.data);
             })
             .catch((e) => console.log(e));
     }, []);
@@ -66,6 +72,9 @@ export default function TypeWorks() {
     const editClick = (value) => {
         console.log("edit el", value);
     };
+    const addClick = (value) => {
+        console.log("edit el", value);
+    };
 
     return (
         <div className="container">
@@ -75,6 +84,7 @@ export default function TypeWorks() {
                         name={"Добавить вид работы"}
                         type_form="work"
                         types={departments}
+                        onSubmit={addClick}
                     ></AddElementButton>
                 </div>
             </div>

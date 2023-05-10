@@ -16,13 +16,12 @@ export default function TypeProtections() {
 
     useEffect(() => {
         let params = {};
-        console.log("loc", typeProtections);
-        // apiInst
-        //     .get("/locations/", {params})
-        //     .then((resp) => {
-        //         setLocations(resp.data);
-        //     })
-        //     .catch(e => console.log(e));
+        apiInst
+            .get("/masking/type-protection/", { params })
+            .then((resp) => {
+                setTypeProtections(resp.data);
+            })
+            .catch((e) => console.log(e));
     }, []);
 
     const onClickDelete = (event, key) => {
@@ -41,7 +40,21 @@ export default function TypeProtections() {
     };
 
     const editClick = (value) => {
-        console.log("edit el", value);
+        console.log("value", value);
+        apiInst
+            .put("/masking/type-protection/", value)
+            .catch((e) => console.log(e));
+    };
+
+    const addClick = (value) => {
+        console.log("value", value);
+        let type_protection = {
+            name: value.name,
+        };
+        console.log(type_protection);
+        apiInst
+            .post("/masking/type-protection/", type_protection)
+            .catch((e) => console.log(e));
     };
 
     return (
@@ -51,6 +64,7 @@ export default function TypeProtections() {
                     <AddElementButton
                         type_form="simple"
                         name={"Добавить тип защиты"}
+                        onSubmit={addClick}
                     ></AddElementButton>
                 </div>
             </div>
@@ -80,7 +94,7 @@ export default function TypeProtections() {
                                         className="btn"
                                         onSubmit={editClick}
                                         name={"Изменить"}
-                                        value={typeProtection.name}
+                                        value={typeProtection}
                                     ></AddElementButton>
                                     <button
                                         className="btn"

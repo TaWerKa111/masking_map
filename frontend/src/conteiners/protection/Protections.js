@@ -22,9 +22,15 @@ export default function Protections() {
     useEffect(() => {
         let params = {};
         apiInst
-            .get("/protections/", { params })
+            .get("/masking/protection/", { params })
             .then((resp) => {
                 setProtections(resp.data);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/type-protection/", { params })
+            .then((resp) => {
+                setTypeProtections(resp.data);
             })
             .catch((e) => console.log(e));
     }, []);

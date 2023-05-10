@@ -22,12 +22,18 @@ export default function Locations() {
     useEffect(() => {
         let params = {};
         console.log("loc", locations);
-        // apiInst
-        //     .get("/locations/", {params})
-        //     .then((resp) => {
-        //         setLocations(resp.data);
-        //     })
-        //     .catch(e => console.log(e));
+        apiInst
+            .get("/masking/location-list/", { params })
+            .then((resp) => {
+                setLocations(resp.data.locations);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/type-location/")
+            .then((resp) => {
+                setTypeLocations(resp.data);
+            })
+            .catch((e) => console.log(e));
     }, []);
 
     const onClickDelete = (event, key) => {

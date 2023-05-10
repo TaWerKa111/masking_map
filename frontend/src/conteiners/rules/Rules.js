@@ -16,13 +16,12 @@ export default function Rules() {
 
     useEffect(() => {
         let params = {};
-        // apiInst
-        //     .get("/rules/", {params})
-        //     .then((resp) => {
-        //         setRules(resp.data);
-        //     })
-        //     .catch(e => console.log(e));
-        setRules({ rules: [{ name: "rule 1", id: 1 }] });
+        apiInst
+            .get("/rule/rules/", { params })
+            .then((resp) => {
+                setRules(resp.data);
+            })
+            .catch((e) => console.log(e));
     }, []);
 
     const onClickDelete = (event, key) => {
@@ -50,6 +49,7 @@ export default function Rules() {
     const deleteClick = (event, key) => {
         console.log("delete el", key);
     };
+
     const editClick = (event, key) => {
         console.log("edit el", key);
     };
@@ -59,7 +59,9 @@ export default function Rules() {
             <div className="row">
                 <div className="col-md d-flex header-list">
                     <button className="btn btn-primary">
-                        <a href="/expert/add-rule/" color="black">Добавить правило</a>
+                        <a href="/expert/add-rule/" color="black">
+                            Добавить правило
+                        </a>
                     </button>
                 </div>
             </div>

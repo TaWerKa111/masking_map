@@ -47,7 +47,7 @@ export default function ParentLocation() {
         //     .catch(e => console.log(e));
         let l = [];
         for (let i = 0; i < 30; i++) {
-            l.push({ name: `loc${i}`, id: 1 });
+            l.push({ name: `loc${i}`, id: i });
         }
         setLocations(l);
     }, []);
@@ -64,6 +64,16 @@ export default function ParentLocation() {
         } else {
             setSelectedItems(selectedItems.filter((i) => i !== item));
         }
+    };
+
+    const addClick = () => {
+        let rel_location = {
+            location_id: selectedItem.id,
+            location_ids: selectedItems.map((item) => item.id),
+        };
+        apiInst
+            .post("/masking/relationship/location-location/", rel_location)
+            .catch((e) => console.log(e));
     };
 
     console.log("locations", locations);
@@ -88,7 +98,7 @@ export default function ParentLocation() {
                             <li key={index}>{item.name}</li>
                         ))}
                     </ul>
-                    <button>Добавить связь</button>
+                    <button onClick={addClick}>Добавить связь</button>
                 </div>
             </div>
             <div className="row">
@@ -104,7 +114,10 @@ export default function ParentLocation() {
                     <div className="list-scroll-container">
                         <ul className="list">
                             {filteredListOneLocation.map((item, index) => (
-                                <div className="check-item" onClick={() => handleListItemClick(item)}>
+                                <div
+                                    className="check-item"
+                                    onClick={() => handleListItemClick(item)}
+                                >
                                     {item.name}
                                 </div>
                             ))}
