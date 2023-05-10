@@ -57,9 +57,9 @@ export default function Rules() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex">
-                    <button>
-                        <a href="/expert/add-rule/">Добавить правило</a>
+                <div className="col-md d-flex header-list">
+                    <button className="btn btn-primary">
+                        <a href="/expert/add-rule/" color="black">Добавить правило</a>
                     </button>
                 </div>
             </div>

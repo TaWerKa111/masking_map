@@ -20,7 +20,7 @@ const Navbar = (props) => {
                     Экспертная система для формирования карт маскирования
                 </h1>
             </div>
-            <div className="row navbar">
+            <div className="row navbar navbar-noauth">
                 <div className="col ">
                     <a href="/" style={aStyle}>
                         <h2 className="navButton">Инструкция</h2>
@@ -29,14 +29,14 @@ const Navbar = (props) => {
                 <div className="col">
                     <a href="/masking-map/" style={aStyle}>
                         <h2 className="navButton">
-                            Составить карту маскирования
+                            Составить карту
                         </h2>
                     </a>
                 </div>
                 <div className="col">
                     <a href="/list-masking-map/" style={aStyle}>
                         <h2 className="navButton">
-                            Посмотреть карты маскирования
+                            Посмотреть карты
                         </h2>
                     </a>
                 </div>

@@ -29,6 +29,7 @@ export default function MaskingMap() {
             ],
         },
     ]);
+    // const [selectedConditions, setSelectedConditions] = useState([]);
 
     useEffect(() => {
         let params = {};
@@ -121,82 +122,177 @@ export default function MaskingMap() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md">
-                    <h1>Заполните анкету</h1>
+                <div className="col-md header-block">
+                    <h1 className="text-center ">Заполните анкету</h1>
+                    <p>
+                        Для заполнения отдельных блоков необходимо нажимать кнопку "Изменить" 
+                        и в появившемся окне необходимо выбрать соответсвующие пункты.
+                    </p>
                 </div>
             </div>
             <div className="row">
-                <div className="col-md">
-                    <label>Виды работ:</label>
-                </div>
-                <div className="col-md">
-                    <p>Виды работ:</p>
-                    <ul>
-                        {typeWorks.map((work) => (
-                            <p key={work.id}>{work.name}</p>
-                        ))}
-                    </ul>
-                    <button onClick={() => setModalTypeWork(true)}>
-                        Изменить
-                    </button>
-                    <ModalTypeWork
-                        isModal={isModalTypeWork}
-                        onClose={() => setModalTypeWork(false)}
-                        handleClickAdd={handleTypeWorks}
-                        works={typeWorks}
-                    ></ModalTypeWork>
-                </div>
+                <table>
+                    <tr>
+                        <td>
+                            <div className="d-flex h3 justify-content-center align-items-center">
+                                <label>Виды работ:</label>
+                            </div>
+                        </td>
+                        <td>
+                            <label className="h6">Виды работ:</label>
+                            <button className="btn btn-secondary float-end" onClick={() => setModalTypeWork(true)}>
+                                Изменить
+                            </button>
+                            <ul>
+                                {typeWorks.map((work) => (
+                                    <p key={work.id}>{work.name}</p>
+                                ))}
+                            </ul>
+                            
+                            <ModalTypeWork
+                                isModal={isModalTypeWork}
+                                onClose={() => setModalTypeWork(false)}
+                                handleClickAdd={handleTypeWorks}
+                                works={typeWorks}
+                            ></ModalTypeWork>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className="d-flex h3 justify-content-center align-items-center">
+                                <label>Локации:</label>
+                            </div>
+                        </td>
+                        <td>
+                            <label className="h6">Локации:</label>
+                            <button className="btn btn-secondary float-end" onClick={() => setModalLocation(true)}>
+                                Изменить
+                            </button>
+                            <ul>
+                                {locations.map((location) => (
+                                    <p key={location.id}>{location.name}</p>
+                                ))}
+                            </ul>
+                            
+                            <ModalLocation
+                                isModal={isModalLocation}
+                                onClose={() => setModalLocation(false)}
+                                handleClickAdd={handleLocations}
+                                locations={locations}
+                            ></ModalLocation>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div className="d-flex h3 justify-content-center align-items-center">
+                                <label>Условия:</label>
+                            </div>
+                        </td>
+                        <td>
+                            <label className="h6">Условия:</label>
+                            <button className="btn btn-secondary float-end" onClick={() => setModalCondition(true)}>
+                                Изменить
+                            </button>
+                            <ul>
+                                {conditions.map((condition) => (
+                                    <div>
+                                        <label key={condition.id}>{condition.name}</label>
+                                        <label>
+                                            {
+                                                condition.answer_id 
+                                                ? condition.answers.filter(item => item.id === condition.answer_id)[0].name 
+                                                : "нет ответа"
+                                            }
+                                        </label>
+                                    </div>
+                                ))}
+                            </ul>
+                            <ModalChoiceConditions
+                                isModal={isModalCondition}
+                                onClose={() => setModalCondition(false)}
+                                handleClickAdd={handleConditions}
+                                conditions={conditions}
+                            ></ModalChoiceConditions>
+                        </td>
+                    </tr>
+                </table>
             </div>
-            <div className="row">
-                <div className="col-md">
-                    <label>Локации:</label>
+            {/* <div className="masking-form">
+                <div className="row">
+                    <div className="col-md-4 d-flex h3 justify-content-center align-items-center">
+                        <label>Виды работ:</label>
+                    </div>
+                    <div className="col-md ">
+                        <label className="h6">Виды работ:</label>
+                        <button className="btn btn-secondary float-end" onClick={() => setModalTypeWork(true)}>
+                            Изменить
+                        </button>
+                        <ul>
+                            {typeWorks.map((work) => (
+                                <p key={work.id}>{work.name}</p>
+                            ))}
+                        </ul>
+                        
+                        <ModalTypeWork
+                            isModal={isModalTypeWork}
+                            onClose={() => setModalTypeWork(false)}
+                            handleClickAdd={handleTypeWorks}
+                            works={typeWorks}
+                        ></ModalTypeWork>
+                    </div>
                 </div>
-                <div className="col-md">
-                    <p>Локации:</p>
-                    <ul>
-                        {locations.map((location) => (
-                            <p key={location.id}>{location.name}</p>
-                        ))}
-                    </ul>
-                    <button onClick={() => setModalLocation(true)}>
-                        Изменить
-                    </button>
-                    <ModalLocation
-                        isModal={isModalLocation}
-                        onClose={() => setModalLocation(false)}
-                        handleClickAdd={handleLocations}
-                        locations={locations}
-                    ></ModalLocation>
+                <div className="row">
+                    <div className="col-md-4 d-flex h3 justify-content-center align-items-center">
+                        <label>Локации:</label>
+                    </div>
+                    <div className="col-md">
+                        <label className="h6">Локации:</label>
+                        <button className="btn btn-secondary float-end" onClick={() => setModalLocation(true)}>
+                            Изменить
+                        </button>
+                        <ul>
+                            {locations.map((location) => (
+                                <p key={location.id}>{location.name}</p>
+                            ))}
+                        </ul>
+                        
+                        <ModalLocation
+                            isModal={isModalLocation}
+                            onClose={() => setModalLocation(false)}
+                            handleClickAdd={handleLocations}
+                            locations={locations}
+                        ></ModalLocation>
+                    </div>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col-md">
-                    <label>Условия:</label>
+                <div className="row">
+                    <div className="col-md-4 d-flex h3 justify-content-center align-items-center">
+                        <label>Условия:</label>
+                    </div>
+                    <div className="col-md">
+                        <label className="h6">Условия:</label>
+                        <button className="btn btn-secondary float-end" onClick={() => setModalCondition(true)}>
+                            Изменить
+                        </button>
+                        <ul>
+                            {conditions.map((condition) => (
+                                <p key={condition.id}>{condition.name}</p>
+                            ))}
+                        </ul>
+                        <ModalChoiceConditions
+                            isModal={isModalCondition}
+                            onClose={() => setModalCondition(false)}
+                            handleClickAdd={handleConditions}
+                            conditions={conditions}
+                        ></ModalChoiceConditions>
+                    </div>
                 </div>
-                <div className="col-md">
-                    <p>Условия:</p>
-                    <ul>
-                        {conditions.map((condition) => (
-                            <p key={condition.id}>{condition.name}</p>
-                        ))}
-                    </ul>
-                    <button onClick={() => setModalCondition(true)}>
-                        Изменить
-                    </button>
-                    <ModalChoiceConditions
-                        isModal={isModalCondition}
-                        onClose={() => setModalCondition(false)}
-                        handleClickAdd={handleConditions}
-                        conditions={conditions}
-                    ></ModalChoiceConditions>
-                </div>
-            </div>
+            </div> */}
             <div className="row">
                 <div className="col-md"></div>
             </div>
             <div className="row">
-                <div className="col-md">
-                    <button>Сформировать карту</button>
+                <div className="col-md d-flex justify-content-center">
+                    <button className="btn btn-primary">Сформировать карту</button>
                 </div>
             </div>
         </div>

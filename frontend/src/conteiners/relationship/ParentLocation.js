@@ -70,7 +70,7 @@ export default function ParentLocation() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex justify-content-center">
+                <div className="col-md d-flex justify-content-center header-list">
                     <p>
                         <h2>Связать локации и их компоненты</h2>
                     </p>
@@ -93,17 +93,18 @@ export default function ParentLocation() {
             </div>
             <div className="row">
                 <div className="col-md ">
-                    <h2>Локации</h2>
+                    <h2 className="text-center">Локации</h2>
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Название локации"
                         value={searchTextOneLocation}
                         onChange={handleSearchTextOneLocationChange}
+                        className="form-control search-location"
                     />
                     <div className="list-scroll-container">
                         <ul className="list">
                             {filteredListOneLocation.map((item, index) => (
-                                <div onClick={() => handleListItemClick(item)}>
+                                <div className="check-item" onClick={() => handleListItemClick(item)}>
                                     {item.name}
                                 </div>
                             ))}
@@ -111,23 +112,25 @@ export default function ParentLocation() {
                     </div>
                 </div>
                 <div className="col-md ">
-                    <h2>Локации</h2>
+                    <h2 className="text-center">Локации</h2>
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Название локации"
                         value={searchTextSecLocation}
                         onChange={handleSearchTextSecLocationChange}
+                        className="form-control search-location"
                     />
                     <div className="list-scroll-container">
                         <ul className="list">
                             {filteredListSecLocation.map((item) => (
-                                <div>
+                                <div className="check-item">
                                     <input
                                         type="checkbox"
                                         checked={selectedItems.includes(item)}
                                         onChange={(event) =>
                                             handleCheckboxChange(event, item)
                                         }
+                                        className="form-check-input check-location"
                                     />
                                     {item.name}
                                 </div>

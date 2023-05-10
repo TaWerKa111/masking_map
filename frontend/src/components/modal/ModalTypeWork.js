@@ -7,12 +7,18 @@ import TypeWorkQuestions from "../../conteiners/questions/TypeWorkQuestions";
 const ModalTypeWork = ({ isModal, onClose, handleClickAdd, works }) => {
     return (
         <Modal isOpen={isModal} onRequestClose={onClose}>
-            <h2>Modal Title</h2>
+            <div className="text-center header-modal">
+                <label className="h2 text-center">Выбрать вид работы</label>
+                <button className="float-end btn btn-close" onClick={onClose}></button>
+            </div>
+            <div>
+                <p className="text-center">Выберите необходимы виды работ и нажмите на кнопку "Выбрать работы"</p>
+            </div>
             <TypeWorkQuestions
                 handleClickAdd={handleClickAdd}
                 selectedWorks={works}
             ></TypeWorkQuestions>
-            <button onClick={onClose}>Close Modal</button>
+            
         </Modal>
     );
 };

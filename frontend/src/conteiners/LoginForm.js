@@ -9,40 +9,58 @@ const LoginForm = ({ onLogin }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        localStorage.setItem("username", username);
-        localStorage.setItem("password", password);
-        localStorage.setItem("is_login", true);
-        try {
-            let userdata = { login: username, password: password };
-            console.log(userdata);
-            const response = apiInst.post("/auth/login/", userdata);
-            onLogin();
-            navigate("/");
-        } catch (error) {
-            console.error(error);
-        }
+        let userdata = { login: username, password: password };
+        console.log(userdata);
+        apiInst.post("/auth/login/", userdata)
+            .then(resp => {
+                if (resp.status === 200){
+                    onLogin();
+                    navigate("/");
+                    localStorage.setItem("username", username);
+                    localStorage.setItem("password", password);
+                    localStorage.setItem("is_login", true);
+                }
+            })
+            .catch(
+                e => (console.log(e))
+            );
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
-                Username:
-                <input
-                    type="text"
-                    value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                />
-            </label>
-            <label>
-                Password:
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                />
-            </label>
-            <button type="submit">Log in</button>
-        </form>
+        <div className="container">
+            <div className="row">
+                <div className="col-md">
+                    <div className="login-form">
+                    <form onSubmit={handleSubmit}>
+                        <div class="mb-3">
+                        <label className="form-label h5">
+                            Имя пользователя:
+                        </label>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(event) => setUsername(event.target.value)}
+                            className="form-control"
+                        />
+                        </div>
+                        <div class="mb-3">
+                        <label className="form-label h5">
+                            Пароль:
+                        </label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            className="form-control"
+                        />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     );
 };
 

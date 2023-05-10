@@ -11,12 +11,17 @@ const ModalChoiceConditions = ({
 }) => {
     return (
         <Modal isOpen={isModal} onRequestClose={onClose}>
-            <h2>Уточняющие вопросы</h2>
+            <div className="text-center header-modal">
+                <label className="h2 text-center">Уточняющие вопросы</label>
+                <button className="float-end btn btn-close" onClick={onClose}></button>
+            </div>
+            <div>
+                <p className="text-center">Ответь на ряд вопросов и нажмите на кнопку Принять ответы</p>
+            </div>
             <AnswerConditionList
                 selectedConditions={conditions}
                 handleClickAdd={handleClickAdd}
             ></AnswerConditionList>
-            <button onClick={onClose}>Close Modal</button>
         </Modal>
     );
 };

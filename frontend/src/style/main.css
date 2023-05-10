@@ -26,11 +26,23 @@ button {
     border-radius: 25px;
 }
 
+.item-of-list {
+    cursor: pointer;
+    background-color: #1B527C;
+    border-radius: 5px;
+    width: 100%;
+    height: 3%;
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+    margin: 10px;
+}
+
 .itemOfQuestions {
     cursor: pointer;
     background-color: #1B527C;
     border-radius: 5px;
-    width: 80%;
+    width: 100%;
     height: 3%;
     color: #fff;
     text-align: left;
@@ -50,7 +62,7 @@ button {
 
 
 .list-scroll-container {
-    height: 200px;
+    height: 80%;
     overflow: auto;
     margin-bottom: 1rem;
 }
@@ -59,4 +71,106 @@ button {
     list-style-type: none;
     margin: 0;
     padding: 0;
+}
+
+.login-form {
+    margin: 100px;
+    padding: 10px;
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+.header-block{
+    margin: 20px;
+    padding: 0px;
+}
+
+.masking-form {
+    margin: 20px;
+    padding: 0px;
+    border: 1px solid black;
+}
+
+.masking-form-row {
+    border: 1px solid black;
+}
+
+table {
+    border-collapse: collapse;
+    border: 4px solid #000;
+    margin-bottom: 2%;
+}
+
+td, th {
+    padding: 5px;
+    border: 2px solid black; 
+    
+}
+
+.header-modal{
+    margin-bottom: 20px;
+}
+
+.check-item {
+    margin-right: 20px;
+}
+
+.question {
+    margin: 10px;
+    padding: auto;
+}
+
+.answer {
+    margin-left: 50px;
+}
+
+.navbar-noauth {
+    margin-left: 10%;
+}
+
+.header-list {
+    margin: 30px;
+    padding: 0px;
+}
+
+button a {
+    color: black;
+}
+
+button a:hover {
+    color: gray;
+}
+
+.search-location {
+    margin: 20px;
+    padding: 10px;
+    max-width: 80%;
+}
+
+.check-location {
+    margin-right: 10px;
+    padding: 0;
+}
+
+.check-item {
+    margin-bottom: 2px;
+}
+
+.check-item:hover {
+    background-color: #1B527C;
+}
+
+.btn-nav {
+    background-color: #1B527C;
+    border: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.btn-nav:hover {
+    background-color: #309BEC;
+}
+
+.form-add-el {
+    margin: 10px;
 }

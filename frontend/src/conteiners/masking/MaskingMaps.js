@@ -39,7 +39,7 @@ export default function MaskingMaps() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex justify-content-center">
+                <div className="col-md d-flex justify-content-center header-block">
                     <p>
                         <h2>Карты маскирования</h2>
                     </p>
@@ -47,7 +47,7 @@ export default function MaskingMaps() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center list-group">
+                    <ul className="d-flex justify-content-end list-group">
                         {maskingMaps == null ? (
                             <p>
                                 <h2>Нет карт маскирования!</h2>
@@ -56,11 +56,11 @@ export default function MaskingMaps() {
                             maskingMaps.masking_maps.map((maskingMap) => (
                                 <div
                                     key={maskingMap.id}
-                                    className="itemOfQuestions"
+                                    className="item-of-list"
                                 >
-                                    <p>{maskingMap.name}</p>
+                                    <label>{maskingMap.name}</label>
                                     <button
-                                        className="btn"
+                                        className="btn btn-primary float-end"
                                         onClick={(el) =>
                                             onClick(el, maskingMap.id)
                                         }

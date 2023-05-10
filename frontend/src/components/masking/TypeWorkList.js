@@ -18,7 +18,8 @@ export default function TypeWorkList({
     };
 
     const handleCheckboxChange = (event, item) => {
-        if (event.target.checked) {
+        if (selectedItems.filter((i) => i.id == item.id).length === 0) {
+        // if (event.target.checked) {
             setSelectedItems([...selectedItems, item]);
         } else {
             setSelectedItems(selectedItems.filter((i) => i.id !== item.id));
@@ -32,12 +33,11 @@ export default function TypeWorkList({
         <div className="row">
             <div className="col-md">
                 <form onSubmit={handleSubmit}>
-                    <h2 className="text-center">Необходимо выбрать локацию</h2>
-                    <button type="submit">Выбрать вид работ</button>
+                    <button type="submit" className="btn btn-primary">Выбрать вид работ</button>
                 </form>
                 <ul className="d-flex justify-content-center ">
                     {typeWorkList.map((item) => (
-                        <div className="itemOfQuestions">
+                        <div className="itemOfQuestions " onClick={event => handleCheckboxChange(event, item)}>
                             <input
                                 type="checkbox"
                                 checked={
@@ -47,6 +47,7 @@ export default function TypeWorkList({
                                 onChange={(event) =>
                                     handleCheckboxChange(event, item)
                                 }
+                                className="form-check-input check-item"
                             />
                             {item.name}
                         </div>

@@ -20,7 +20,7 @@ const NavAuthBar = (props) => {
                     Экспертная система для формирования карт маскирования
                 </h1>
             </div>
-            <div className="row navbar">
+            <div className="row navbar navbar-noauth">
                 <div className="col ">
                     <a href="/expert/" style={aStyle}>
                         <h2 className="navButton">Инструкция</h2>
@@ -49,8 +49,8 @@ const NavAuthBar = (props) => {
                 <div className="col">
                     <Dropdown>
                         <Dropdown.Toggle
-                            variant="secondary"
                             id="dropdown-basic"
+                            className="btn btn-secondary btn-nav"
                         >
                             Прочее
                         </Dropdown.Toggle>

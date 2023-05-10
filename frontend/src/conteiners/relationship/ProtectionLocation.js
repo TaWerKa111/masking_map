@@ -57,7 +57,7 @@ export default function LocationProtection() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex justify-content-center">
+                <div className="col-md d-flex justify-content-center header-list">
                     <p>
                         <h2>Связать локации и их защит</h2>
                     </p>
@@ -80,17 +80,18 @@ export default function LocationProtection() {
             </div>
             <div className="row">
                 <div className="col-md ">
-                    <h2>Локации</h2>
+                    <h2 className="text-center">Локации</h2>
                     <input
                         type="text"
                         placeholder="Search..."
                         value={searchTextLocation}
                         onChange={handleSearchTextLocationChange}
+                        className="form-control search-location"
                     />
                     <div className="list-scroll-container">
                         <ul className="list">
                             {filteredListLocation.map((item, index) => (
-                                <div onClick={() => handleListItemClick(item)}>
+                                <div className="check-item" onClick={() => handleListItemClick(item)}>
                                     {item.name}
                                 </div>
                             ))}
@@ -98,17 +99,18 @@ export default function LocationProtection() {
                     </div>
                 </div>
                 <div className="col-md ">
-                    <h2>Защиты</h2>
+                    <h2 className="text-center">Защиты</h2>
                     <input
                         type="text"
                         placeholder="Search..."
                         value={searchTextProtection}
                         onChange={handleSearchTextProtectionChange}
+                        className="form-control search-location"
                     />
                     <div className="list-scroll-container">
                         <ul className="list">
                             {filteredListProtection.map((item) => (
-                                <div>
+                                <div className="check-item">
                                     <input
                                         type="checkbox"
                                         checked={selectedProtections.includes(
@@ -117,6 +119,7 @@ export default function LocationProtection() {
                                         onChange={(event) =>
                                             handleCheckboxChange(event, item)
                                         }
+                                        className="form-check-input check-location"
                                     />
                                     {item.name}
                                 </div>

@@ -70,7 +70,7 @@ export default function TypeWorks() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex">
+                <div className="col-md d-flex header-list">
                     <AddElementButton
                         name={"Добавить вид работы"}
                         type_form="work"
@@ -98,24 +98,24 @@ export default function TypeWorks() {
                                     key={typeWork.id}
                                     className="itemOfQuestions"
                                 >
-                                    <p
+                                    <label
                                         onClick={(el) =>
                                             onClick(el, typeWork.id)
                                         }
                                     >
                                         {typeWork.name}
-                                    </p>
+                                    </label>
                                     <AddElementButton
                                         is_edit={true}
                                         type_form="work"
-                                        className="btn"
+                                        className="btn btn-primary float-end"
                                         onSubmit={editClick}
                                         name={"Изменить"}
                                         types={departments}
                                         value={typeWork}
                                     ></AddElementButton>
                                     <button
-                                        className="btn"
+                                        className="btn btn-primary float-end"
                                         onClick={(el) =>
                                             deleteClick(el, typeWork.id)
                                         }

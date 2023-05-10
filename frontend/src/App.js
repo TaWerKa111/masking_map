@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./conteiners/Home";
+import Instraction from "./conteiners/Instraction";
 import { Provider } from "react-redux";
 import Layout from "./hocs/Layout";
 import TypeWorkQuestions from "./conteiners/questions/TypeWorkQuestions";
@@ -24,6 +24,7 @@ import LocationProtection from "./conteiners/relationship/ProtectionLocation";
 import AddRule from "./conteiners/rules/AddRule";
 import ChoiceProtections from "./conteiners/protection/ChoiceProtection";
 import MaskingMaps from "./conteiners/masking/MaskingMaps";
+import ExpertInstraction from "./conteiners/instractions/ExpertInstraction";
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
@@ -80,7 +81,7 @@ function App() {
         <BrowserRouter>
             <Layout user={user}>
                 <Routes>
-                    <Route exact path="/" element={<Home />} />
+                    <Route exact path="/" element={<Instraction />} />
                     <Route
                         exact
                         path="/login/"
@@ -118,6 +119,10 @@ function App() {
                         path="/logout/"
                         element={<Logout onLogout={handleLogout} />}
                     />
+                    <Route exact path="/expert/"
+                        element={<ExpertInstraction/>}
+                    >
+                    </Route>
                     <Route path="/expert/rules/" element={<Rules />}></Route>
                     <Route
                         path="/expert/type-works/"

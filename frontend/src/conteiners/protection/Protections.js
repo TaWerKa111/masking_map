@@ -61,7 +61,7 @@ export default function Protections() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex">
+                <div className="col-md d-flex header-list">
                     <AddElementButton
                         name={"Добавить защиту"}
                         type_form="protection"
