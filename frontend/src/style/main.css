@@ -47,3 +47,16 @@ button {
     margin-top: 1%;
     margin-bottom: 1%;
 }
+
+
+.list-scroll-container {
+    height: 200px;
+    overflow: auto;
+    margin-bottom: 1rem;
+}
+
+.list-el {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}

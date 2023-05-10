@@ -31,6 +31,6 @@ ADD . transneft
 WORKDIR transneft/
 RUN mkdir "./map_files/"
 
-CMD ["python", "manage.py", "runserver", "--host=0.0.0.0"]
+CMD ["python", "manage.py", "run", "--host=0.0.0.0"]
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

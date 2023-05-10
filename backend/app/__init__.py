@@ -4,16 +4,13 @@ from flask_cors import CORS
 
 from flask_sqlalchemy import SQLAlchemy
 
-from common.postgres.models import User
 from config import AppConfig
-from flask_httpauth import HTTPBasicAuth
 
 
 app = Flask(
     __name__, static_url_path="/static", template_folder="../common/templates"
 )
 app.config.from_object("config.AppConfig")
-auth = HTTPBasicAuth()
 
 db = SQLAlchemy(app)
 
@@ -23,20 +20,6 @@ CORS(
     resources={r"/api/*": {"origins": "*"}},
     supports_credentials=AppConfig.Access_Control_Allow_Credentials,
 )
-
-
-# verify user
-@auth.verify_password
-def verify_user_password(username: str, password: str) -> str or None:
-    user = db.session.query(User).filter(User.username == username).first()
-
-    if user and user.check_password(password):
-        return username
-
-
-@auth.get_user_roles
-def get_user_roles(user: User) -> str:
-    return user.role
 
 
 from app.management.create.swagger import bp as cli_cr_swagger  # noqa:

@@ -1,35 +1,56 @@
-import { createSearchParams, useNavigate } from "react-router-dom";
+import {
+    createSearchParams,
+    useNavigate,
+    useSearchParams,
+} from "react-router-dom";
+import { useEffect, useState } from "react";
 
-export default function TypeWorkList ({typeWorkList}) {
-    
-    const onClick = (event, key) => {
-        let params = {
-            type_work_id: key
-        }; 
-        console.log(params);
-        navigate(
-            {
-                pathname: `/mn-object/`,
-                search: `?${createSearchParams(params)}`
-            }
-        );
+export default function TypeWorkList({
+    typeWorkList,
+    handleClickAdd,
+    selectedWorks,
+}) {
+    const [selectedItems, setSelectedItems] = useState(selectedWorks);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        handleClickAdd(selectedItems);
     };
 
-    const navigate = useNavigate();
+    const handleCheckboxChange = (event, item) => {
+        if (event.target.checked) {
+            setSelectedItems([...selectedItems, item]);
+        } else {
+            setSelectedItems(selectedItems.filter((i) => i.id !== item.id));
+        }
+    };
 
-    if (typeWorkList.length === 0){
-        return (<h2>Нет вопросов! Попробуйте позже.</h2>)
+    if (typeWorkList.length === 0) {
+        return <h2>Нет видов работ! Попробуйте позже.</h2>;
     }
     return (
         <div className="row">
             <div className="col-md">
-                <h2 className="text-center">Необходимо выбрать только один ответ</h2>
+                <form onSubmit={handleSubmit}>
+                    <h2 className="text-center">Необходимо выбрать локацию</h2>
+                    <button type="submit">Выбрать вид работ</button>
+                </form>
                 <ul className="d-flex justify-content-center ">
-                    {
-                        typeWorkList.map(
-                            work => <div key={work.id} className="itemOfQuestions" onClick={el => onClick(el, work.id)}>{work.name}</div>
-                        )
-                    }
+                    {typeWorkList.map((item) => (
+                        <div className="itemOfQuestions">
+                            <input
+                                type="checkbox"
+                                checked={
+                                    selectedItems.filter((i) => i.id == item.id)
+                                        .length > 0
+                                }
+                                onChange={(event) =>
+                                    handleCheckboxChange(event, item)
+                                }
+                            />
+                            {item.name}
+                        </div>
+                    ))}
                 </ul>
             </div>
         </div>

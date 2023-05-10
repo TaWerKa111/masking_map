@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
-const Logout = ({onLogout}) => {
+const Logout = ({ onLogout }) => {
     const navigate = useNavigate();
 
     useEffect(() => {

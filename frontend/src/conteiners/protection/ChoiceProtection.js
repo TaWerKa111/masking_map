@@ -7,11 +7,14 @@ import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
 
-export default function LocationProtection() {
+export default function ChoiceProtections({ selProtections, handleClickAdd }) {
     const [locations, setLocations] = useState([{ name: "asd", id: 1 }]);
-    const [protections, setProtections] = useState([{ name: "123", id: 1 }]);
+    const [protections, setProtections] = useState([
+        { name: "123", id: 1, is_masking: true },
+    ]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [selectedProtections, setSelectedProtections] = useState([]);
+    const [selectedProtections, setSelectedProtections] =
+        useState(selProtections);
     const navigate = useNavigate();
 
     // Состояния для значений поиска
@@ -49,9 +52,29 @@ export default function LocationProtection() {
             setSelectedProtections([...selectedProtections, item]);
         } else {
             setSelectedProtections(
-                selectedProtections.filter((i) => i !== item)
+                selectedProtections.filter((i) => i.id !== item.id)
             );
         }
+    };
+
+    const handleClickChoiceProtection = () => {
+        let indexes = [];
+        selectedProtections.forEach((item) => indexes.push(item.id));
+        let params = {
+            protection_ids: indexes,
+        };
+
+        let pathname = "/expert/add-rule/";
+
+        navigate({
+            pathname: pathname,
+            search: createSearchParams(params).toString(),
+        });
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        handleClickAdd(selectedProtections);
     };
 
     return (
@@ -65,17 +88,19 @@ export default function LocationProtection() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <p>
-                        Выбранная локация:{" "}
-                        {selectedItem ? selectedItem.name : ""}
-                    </p>
-                    <p>Выбранные защиты:</p>
-                    <ul>
-                        {selectedProtections.map((item, index) => (
-                            <li key={index}>{item.name}</li>
-                        ))}
-                    </ul>
-                    <button>Добавить связь</button>
+                    <form onSubmit={handleSubmit}>
+                        <p>
+                            Выбранная локация:{" "}
+                            {selectedItem ? selectedItem.name : ""}
+                        </p>
+                        <p>Выбранные защиты:</p>
+                        <ul>
+                            {selectedProtections.map((item, index) => (
+                                <li key={index}>{item.name}</li>
+                            ))}
+                        </ul>
+                        <button onClick="submit">Выбрать защиты</button>
+                    </form>
                 </div>
             </div>
             <div className="row">
@@ -111,9 +136,11 @@ export default function LocationProtection() {
                                 <div>
                                     <input
                                         type="checkbox"
-                                        checked={selectedProtections.includes(
-                                            item
-                                        )}
+                                        checked={
+                                            selectedProtections.filter(
+                                                (i) => i.id == item.id
+                                            ).length > 0
+                                        }
                                         onChange={(event) =>
                                             handleCheckboxChange(event, item)
                                         }

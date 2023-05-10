@@ -75,6 +75,11 @@ class TypeCriteria(BaseSetting):
 
 class AppConfig(BaseSetting):
     # Postgres settings
+    SECRET_KEY = "123"
+    SESSION_COOKIE_HTTPONLY =True
+    REMEMBER_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = None
+    SESSION_COOKIE_DOMAIN = "app.localhost"
     POSTGRES = PostgresConfig
     SQLALCHEMY_DATABASE_URI = SqlAlchemyBuilder(PostgresConfig)
     SQLALCHEMY_TRACK_MODIFICATIONS = True

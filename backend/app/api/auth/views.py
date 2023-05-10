@@ -3,16 +3,17 @@ import http
 from flask import Blueprint, request, current_app
 from marshmallow import ValidationError
 
-from app import auth
-from app.api.auth.helpers import login_user, logout_user
-from app.api.auth.schemas import LoginSchema
+from app.api.auth.helpers import login_user, logout_user, get_user, add_user, \
+    get_user_by_login
+from app.api.auth.schemas import LoginSchema, UserSchema
+from app.api.helpers.decorators import login_required
 from app.api.helpers.messages import MESSAGES_DICT
 from app.api.helpers.schemas import BinaryResponseSchema
 
 bp = Blueprint("api_auth", __name__, url_prefix="/api/auth/")
 
 
-@bp.route("/login/")
+@bp.route("/login/", methods=["POST"])
 def login() -> tuple[dict, int]:
     """
     Авторизация пользователя в приложении
@@ -48,7 +49,7 @@ def login() -> tuple[dict, int]:
     data = request.json
 
     try:
-        user = LoginSchema().load(data)
+        user_data = LoginSchema().load(data)
     except ValidationError as err:
         current_app.logger.debug(
             f"Ошибка при валидации данных для схемы. {err}"
@@ -59,14 +60,15 @@ def login() -> tuple[dict, int]:
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
+    user = get_user_by_login(user_data.get("login"))
     login_user(user)
     return BinaryResponseSchema().dump(
-        {"message": "Тип работы успешно добавлен!", "result": True}
+        {"message": "Успешная авторизация!", "result": True}
     )
 
 
 @bp.route("/logout/")
-@auth.login_required
+@login_required()
 def logout() -> tuple[dict, int]:
     """
 
@@ -95,7 +97,47 @@ def logout() -> tuple[dict, int]:
     )
 
 
+@bp.route("/current-user/")
+def profile() -> tuple[dict, int]:
+    """
+
+    :return: tuple[dict, int]
+    ---
+    get:
+        summary: Получить профиль пользователя
+        description: Получить профиль пользователя
+        responses:
+            '200':
+                description: Профиль пользователя
+                content:
+                    app/json:
+                        schema: UserSchema
+            '401': Unauthorized
+        tags:
+            -   auth
+    """
+
+    # user = get_user()
+    username, password = request.headers.get(
+        "Authorization").split(":")
+    user = get_user_by_login(username)
+
+    if user and user.check_password(password):
+        return (
+            UserSchema().dump(
+                user
+            ),
+            http.HTTPStatus.OK,
+        )
+    return BinaryResponseSchema().dump({
+        "message": "Пользователь не авторизован!",
+        "result": False
+    }), http.HTTPStatus.UNAUTHORIZED
+
+
+
+
 @bp.route("/test/")
-@auth.login_required
+@login_required()
 def test_log() -> tuple[dict, int]:
     return {"message": "Под логином!"}, 200

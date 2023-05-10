@@ -338,6 +338,7 @@ class Rule(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
+    user_id = Column(Integer, ForeignKey("users.id"))
 
     # relationship
     criteria = relationship(
@@ -353,6 +354,11 @@ class Rule(Base):
         uselist=True,
         back_populates="rules",
         secondary="rule_protection"
+    )
+    user = relationship(
+        "User",
+        lazy="select",
+        backref="rules"
     )
 
 
