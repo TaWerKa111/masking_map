@@ -99,12 +99,19 @@ table {
     border-collapse: collapse;
     border: 4px solid #000;
     margin-bottom: 2%;
+    margin-top: 2%;
+    width: 100%;
 }
 
 td, th {
     padding: 5px;
     border: 2px solid black; 
     
+}
+
+.td-btn {
+    width: 10%;
+    max-width: 20%;
 }
 
 .header-modal{
@@ -174,3 +181,8 @@ button a:hover {
 .form-add-el {
     margin: 10px;
 }
+
+.btn-manage-el {
+    margin-left: 80%;
+}
+

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
 import MyPagination from "../../components/Pagination";
+import Select from 'react-select';
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -20,6 +21,7 @@ export default function TypeWorks() {
     });
     const [departments, setDepartments] = useState([{ name: "dep1", id: 1 }]);
     const [page, setPage] = useState(1);
+    const [selectedDepartaments, setSelectedDepartaments] = useState([]);
     const pageSize = 10;
 
     const navigate = useNavigate();
@@ -76,6 +78,24 @@ export default function TypeWorks() {
         console.log("edit el", value);
     };
 
+    const optionList = [
+        { value: "red", label: "Red" },
+        { value: "green", label: "Green" },
+        { value: "yellow", label: "Yellow" },
+        { value: "blue", label: "Blue" },
+        { value: "white", label: "White" }
+    ];
+
+    const handleSelect =(data) => {
+        setSelectedDepartaments(data);
+        console.log("data", data);
+    }
+
+    const handleFiltered = () => {
+        console.log("fitering type-works...");
+        apiInst.get();
+    }
+
     return (
         <div className="container">
             <div className="row">
@@ -89,53 +109,86 @@ export default function TypeWorks() {
                 </div>
             </div>
             <div className="row">
-                <div className="col-md d-flex justify-content-center">
+                <div className="col-md">
                     <p>
-                        <h2>Виды работ</h2>
+                        <h2 className="text-center">Виды работ</h2>
                     </p>
+                    <div className="d-flex">
+                        <label>
+                            Фильтры
+                        </label>
+                        <div className="">
+                            <label>
+                                Название
+                            </label>
+                            <input type="text">
+                            </input>
+                        </div>
+                        <div>
+                            <label>
+                                Отдел
+                            </label>
+                            <Select
+                                options={optionList}
+                                placeholder="Select color"
+                                value={selectedDepartaments}
+                                onChange={handleSelect}
+                                isMulti
+                            >
+                            </Select>
+                        </div>
+                        <button className="btn btn-primary" onClick={handleFiltered}>
+                            Применить фильтры
+                        </button>
+                    </div>
                 </div>
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center list-group">
-                        {typeWorks == null ? (
+                {typeWorks == null ? (
                             <p>
                                 <h2>Нет видов работ!</h2>
                             </p>
-                        ) : (
+                        ): (
+                            <table>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Отдел</th>
+                                    <th>Правила</th>
+                                    <th>Изменить</th>
+                                    <th>Удалить</th>
+                                </tr>{
                             typeWorks.typeWorks.map((typeWork) => (
-                                <div
-                                    key={typeWork.id}
-                                    className="itemOfQuestions"
-                                >
-                                    <label
-                                        onClick={(el) =>
-                                            onClick(el, typeWork.id)
-                                        }
-                                    >
-                                        {typeWork.name}
-                                    </label>
-                                    <AddElementButton
-                                        is_edit={true}
-                                        type_form="work"
-                                        className="btn btn-primary float-end"
-                                        onSubmit={editClick}
-                                        name={"Изменить"}
-                                        types={departments}
-                                        value={typeWork}
-                                    ></AddElementButton>
-                                    <button
-                                        className="btn btn-primary float-end"
-                                        onClick={(el) =>
-                                            deleteClick(el, typeWork.id)
-                                        }
-                                    >
-                                        Удалить
-                                    </button>
-                                </div>
+                                <tr>
+                                    <td>{typeWork.name}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td className="td-btn">
+                                        <AddElementButton
+                                            is_edit={true}
+                                            type_form="work"
+                                            className="btn btn-primary"
+                                            onSubmit={editClick}
+                                            name={"Изменить"}
+                                            types={departments}
+                                            value={typeWork}
+                                        ></AddElementButton>
+                                    </td>
+                                    <td className="td-btn">
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={(el) =>
+                                                deleteClick(el, typeWork.id)
+                                            }
+                                        >
+                                            Удалить
+                                        </button>
+                                    </td>
+                                </tr>
                             ))
+                            }
+                            </table>
                         )}
-                    </ul>
                 </div>
             </div>
             <div className="row">

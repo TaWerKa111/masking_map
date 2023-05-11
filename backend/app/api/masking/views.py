@@ -11,6 +11,8 @@ from app.api.masking.schemas import (
     AddProtectionSchema,
     AddTypeWorkSchema,
     AddLocationSchema,
+    DepartamentListSchema,
+    DepartamentSchema,
     TypeWorkSchema,
     TypeProtectionSchema,
     ProtectionSchema,
@@ -254,9 +256,7 @@ def get_departament_type_work_view() -> tuple[dict, int]:
                 description: Список отделов
                 content:
                     application/json:
-                        schema:
-                            type: array
-                            items: DepartamentSchema
+                        schema: DepartamentListSchema
             '400':
                 description: Ошибка при выполнении запроса
                 content:
@@ -282,7 +282,7 @@ def get_departament_type_work_view() -> tuple[dict, int]:
     result = {"departaments": dep_list}
 
     return (
-        TypeWorkListSchema().dump(result),
+        DepartamentListSchema().dump(result),
         http.HTTPStatus.OK,
     )
 

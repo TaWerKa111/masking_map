@@ -12,14 +12,18 @@ export default function Departments() {
     const [departments, setDepartments] = useState([{ name: "type1", id: 1 }]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        let params = {};
+    const fetchDepartamentsData = (params=null) => {
         apiInst
             .get("/masking/departament-type-work/", { params })
             .then((resp) => {
-                setDepartments(resp.data);
+                setDepartments(resp.data.departaments);
             })
             .catch((e) => console.log(e));
+    }
+
+    useEffect(() => {
+        let params = {};
+        fetchDepartamentsData();
     }, []);
 
     const deleteClick = (event, key) => {
@@ -31,6 +35,7 @@ export default function Departments() {
         apiInst
             .put("/masking/departament-type-work/", value)
             .catch((e) => console.log(e));
+        fetchDepartamentsData();
     };
 
     const addClick = (value) => {
@@ -42,6 +47,7 @@ export default function Departments() {
         apiInst
             .post("/masking/departament-type-work/", departament)
             .catch((e) => console.log(e));
+        fetchDepartamentsData();
     };
 
     return (
@@ -64,7 +70,7 @@ export default function Departments() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center">
+                    <ul className="">
                         {departments == null ? (
                             <p>
                                 <h2>Нет отделов!</h2>
@@ -73,24 +79,27 @@ export default function Departments() {
                             departments.map((department) => (
                                 <div
                                     key={department.id}
-                                    className="itemOfQuestions"
+                                    className="itemOfQuestions d-flex"
                                 >
                                     <p>{department.name}</p>
-                                    <AddElementButton
-                                        type_form="simple"
-                                        className="btn"
-                                        onSubmit={editClick}
-                                        name={"Изменить"}
-                                        value={department}
-                                    ></AddElementButton>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) =>
-                                            deleteClick(el, department.id)
-                                        }
-                                    >
-                                        Удалить
-                                    </button>
+                                    <div className="btn-manage-el">
+                                        <AddElementButton
+                                            type_form="simple"
+                                            className="btn"
+                                            onSubmit={editClick}
+                                            name={"Изменить"}
+                                            value={department}
+                                        ></AddElementButton>
+                                        <button
+                                            className="btn"
+                                            onClick={(el) =>
+                                                deleteClick(el, department.id)
+                                            }
+                                        >
+                                            Удалить
+                                        </button>
+                                    </div>
+                                    
                                 </div>
                             ))
                         )}
