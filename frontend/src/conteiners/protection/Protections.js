@@ -84,38 +84,54 @@ export default function Protections() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center">
-                        {protections == null ? (
+                    {protections == null ? (
                             <p>
                                 <h2>Нет защит!</h2>
                             </p>
                         ) : (
-                            protections.map((protection) => (
-                                <div
-                                    key={protection.id}
-                                    className="itemOfQuestions"
-                                >
-                                    <p>{protection.name}</p>
-                                    <AddElementButton
-                                        type_form="protection"
-                                        className="btn"
-                                        onSubmit={editClick}
-                                        name={"Изменить"}
-                                        value={protection}
-                                        types={typeProtections}
-                                    ></AddElementButton>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) =>
-                                            deleteClick(el, protection.id)
-                                        }
-                                    >
-                                        Удалить
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </ul>
+                            <table>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Тип защиты</th>
+                                    <th>Локация</th>
+                                    <th>Статус</th>
+                                    <th>Вход/Выход</th>
+                                    <th>Изменить</th>
+                                    <th>Удалить</th>
+                                </tr>
+                                {
+                                    protections.map((protection) => (
+                                        <tr key={protection.id}>
+                                            <td>{protection.name}</td>
+                                            <td>{protection.type}</td>
+                                            <td>{protection.location}</td>
+                                            <td>{protection.status}</td>
+                                            <td>{protection.is_end ? "Вход" : "Выход"}</td>
+                                            <td className="td-btn">
+                                                <AddElementButton
+                                                    type_form="protection"
+                                                    className="btn"
+                                                    onSubmit={editClick}
+                                                    name={"Изменить"}
+                                                    value={protection}
+                                                    types={typeProtections}
+                                                ></AddElementButton>
+                                            </td>
+                                            <td className="td-btn"><button
+                                                    className="btn btn-danger"
+                                                    onClick={(el) =>
+                                                        deleteClick(el, protection.id)
+                                                    }
+                                                >
+                                                    Удалить
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))    
+                                }
+                            </table>
+                        )
+                    }
                 </div>
             </div>
         </div>

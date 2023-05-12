@@ -77,37 +77,45 @@ export default function TypeProtections() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center">
-                        {typeProtections == null ? (
+                    {typeProtections == null ? (
                             <p>
                                 <h2>Нет типов защит!</h2>
                             </p>
                         ) : (
-                            typeProtections.map((typeProtection) => (
-                                <div
-                                    key={typeProtection.id}
-                                    className="itemOfQuestions"
-                                >
-                                    <p>{typeProtection.name}</p>
-                                    <AddElementButton
-                                        type_form="simple"
-                                        className="btn"
-                                        onSubmit={editClick}
-                                        name={"Изменить"}
-                                        value={typeProtection}
-                                    ></AddElementButton>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) =>
-                                            deleteClick(el, typeProtection.id)
-                                        }
-                                    >
-                                        Удалить
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </ul>
+                            <table>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Изменить</th>
+                                    <th>Удалить</th>
+                                </tr>
+                                {typeProtections.map((typeProtection) => (
+                                    <tr key={typeProtection.id}>
+                                        <td>{typeProtection.name}</td>
+                                        <td className="td-btn">
+                                            <AddElementButton
+                                                type_form="simple"
+                                                className="btn"
+                                                onSubmit={editClick}
+                                                name={"Изменить"}
+                                                value={typeProtection}
+                                            ></AddElementButton>
+                                        </td>
+                                        <td className="td-btn">
+                                            <button
+                                                className="btn"
+                                                onClick={(el) =>
+                                                    deleteClick(el, typeProtection.id)
+                                                }
+                                            >
+                                                Удалить
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    ))    
+                                }
+                            </table>
+                        )
+                    }   
                 </div>
             </div>
         </div>

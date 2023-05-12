@@ -77,37 +77,54 @@ export default function TypeLocations() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center">
-                        {typeLocations == null ? (
+                    {typeLocations == null ? (
                             <p>
                                 <h2>Нет типов локаций!</h2>
                             </p>
                         ) : (
-                            typeLocations.map((typeLocation) => (
-                                <div
-                                    key={typeLocation.id}
-                                    className="itemOfQuestions"
-                                >
-                                    <p>{typeLocation.name}</p>
-                                    <AddElementButton
-                                        type_form="simple"
-                                        className="btn"
-                                        onSubmit={editClick}
-                                        name={"Изменить"}
-                                        value={typeLocation}
-                                    ></AddElementButton>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) =>
-                                            deleteClick(el, typeLocation.id)
-                                        }
-                                    >
+                            <table>
+                                <tr>
+                                    <th>
+                                        <p>Название</p>
+                                    </th>
+                                    <th>
+                                        Изменить
+                                    </th>
+                                    <th>
                                         Удалить
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </ul>
+                                    </th>
+                                </tr>
+                                {
+                                    typeLocations.map((typeLocation) => (
+                                        <tr key={typeLocation.id}>
+                                            <td>
+                                                <p>{typeLocation.name}</p>
+                                            </td>
+                                            <td className="td-btn">
+                                                <AddElementButton
+                                                    type_form="simple"
+                                                    className="btn"
+                                                    onSubmit={editClick}
+                                                    name={"Изменить"}
+                                                    value={typeLocation}
+                                                ></AddElementButton>
+                                            </td>
+                                            <td className="td-btn">
+                                                <button
+                                                    className="btn btn-danger"
+                                                    onClick={(el) =>
+                                                        deleteClick(el, typeLocation.id)
+                                                    }
+                                                >
+                                                    Удалить
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))    
+                                }
+                            </table>
+                        )
+                    }
                 </div>
             </div>
         </div>

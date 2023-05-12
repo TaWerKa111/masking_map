@@ -56,6 +56,9 @@ const NavAuthBar = (props) => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
+                            <Dropdown.Item href="/expert/questions/">
+                                Банк вопросов
+                            </Dropdown.Item>
                             <Dropdown.Item href="/expert/dep/">
                                 Отделы работы
                             </Dropdown.Item>

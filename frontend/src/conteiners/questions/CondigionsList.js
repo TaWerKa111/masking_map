@@ -33,7 +33,7 @@ export default function CondigionsList({ handleClickAdd, selectedConditions }) {
             <div className="row">
                 <div className="col-md">
                     <h2>Уточняющие вопросы</h2>
-                    <button onClick={onAddClick}>Доавить вопрос</button>
+                    <button onClick={onAddClick}>Добавить вопрос</button>
                 </div>
             </div>
             <div className="row">

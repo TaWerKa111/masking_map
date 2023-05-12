@@ -6,14 +6,15 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import FilterButton from "../forms/FilterForm";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
 export default function Locations() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [locations, setLocations] = useState({
-        locations: [{ name: "name1", id: 1, type: 1 }],
-    });
+    const [locations, setLocations] = useState(
+        [{ name: "name1", id: 1, type: 1 }],
+    );
     const [typeLocations, setTypeLocations] = useState([
         { name: "type1", id: 1 },
     ]);
@@ -85,46 +86,71 @@ export default function Locations() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center">
-                        {locations == null ? (
-                            <p>
-                                <h2>Нет локаций!</h2>
-                            </p>
-                        ) : (
-                            locations.locations.map((location) => (
-                                <div
-                                    key={location.id}
-                                    className="itemOfQuestions"
-                                >
-                                    <p
-                                        onClick={(el) =>
-                                            onClick(el, location.id)
-                                        }
-                                    >
-                                        {location.name}
-                                    </p>
-                                    {/* <button className="btn" onClick={el => editClick(el, location.id)}>Изменить</button> */}
-                                    <AddElementButton
-                                        is_edit={true}
-                                        type_form="loc"
-                                        className="btn"
-                                        onSubmit={editClick}
-                                        name={"Изменить"}
-                                        types={typeLocations}
-                                        value={location}
-                                    ></AddElementButton>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) =>
-                                            deleteClick(el, location.id)
-                                        }
-                                    >
-                                        Удалить
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </ul>
+                    <FilterButton>
+                    </FilterButton>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md">
+                    {
+                        locations == null ? (
+                                <p>
+                                    <h2>Нет локаций!</h2>
+                                </p>
+                            ) : (
+                                <table>
+                                    <tr>
+                                        <th>
+                                            Название
+                                        </th>
+                                        <th>
+                                            Тип локации
+                                        </th>
+                                        <th>
+                                            Защиты
+                                        </th>
+                                        <th>
+                                            Изменить
+                                        </th>
+                                        <th>
+                                            Удалить
+                                        </th>
+                                    </tr>
+                                    {
+                                        locations.map((location) => (
+                                            <tr key={location.id}>
+                                                <td>
+                                                    {location.name}
+                                                </td>
+                                                <td>{location.type}</td>
+                                                <td>{location.protection}</td>
+                                                <td className="td-btn">
+                                                    <AddElementButton
+                                                        is_edit={true}
+                                                        type_form="loc"
+                                                        className="btn"
+                                                        onSubmit={editClick}
+                                                        name={"Изменить"}
+                                                        types={typeLocations}
+                                                        value={location}
+                                                    ></AddElementButton>
+                                                </td>
+                                                <td className="td-btn">
+                                                    <button
+                                                        className="btn btn-danger"
+                                                        onClick={(el) =>
+                                                            deleteClick(el, location.id)
+                                                        }
+                                                    >
+                                                        Удалить
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
+                                </table>
+                                )
+                    }
                 </div>
             </div>
         </div>

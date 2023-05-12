@@ -25,6 +25,9 @@ import AddRule from "./conteiners/rules/AddRule";
 import ChoiceProtections from "./conteiners/protection/ChoiceProtection";
 import MaskingMaps from "./conteiners/masking/MaskingMaps";
 import ExpertInstraction from "./conteiners/instractions/ExpertInstraction";
+import BankQuestions from "./conteiners/questions/BankQuestions";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
@@ -79,6 +82,7 @@ function App() {
 
     return (
         <BrowserRouter>
+            <ToastContainer />
             <Layout user={user}>
                 <Routes>
                     <Route exact path="/" element={<Instraction />} />
@@ -119,6 +123,13 @@ function App() {
                         path="/logout/"
                         element={<Logout onLogout={handleLogout} />}
                     />
+                    <Route
+                        exact
+                        path="/expert/questions/"
+                        element={<BankQuestions />}
+                    >
+
+                    </Route>
                     <Route
                         exact
                         path="/expert/"

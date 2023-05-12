@@ -6,6 +6,9 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import { ToastContainer, toast } from "react-toastify";
+import send_notify from "../../utils/toast";
+
 
 export default function Departments() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -46,7 +49,10 @@ export default function Departments() {
         console.log(departament);
         apiInst
             .post("/masking/departament-type-work/", departament)
-            .catch((e) => console.log(e));
+            .catch((e) => {
+                send_notify("Ошибка при добавлении отдела", "error");
+            }
+        );
         fetchDepartamentsData();
     };
 
@@ -70,42 +76,37 @@ export default function Departments() {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <ul className="">
-                        {departments == null ? (
+                {departments == null? (
                             <p>
                                 <h2>Нет отделов!</h2>
                             </p>
-                        ) : (
+                    ):(
+                    <table>
+                        <tr>
+                            <th>
+                                Название
+                            </th>
+                            <th>
+                                Виды работ
+                            </th>
+                            <th>Изменить</th>
+                            <th>Удалить</th>
+                        </tr>
+                        {
                             departments.map((department) => (
-                                <div
-                                    key={department.id}
-                                    className="itemOfQuestions d-flex"
-                                >
-                                    <p>{department.name}</p>
-                                    <div className="btn-manage-el">
-                                        <AddElementButton
-                                            type_form="simple"
-                                            className="btn"
-                                            onSubmit={editClick}
-                                            name={"Изменить"}
-                                            value={department}
-                                        ></AddElementButton>
-                                        <button
-                                            className="btn"
-                                            onClick={(el) =>
-                                                deleteClick(el, department.id)
-                                            }
-                                        >
-                                            Удалить
-                                        </button>
-                                    </div>
-                                    
-                                </div>
+                                <tr key={department.id}>
+                                    <td>{department.name}</td>
+                                    <td>{department.type_work}</td>
+                                    <td className="td-btn"><button className="btn btn-primary">Изменить</button></td>
+                                    <td className="td-btn"><button className="btn btn-danger">Удалить</button></td>
+                                </tr>
                             ))
-                        )}
-                    </ul>
+                        }
+                    </table> 
+                    )}
                 </div>
             </div>
+
         </div>
     );
 }
