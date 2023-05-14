@@ -106,6 +106,7 @@ def update_type_work(type_work_id: int, name: str, dep_id: int):
         type_work.departament_id = dep_id
 
     db.session.commit()
+    return True
 
 
 def add_departament(name: str) -> DepartamentOfWork:
@@ -261,6 +262,7 @@ def update_type_protection(id_type_protection: int, name: str) -> bool or None:
 
     if name:
         type_protection.name = name
+    db.session.commit()
     return True
 
 
@@ -276,20 +278,21 @@ def get_status_protection_list():
 
 
 # Locations
-def add_location(name, id_protection=None, id_parent=None):
+def add_location(name, ind_location=None, id_parent=None, id_type_location=None):
     """
 
     :param name:
-    :param id_protection:
+    :param ind_location:
     :param id_parent:
     :return:
     """
 
-    mn_object = Location(
-        name=name, id_protection=id_protection, id_parent=id_parent
+    location = Location(
+        name=name, id_parent=id_parent, ind_location=ind_location, id_type=id_type_location
     )
 
-    session_add(db.session, mn_object)
+    session_add(db.session, location)
+    return location
 
 
 def get_location(location_id):
@@ -316,20 +319,21 @@ def get_location_list(
     query = (
         db.session().query(Location)
         # .outerjoin(TypeMnObject)
-        .join(Protection, Location.id_protection == Protection.id)
+        .outerjoin(Protection, Location.id == Protection.id_location)
     )
 
     if name:
         search_name = f"%{name}%"
         query = query.filter(Location.name.ilike(search_name))
 
-    if ids_type_protection:
-        query = query.filter(Location.id_type.in_(ids_type_mn_object))
+    # if ids_type_protection:
+    #     query = query.filter(Protection.id_type_protection.in_(ids_type_protection))
 
     if ids_type_mn_object:
         query = query.filter(
-            Protection.id_type_protection.in_(ids_type_protection)
+            Location.id_type.in_(ids_type_mn_object)
         )
+
     current_app.logger.debug(f"query - {query}")
     result = query.paginate(page=page, per_page=limit, error_out=False)
     return result
@@ -391,6 +395,7 @@ def update_type_location(type_location_id: int, name: str) -> bool or None:
     if name:
         type_location.name = name
     db.session.commit()
+    return True
 
 
 def update_rel_location_location(location_id, location_ids):
@@ -410,11 +415,10 @@ def update_rel_location_protection(location_id, protection_ids):
     protections = (
         db.session.query(Protection)
         .filter(Protection.id.in_(protection_ids))
-        .all()
+        .update({
+            "id_location": int(location_id),
+        })
     )
-
-    for protection in protections:
-        protection.id_location = location_id
 
     db.session.commit()
 

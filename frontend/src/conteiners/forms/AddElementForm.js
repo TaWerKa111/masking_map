@@ -51,6 +51,7 @@ function AddLocAndWorkElementForm(props) {
     const handleChange = (event) => {
         let temp_value = Object.assign({}, value);
         temp_value[event.target.name] = event.target.value;
+        console.log("temp", temp_value);
         setValue(temp_value);
         console.log("temp", event.target.value);
     };

@@ -53,7 +53,6 @@ from app.api.masking.helpers import (
 bp = Blueprint("masking_api", __name__, url_prefix="/api/masking/")
 
 
-# TOdo Исправить работоспособность всех вьюшек
 @bp.route("/type-work/", methods=["GET"])
 def get_type_work_view() -> tuple[dict, int]:
     """
@@ -71,9 +70,7 @@ def get_type_work_view() -> tuple[dict, int]:
                 description: Список типов работ
                 content:
                     app/json:
-                        schema:
-                            type: array
-                            items: TypeWorkSchema
+                        schema: TypeWorkListSchema
             '400':
                 description: Не удалось получить данные!
                 content:
@@ -102,6 +99,7 @@ def get_type_work_view() -> tuple[dict, int]:
         )
 
     type_works, pagination = serialize_paginate_object(type_work_list)
+    current_app.logger.info(f"type works {type_works[1].departament}")
     result = {"type_works": type_works, "pagination": pagination}
 
     return (
@@ -217,6 +215,7 @@ def update_type_work_view() -> tuple[dict, int]:
             http.HTTPStatus.BAD_REQUEST,
         )
 
+    current_app.logger.debug(f"data {type_work_data}")
     result_update = update_type_work(
         type_work_data.get("id"),
         type_work_data.get("name"),
@@ -441,7 +440,8 @@ def get_protection_view() -> tuple[dict, int]:
         tags:
             - masking
     """
-    data = request.args.to_dict(flat=False)
+    data = request.args.to_dict()
+
     try:
         data = FileterParamProtectionSchema().load(data)
     except ValidationError as err:
@@ -468,7 +468,7 @@ def get_protection_view() -> tuple[dict, int]:
 
     return (
         ProtectionListSchema().dump(result),
-        http.HTTPStatus.BAD_REQUEST,
+        http.HTTPStatus.OK,
     )
 
 
@@ -688,7 +688,7 @@ def add_type_protection_view() -> tuple[dict, int]:
     data = request.json
 
     try:
-        type_protection_data = AddTypeProtectionSchema().load(data)
+        type_protection = AddTypeProtectionSchema().load(data)
     except ValidationError as err:
         current_app.logger.debug(
             f"Ошибка при валидации данных для схемы. {err}"
@@ -700,9 +700,6 @@ def add_type_protection_view() -> tuple[dict, int]:
             http.HTTPStatus.BAD_REQUEST,
         )
 
-    type_protection = add_type_protection(
-        type_protection_data.get("name")
-    )
     current_app.logger.debug(f"type_protection add id - {type_protection.id}")
     return BinaryResponseSchema().dump(
         {"message": "Тип защиты объекта успешно добавлен!", "result": True}
@@ -748,6 +745,7 @@ def update_type_protection_view() -> tuple[dict, int]:
         )
 
     data = request.json
+    current_app.logger.debug(f"data - {data}")
 
     try:
         type_protection_data = UpdateTypeProtectionSchema().load(data)
@@ -857,12 +855,12 @@ def get_mn_location_list_view() -> tuple[dict, int]:
             - masking
     """
 
-    data = dict()
-    data["ids_type_protection[]"] = request.args.getlist(
-        "ids_type_protection[]"
-    )
-    data["ids_type_location[]"] = request.args.getlist("ids_type_location[]")
-    data["name"] = request.args.get("name")
+    data = request.args.to_dict()
+    # data["ids_type_protection[]"] = request.args.getlist(
+    #     "ids_type_protection[]"
+    # )
+    # data["ids_type_location[]"] = request.args.getlist("ids_type_location[]")
+    # data["name"] = request.args.get("name")
     current_app.logger.debug(f"mn objects data - {data}")
 
     try:
@@ -878,6 +876,7 @@ def get_mn_location_list_view() -> tuple[dict, int]:
 
     locations_ser, pagination = serialize_paginate_object(locations)
     result = {"locations": locations_ser, "pagination": pagination}
+    current_app.logger.debug(f"result - {locations.items}")
 
     return (
         LocationListSchema().dump(result),
@@ -897,7 +896,7 @@ def add_mn_location_view() -> tuple[dict, int]:
         requestBody:
             content:
                 app/json:
-                    schema: AddMNObjectSchema
+                    schema: AddLocationSchema
         responses:
             '200':
                 description: Данные успешно добавлены
@@ -941,10 +940,11 @@ def add_mn_location_view() -> tuple[dict, int]:
 
     location = add_location(
         location_data.get("name"),
-        location_data.get("id_protection"),
+        location_data.get("ind_location"),
         location_data.get("id_parent"),
+        location_data.get("id_type_location"),
     )
-    current_app.logger.debug(f"location add id - {location.id}")
+    current_app.logger.debug(f"location add id - {location}")
 
     return BinaryResponseSchema().dump(
         {"message": "Объект успешно добавлен!", "result": True}
@@ -1283,7 +1283,7 @@ def update_relationship_location_protection():
 
     update_rel_location_protection(
         rel_loc_prot_data.get("location_id"),
-        rel_loc_prot_data.get("protections_ids"),
+        rel_loc_prot_data.get("protection_ids"),
     )
 
     return BinaryResponseSchema().dump(

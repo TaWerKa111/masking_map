@@ -1,6 +1,6 @@
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
 
-export default function send_notify (message, type) {
+export default function send_notify(message, type) {
     const settings = {
         position: "top-right",
         autoClose: 5000,

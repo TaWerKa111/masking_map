@@ -3,17 +3,23 @@ import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import CondigionsList from "../../conteiners/questions/CondigionsList";
 
-const ModalConditions = ({ isModal, onClose, conditions, handleClickAdd }) => {
+const ModalQuestions = ({ isModal, onClose, conditions, handleClickAdd }) => {
     return (
         <Modal isOpen={isModal} onRequestClose={onClose}>
-            <h2>Уточняющие вопросы</h2>
+            <div className="text-center header-modal">
+                <label className="h2 text-center">Уточняющие вопросы</label>
+                <button
+                    className="float-end btn btn-close"
+                    onClick={onClose}
+                ></button>
+            </div>
+            <div></div>
             <CondigionsList
                 selectedConditions={conditions}
                 handleClickAdd={handleClickAdd}
             ></CondigionsList>
-            <button onClick={onClose}>Close Modal</button>
         </Modal>
     );
 };
 
-export default ModalConditions;
+export default ModalQuestions;

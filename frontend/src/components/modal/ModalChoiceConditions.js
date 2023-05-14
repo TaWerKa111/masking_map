@@ -13,10 +13,15 @@ const ModalChoiceConditions = ({
         <Modal isOpen={isModal} onRequestClose={onClose}>
             <div className="text-center header-modal">
                 <label className="h2 text-center">Уточняющие вопросы</label>
-                <button className="float-end btn btn-close" onClick={onClose}></button>
+                <button
+                    className="float-end btn btn-close"
+                    onClick={onClose}
+                ></button>
             </div>
             <div>
-                <p className="text-center">Ответь на ряд вопросов и нажмите на кнопку Принять ответы</p>
+                <p className="text-center">
+                    Ответь на ряд вопросов и нажмите на кнопку Принять ответы
+                </p>
             </div>
             <AnswerConditionList
                 selectedConditions={conditions}

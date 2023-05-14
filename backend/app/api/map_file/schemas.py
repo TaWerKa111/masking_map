@@ -36,6 +36,7 @@ class GenerateMaskingPlanSchema(Schema):
     location_id = fields.Integer(validate=[is_not_exist_mn_object])
     type_work_id = fields.Integer(validate=[is_not_exist_type_work])
     questions = fields.List(fields.Nested(Question()))
+    is_test = fields.Boolean()
 
 
 class MaskingResponseFileSchema(BinaryResponseSchema):

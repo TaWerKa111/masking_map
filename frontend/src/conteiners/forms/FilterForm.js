@@ -1,34 +1,55 @@
 import { useState } from "react";
+import Select from "react-select";
 
 function FilterElementForm(props) {
-    const [value, setValue] = useState(!props.value ? { name: "" } : props.value);
+    const [searchName, setSearchName] = useState(null);
+    const [optionList, setOptionList] = useState([]);
+    const [optionTypeLocations, setOptionTypeLocations] = useState(
+        props.optionTypeLocations
+    );
+    const [selectedTypeLocation, setSelectedTypeLocation] = useState([]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        props.onSubmit(value);
+        let params = {
+            name: searchName,
+            type_location: selectedTypeLocation,
+        };
+        props.onClickFiltered(params);
     };
 
     const handleChange = (event) => {
-        let temp_value = Object.assign({}, value);
-        temp_value[event.target.name] = event.target.value;
-        setValue(temp_value);
-        console.log("temp", event.target.value);
+        setSearchName(event.target.value);
+    };
+
+    const handleSelect = (data) => {
+        setSelectedTypeLocation(data);
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <div class="form-group form-add-el">
+            <div class="col-md-4">
                 <label className="">Название:</label>
                 <input
                     type="text"
                     name="name"
-                    value={value.name}
+                    value={searchName}
                     onChange={(e) => handleChange(e)}
                     className=""
                 />
             </div>
+            <div className="col-md-4 d-flex">
+                <label>Отдел</label>
+                <Select
+                    options={optionTypeLocations}
+                    placeholder="Select color"
+                    value={selectedTypeLocation}
+                    onChange={handleSelect}
+                    isMulti
+                ></Select>
+            </div>
             <button type="submit" className="btn btn-primary">
-                {props.btnName}
+                Применить фильтр
             </button>
         </form>
     );
@@ -36,7 +57,7 @@ function FilterElementForm(props) {
 
 function FilterButton(props) {
     const [showForm, setShowForm] = useState(false);
-    let name = !props.name ? "Фильтры" : props.name;
+    let name = "Фильтры";
 
     const handleClick = () => {
         setShowForm(!showForm);
@@ -49,8 +70,10 @@ function FilterButton(props) {
             </button>
             {showForm && (
                 <div>
-                    <FilterElementForm></FilterElementForm>
-                    <h1>Фильтры</h1>
+                    <FilterElementForm
+                        optionTypeLocations={props.optionTypeLocations}
+                        onClickFiltered={props.onClickFiltered}
+                    ></FilterElementForm>
                 </div>
             )}
         </div>

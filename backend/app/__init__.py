@@ -11,6 +11,7 @@ app = Flask(
     __name__, static_url_path="/static", template_folder="../common/templates"
 )
 app.config.from_object("config.AppConfig")
+app.config["DEBUG"] = True
 
 db = SQLAlchemy(app)
 
@@ -22,8 +23,7 @@ CORS(
 )
 
 
-from app.management.create.swagger import bp as cli_cr_swagger  # noqa:
-from app.management.create.user import bp as cli_cr_user
+from app.management.create.swagger import bp as cli_create  # noqa:
 
 from app.api.masking.views import bp as api_masking  # noqa:
 from app.api.test.views import bp as api_test  # noqa:
@@ -36,8 +36,7 @@ from app.api.map_file.views import bp as api_files  # noqa:
 from app.api.rule.views import bp as api_rules  # noqa:
 
 
-app.register_blueprint(cli_cr_swagger)
-app.register_blueprint(cli_cr_user)
+app.register_blueprint(cli_create)
 app.register_blueprint(api_masking)
 app.register_blueprint(api_test)
 app.register_blueprint(api_swagger)

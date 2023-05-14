@@ -12,12 +12,18 @@ const ModalChoiceProtections = ({
 }) => {
     return (
         <Modal isOpen={isModal} onRequestClose={onClose}>
-            <h2>Modal Title</h2>
+            <div className="text-center header-modal">
+                <label className="h2 text-center">Выбор защит</label>
+                <button
+                    className="float-end btn btn-close"
+                    onClick={onClose}
+                ></button>
+            </div>
+            <div></div>
             <ChoiceProtections
                 selProtections={protections}
                 handleClickAdd={handleClickAdd}
             ></ChoiceProtections>
-            <button onClick={onClose}>Close Modal</button>
         </Modal>
     );
 };

@@ -1,3 +1,6 @@
+from tkinter.scrolledtext import example
+
+from flask import current_app
 from marshmallow import Schema, fields, post_load, EXCLUDE
 
 from app.api.helpers.schemas import (
@@ -49,7 +52,7 @@ class AddTypeWorkSchema(Schema):
     """ """
 
     name = fields.String(example="Огневые работы")
-    departament_id = fields.Integer(example=1)
+    departament_id = fields.Integer(example=1, allow_none=True)
 
     class Meta:
         unknown = EXCLUDE
@@ -62,7 +65,7 @@ class AddTypeWorkSchema(Schema):
 class UpdateTypeWorkSchema(Schema):
     id = fields.Integer()
     name = fields.String()
-    departament_id = fields.Integer()
+    departament_id = fields.Integer(allow_none=True)
 
 
 class TypeWorkSchema(Schema):
@@ -72,7 +75,7 @@ class TypeWorkSchema(Schema):
 
 
 class TypeWorkListSchema(Schema):
-    type_works = fields.Nested(TypeWorkSchema())
+    type_works = fields.List(fields.Nested(TypeWorkSchema()))
     pagination = fields.Nested(PaginationResponseSchema())
 
 
@@ -170,6 +173,8 @@ class AddLocationSchema(Schema):
     name = fields.String(example="Защита агрегата №1")
     id_parent = fields.Integer(example=1)
     # id_protection = fields.Integer(example=1)
+    ind_location = fields.Integer(example=1)
+    id_type_location = fields.Integer(example=1)
 
     class Meta:
         unknown = EXCLUDE
@@ -178,7 +183,8 @@ class AddLocationSchema(Schema):
 class UpdateLocationSchema(Schema):
     id = fields.Integer()
     name = fields.String()
-    id_parent = fields.Integer()
+    id_parent = fields.Integer(allow_none=True)
+    id_type_location = fields.Integer(allow_none=True)
 
 
 class GetLocationSchema(Schema):
@@ -203,15 +209,16 @@ class LocationListSchema(Schema):
 
 class FilterParamLocationSchema(PaginationSchema):
     ids_type_protection = fields.List(
-        fields.Integer, example=[1], data_key="ids_type_protection[]"
+        fields.Integer, example=[1], data_key="ids_type_protection[]", allow_none=True
     )
     ids_type_location = fields.List(
-        fields.Integer, example=[1], data_key="ids_type_mn_object[]"
+        fields.Integer, example=[1], data_key="ids_type_mn_location[]", allow_none=True
     )
     name = fields.String(example="example", allow_none=True)
 
     @post_load
     def get_mn_object_list(self, data, **kwargs):
+        current_app.logger.info(data)
         return get_location_list(
             name=data.get("name"),
             ids_type_mn_object=data.get("ids_type_location"),

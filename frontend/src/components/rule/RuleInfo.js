@@ -6,12 +6,14 @@ import ModalTypeWork from "../modal/ModalTypeWork";
 import ModalChoiceProtections from "../modal/Protections";
 import ModalLocation from "../modal/ModalLocation";
 import CheckboxProtection from "../checkbox/CheckBoxProtection";
-import ModalConditions from "../modal/ModalQuestions";
+import ModalQuestions from "../modal/ModalQuestions";
+import Select from "react-select";
+import send_notify from "../../utils/toast";
 
 export default function RuleInfo(props) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [rule, setRule] = useState(props.rule);
-    const [typeLocations, setTypeLocations] = useState([
+    const [typeOptionLocations, setOptionTypeLocations] = useState([
         { name: "asd", id: 1 },
         { name: "asd", id: 2 },
     ]);
@@ -25,14 +27,25 @@ export default function RuleInfo(props) {
     const [protections, setProtections] = useState(rule.protections);
 
     useEffect(() => {
-        let params = {};
-        // apiInst
-        //     .get("/rules/", {params})
-        //     .then((resp) => {
-        //         setRules(resp.data);
-        //     })
-        //     .catch(e => console.log(e));
+        apiInst
+            .get("/masking/type-location/", { params: {} })
+            .then((resp) => {
+                setOptionTypeLocations(
+                    resp.data.map((type) => {
+                        return { value: type.id, label: type.name };
+                    })
+                );
+            })
+            .catch((e) => console.log(e));
     }, []);
+
+    const handleChange = (event) => {
+        let temp_value = Object.assign({}, rule);
+        temp_value[event.target.name] = event.target.value;
+        console.log("temp", temp_value);
+        setRule(temp_value);
+        console.log("temp", event.target.value);
+    };
 
     const handleOptionSelect = (event) => {
         const optionValue = event.target.value;
@@ -93,18 +106,82 @@ export default function RuleInfo(props) {
         );
     };
 
-    const handleConditions = (conditions) => {};
+    const handleConditions = (conditions) => {
+        console.log("conditions", conditions);
+        setModalCondition(false);
+        let temp = Object.assign({}, rule);
+        temp["conditions"] = conditions.map((condition) => {
+            return {
+                id: condition.value,
+                text: condition.label,
+                answers: condition.answers,
+            };
+        });
+        setRule(temp);
+    };
 
+    const handleSelect = (data) => {
+        setSelectedTypeLocations(data);
+    };
+
+    const handleAddRule = () => {
+        let newRule = {
+            name: rule.name,
+            compensatory_measures: rule.compensatory_measures,
+            type_locations: selectedTypeLocations.map((type) => ({
+                id: type.value,
+                text: type.label,
+            })),
+            protections: rule.protections,
+            works: rule.works,
+            locations: rule.locations,
+            questions: rule.conditions,
+        };
+        console.log("newRule", newRule);
+        // apiInst
+        //     .post("/rule/rule/", newRule)
+        //     .then((resp) => {
+        //         if (resp.data.result) {
+        //             send_notify(resp.data.message, "success");
+        //         } else send_notify(resp.data.message, "error");
+        //     })
+        //     .catch((e) => {
+        //         send_notify(e.response.data.message, "error");
+        //         console.log(e.response.data.message);
+        //     });
+    };
+
+    console.log("rule", rule);
     return (
         <div className="container">
             <div className="row">
                 <div className="col-md">
                     <label>Название: </label>
                     <input
-                        name="name_rule"
+                        name="name"
+                        type="text"
                         disabled={false}
                         value={rule.name}
+                        onChange={handleChange}
                     ></input>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md">
+                    <label>Сопровождающие мероприятия: </label>
+                    <textarea
+                        name="compensatory_measures"
+                        type="text"
+                        disabled={false}
+                        value={rule.compensatory_measures}
+                        onChange={handleChange}
+                        placeholder="Сопровождающие мероприятия"
+                        title="Сопровождающие мероприятия"
+                        id="description"
+                        className="form-control"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                    ></textarea>
                 </div>
             </div>
             <div className="row">
@@ -155,29 +232,13 @@ export default function RuleInfo(props) {
                 </div>
                 <div className="col-md">
                     <p>Тип Локаций:</p>
-                    {/* <ul>
-                            {
-                                rule.type_locations.map(
-                                    work => <p key={work.id}>{work.name}</p>
-                                )
-                            }
-                        </ul> */}
-                    <select
-                        id="multi-select"
-                        name="multi-select"
-                        multiple
+                    <Select
+                        options={typeOptionLocations}
+                        placeholder="Select color"
                         value={selectedTypeLocations}
-                        onChange={handleOptionSelect}
-                    >
-                        {typeLocations.map((typeLocation) => (
-                            <option
-                                key={typeLocation.id}
-                                value={typeLocation.id}
-                            >
-                                {typeLocation.name}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={handleSelect}
+                        isMulti
+                    ></Select>
                 </div>
             </div>
             <div className="row">
@@ -188,15 +249,22 @@ export default function RuleInfo(props) {
                     <p>Условия:</p>
                     <ul>
                         {rule.conditions.map((condition) => (
-                            <p key={condition.id}>{condition.name}</p>
+                            <p key={condition.id}>
+                                {condition.text}{" "}
+                                {
+                                    condition.answers.find(
+                                        (answer) => answer.is_right === true
+                                    ).text
+                                }
+                            </p>
                         ))}
                     </ul>
-                    <ModalConditions
+                    <ModalQuestions
                         isModal={isModalCondition}
                         onClose={() => setModalCondition(false)}
                         handleClickAdd={handleConditions}
                         conditions={rule.conditions}
-                    ></ModalConditions>
+                    ></ModalQuestions>
                     <button onClick={() => setModalCondition(true)}>
                         Изменить
                     </button>
@@ -245,7 +313,7 @@ export default function RuleInfo(props) {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <button>Сохранить правило</button>
+                    <button onClick={handleAddRule}>Сохранить правило</button>
                 </div>
             </div>
         </div>

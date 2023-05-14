@@ -6,12 +6,7 @@ export default function MnObjectQuestions({
     handleClickAdd,
     selectedLocation,
 }) {
-    const [mnObjects, setMnObjects] = useState([
-        {
-            id: 1,
-            name: "Mn object 1",
-        },
-    ]);
+    const [mnObjects, setMnObjects] = useState([]);
 
     const [typeProtections, setTypeProtection] = useState([]);
     const [typeMnObject, setTypeMnObject] = useState([]);
@@ -19,10 +14,12 @@ export default function MnObjectQuestions({
 
     useEffect(() => {
         apiInst
-            .get("/masking/mn-object/")
+            .get("/masking/location-list/")
             .then((resp) => {
-                setMnObjects(resp.data === null ? [] : resp.data);
-                console.log(resp.data);
+                setMnObjects(
+                    resp.data.locations === null ? [] : resp.data.locations
+                );
+                console.log(resp.data.locations);
             })
             .catch((e) => console.log(e));
 

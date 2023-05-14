@@ -21,6 +21,23 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
     const [searchTextLocation, setSearchTextLocation] = useState("");
     const [searchTextProtection, setSearchTextProtection] = useState("");
 
+    useEffect(() => {
+        let params = {
+            limit: 100,
+        };
+        apiInst
+            .get("/masking/location-list/", { params: params })
+            .then((resp) => {
+                setLocations(resp.data.locations);
+            });
+        let protectionParams = {};
+        apiInst
+            .get("/masking/protection/", { protectionParams })
+            .then((resp) => {
+                setProtections(resp.data.protections);
+            });
+    }, []);
+
     // Обработчик изменения поля поиска первого списка
     const handleSearchTextLocationChange = (event) => {
         setSearchTextLocation(event.target.value);
@@ -80,19 +97,12 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex justify-content-center">
-                    <p>
-                        <h2>Связать локации и их защит</h2>
-                    </p>
-                </div>
-            </div>
-            <div className="row">
                 <div className="col-md">
                     <form onSubmit={handleSubmit}>
-                        <p>
+                        {/* <p>
                             Выбранная локация:{" "}
                             {selectedItem ? selectedItem.name : ""}
-                        </p>
+                        </p> */}
                         <p>Выбранные защиты:</p>
                         <ul>
                             {selectedProtections.map((item, index) => (
@@ -104,7 +114,7 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
                 </div>
             </div>
             <div className="row">
-                <div className="col-md ">
+                {/* <div className="col-md ">
                     <h2>Локации</h2>
                     <input
                         type="text"
@@ -121,7 +131,7 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
                             ))}
                         </ul>
                     </div>
-                </div>
+                </div> */}
                 <div className="col-md ">
                     <h2>Защиты</h2>
                     <input

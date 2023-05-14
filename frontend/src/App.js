@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { apiInst } from "./utils/axios";
 import LoginForm from "./conteiners/LoginForm";
 import Logout from "./conteiners/Logout";
-import TypeWorks from "./conteiners/works/TypeWorks";
+import TypeWorksList from "./conteiners/works/TypeWorks";
 import Rules from "./conteiners/rules/Rules";
 import Locations from "./conteiners/location/Locations";
 import Protections from "./conteiners/protection/Protections";
@@ -26,8 +26,8 @@ import ChoiceProtections from "./conteiners/protection/ChoiceProtection";
 import MaskingMaps from "./conteiners/masking/MaskingMaps";
 import ExpertInstraction from "./conteiners/instractions/ExpertInstraction";
 import BankQuestions from "./conteiners/questions/BankQuestions";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
@@ -127,9 +127,7 @@ function App() {
                         exact
                         path="/expert/questions/"
                         element={<BankQuestions />}
-                    >
-
-                    </Route>
+                    ></Route>
                     <Route
                         exact
                         path="/expert/"
@@ -138,7 +136,7 @@ function App() {
                     <Route path="/expert/rules/" element={<Rules />}></Route>
                     <Route
                         path="/expert/type-works/"
-                        element={<TypeWorks />}
+                        element={<TypeWorksList />}
                     ></Route>
                     <Route
                         path="/expert/locations/"

@@ -1,26 +1,30 @@
 import MnObjectList from "../../components/masking/MnObjectList";
 import { apiInst } from "../../utils/axios";
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export default function QuestionInfo({
     handleClickAdd,
     question_id,
     question_info,
 }) {
-    const [question, setQuestion] = useState(question_info ? question_info :{
-        "name": "",
-        "answers":[],
-    });
+    const [question, setQuestion] = useState(
+        question_info
+            ? question_info
+            : {
+                  text: "",
+                  answers: [],
+              }
+    );
 
     useEffect(() => {
         if (question_id) {
             setQuestion(question_id);
-        }
-        else {
+        } else {
             if (!question) {
                 setQuestion({
-                    "name": "",
-                    "answers":[],
+                    text: "",
+                    answers: [],
                 });
             }
         }
@@ -34,28 +38,26 @@ export default function QuestionInfo({
     const OnAddAnswer = (el) => {
         const newAnswers = [...question.answers];
         newAnswers.push({
-            "name": "",
-            "id": newAnswers.length + 1,
+            text: "",
+            id: uuidv4(),
         });
         setQuestion({
-          ...question,
-            "answers": newAnswers,
+            ...question,
+            answers: newAnswers,
         });
     };
 
     const OnChangeName = (el) => {
         setQuestion({
-          ...question,
-                "name": el.target.value,
+            ...question,
+            text: el.target.value,
         });
     };
 
     const OnChangeNameAnswer = (event, el) => {
         let temp_value = Object.assign({}, question);
         let answers = temp_value.answers.map((ans) =>
-            ans.id === el.id
-                ? { ...ans, ["name"]: event.target.value }
-                : ans
+            ans.id === el.id ? { ...ans, ["text"]: event.target.value } : ans
         );
         temp_value.answers = answers;
         setQuestion(temp_value);
@@ -64,8 +66,8 @@ export default function QuestionInfo({
     const OnDeleteAnswer = (el) => {
         const newAnswers = [...question.answers];
         setQuestion({
-          ...question,
-            "answers": newAnswers.filter((answer) => answer.id !== el.id),
+            ...question,
+            answers: newAnswers.filter((answer) => answer.id !== el.id),
         });
     };
 
@@ -74,7 +76,9 @@ export default function QuestionInfo({
             <div className="row">
                 <div className="col-md-12">
                     <form onSubmit={handleSubmit}>
-                        <button type="submit" className="btn btn-primary">Добавить</button>
+                        <button type="submit" className="btn btn-primary">
+                            Добавить
+                        </button>
                         <div className="form-group">
                             <label htmlFor="name">Название</label>
                             <input
@@ -82,38 +86,62 @@ export default function QuestionInfo({
                                 className="form-control"
                                 id="name"
                                 name="name"
-                                value={question.name}
+                                value={question.text}
                                 onChange={OnChangeName}
                             />
-                            <small id="nameHelp" className="form-text text-muted">
+                            <small
+                                id="nameHelp"
+                                className="form-text text-muted"
+                            >
                                 Введите название
                             </small>
                         </div>
                         <div className="form-group">
                             <label htmlFor="answers">Ответы</label>
-                            <button type="button" className="btn btn-primary" onClick={OnAddAnswer}>Добавить ответ</button>
-                            {
-                                question.answers.map((answer, index) => {
-                                    return (
-                                        <div key={index} className="form-group">
-                                            <label htmlFor="answers">Текст ответа</label>
-                                            <div className="d-flex">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="answers"
-                                                    value={answer.name}
-                                                    onChange={(e) => OnChangeNameAnswer(e, answer)}
-                                                ></input>
-                                                <button className="btn btn-danger" onClick={() => OnDeleteAnswer(answer)}>Удалить</button>
-                                            </div>
-                                            <small id="nameHelp" className="form-text text-muted">
-                                                Введите текст
-                                            </small>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={OnAddAnswer}
+                            >
+                                Добавить ответ
+                            </button>
+                            {question.answers.map((answer, index) => {
+                                return (
+                                    <div key={index} className="form-group">
+                                        <label htmlFor="answers">
+                                            Текст ответа
+                                        </label>
+                                        <div className="d-flex">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                name="answers"
+                                                value={answer.text}
+                                                onChange={(e) =>
+                                                    OnChangeNameAnswer(
+                                                        e,
+                                                        answer
+                                                    )
+                                                }
+                                            ></input>
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() =>
+                                                    OnDeleteAnswer(answer)
+                                                }
+                                            >
+                                                Удалить
+                                            </button>
                                         </div>
-                                    )
-                                })
-                            }
+                                        <small
+                                            id="nameHelp"
+                                            className="form-text text-muted"
+                                        >
+                                            Введите текст
+                                        </small>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </form>
                 </div>

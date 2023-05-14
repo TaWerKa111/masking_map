@@ -38,18 +38,14 @@ export default function ParentLocation() {
     );
 
     useEffect(() => {
-        let params = {};
-        // apiInst
-        //     .get("/locations/", {params})
-        //     .then((resp) => {
-        //         setLocations(resp.data);
-        //     })
-        //     .catch(e => console.log(e));
-        let l = [];
-        for (let i = 0; i < 30; i++) {
-            l.push({ name: `loc${i}`, id: i });
-        }
-        setLocations(l);
+        let params = {
+            limit: 100,
+        };
+        apiInst
+            .get("/masking/location-list/", { params: params })
+            .then((resp) => {
+                setLocations(resp.data.locations);
+            });
     }, []);
 
     const handleListItemClick = (item) => {

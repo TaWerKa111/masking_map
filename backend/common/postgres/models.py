@@ -23,7 +23,7 @@ from sqlalchemy.orm import (
     backref,
     declarative_base,
 )
-from sqlalchemy.sql.sqltypes import DateTime, Date
+from sqlalchemy.sql.sqltypes import DateTime, Date, Text
 from sqlalchemy.ext.mutable import MutableDict
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -226,6 +226,15 @@ class User(Base, TimestampsMixin):
 
 
 class MaskingMapFile(Base):
+    """
+    Карты маскирования
+
+    Поля
+        - is_test: boolean - тестовый запрос на создания карты маскирования
+        - params_masking: dict - параметры маскирования
+        - is_valid: boolean - валидность карты маскирования
+    """
+
     __tablename__ = "masking_map_file"
 
     id = Column(Integer, primary_key=True)
@@ -239,6 +248,11 @@ class MaskingMapFile(Base):
     user_id = Column(
         Integer, ForeignKey("users.id"), nullable=True
     )
+    is_test = Column(Boolean)
+    params_masking = Column(
+        MutableDict.as_mutable(postgresql.JSONB)
+    )
+    is_valid = Column(Boolean)
 
 
 class Criteria(Base):
@@ -339,6 +353,7 @@ class Rule(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     user_id = Column(Integer, ForeignKey("users.id"))
+    compensatory_measures = Column(Text)
 
     # relationship
     criteria = relationship(

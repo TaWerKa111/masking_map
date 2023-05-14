@@ -1,12 +1,21 @@
 import Modal from "react-modal";
 import QuestionInfo from "../question/QuestionInfo";
 
-const ModalQuestion = ({ isModal, onClose, handleClickAdd, question, question_id=null }) => {
+const ModalQuestion = ({
+    isModal,
+    onClose,
+    handleClickAdd,
+    question,
+    question_id = null,
+}) => {
     return (
         <Modal isOpen={isModal} onRequestClose={onClose}>
             <div className="text-center header-modal">
                 <label className="h2 text-center">Редактирование вопроса</label>
-                <button className="float-end btn btn-close" onClick={onClose}></button>
+                <button
+                    className="float-end btn btn-close"
+                    onClick={onClose}
+                ></button>
             </div>
             <div>
                 <p className="text-center">Измените вопрос"</p>

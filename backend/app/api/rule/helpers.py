@@ -1,3 +1,4 @@
+from flask import current_app
 from flask_sqlalchemy import Pagination
 
 from app import db
@@ -343,3 +344,67 @@ def update_rule(
 
     db.session.commit()
     return rule
+
+
+def filter_list_question(questions_ids: list[int], text:str, page: int = 1, limit: int =10):
+    """
+
+    :param questions_ids:
+    :param text:
+    :param page:
+    :param limit:
+    :return:
+    """
+    query = db.session.query(Question)
+
+    if questions_ids:
+        query = query.filter(Question.id.in_(questions_ids))
+    if text:
+        filter_text = f"%{text}%"
+        query = query.filter(Question.text.ilike(filter_text))
+
+    result = query.paginate(page=page, per_page=limit, error_out=False)
+    return result
+
+
+def get_question(question_id: int) -> Question:
+    """
+    Получить вопрос по идентификатору
+
+    :param question_id: int,
+        идентификатор вопроса
+    :return: Question
+    """
+    question = db.session.query(Question).filter(Question.id == question_id).limit(1).first()
+
+    return question
+
+
+def update_question(question_id: int, text: str, answers: list[dict]):
+    """
+
+    :param question_id:
+    :param text:
+    :param answers:
+    :return:
+    """
+
+    question = db.session.query(Question).filter(Question.id ==question_id).first()
+    if not question:
+        return None
+
+    if text:
+        question.text = text
+
+    if answers is not None:
+        new_answers = []
+        for answer_data in answers:
+            new_answers.append(
+                add_question_answer(
+                    answer_data.get("text"), question.id))
+        current_app.logger.info(f"new answers {new_answers}")
+        question.answers = new_answers
+
+    db.session.query(QuestionAnswer).filter(QuestionAnswer.id_question.is_(None)).delete()
+    db.session.commit()
+    return question

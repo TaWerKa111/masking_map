@@ -3,9 +3,10 @@ import {
     useNavigate,
     useSearchParams,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import send_notify from "../../utils/toast";
 
 export default function TypeProtections() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -14,36 +15,53 @@ export default function TypeProtections() {
     ]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        let params = {};
+    function fetchTypeProtections() {
+        let params = {
+            limit: 100,
+        };
         apiInst
-            .get("/masking/type-protection/", { params })
+            .get("/masking/type-protection/", { params: params })
             .then((resp) => {
                 setTypeProtections(resp.data);
             })
             .catch((e) => console.log(e));
+    }
+
+    useEffect(() => {
+        fetchTypeProtections();
     }, []);
 
-    const onClickDelete = (event, key) => {
+    const deleteClick = (event, key) => {
+        console.log("delete el", key);
         let params = {
             rule_id: key,
         };
         console.log(params);
         apiInst
             .delete("/locations/", (params = params))
-            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
+            .then((resp) => alert(resp.data.result ? "Удалено" : "Не удалено"))
             .catch((e) => console.log(e));
-    };
-
-    const deleteClick = (event, key) => {
-        console.log("delete el", key);
     };
 
     const editClick = (value) => {
         console.log("value", value);
+        let new_value = {
+            id: value.id,
+            name: value.name,
+        };
         apiInst
-            .put("/masking/type-protection/", value)
-            .catch((e) => console.log(e));
+            .put("/masking/type-protection/", new_value)
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeProtections();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e);
+            });
+        fetchTypeProtections();
     };
 
     const addClick = (value) => {
@@ -54,7 +72,16 @@ export default function TypeProtections() {
         console.log(type_protection);
         apiInst
             .post("/masking/type-protection/", type_protection)
-            .catch((e) => console.log(e));
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeProtections();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e);
+            });
     };
 
     return (
@@ -78,44 +105,45 @@ export default function TypeProtections() {
             <div className="row">
                 <div className="col-md">
                     {typeProtections == null ? (
-                            <p>
-                                <h2>Нет типов защит!</h2>
-                            </p>
-                        ) : (
-                            <table>
-                                <tr>
-                                    <th>Название</th>
-                                    <th>Изменить</th>
-                                    <th>Удалить</th>
+                        <p>
+                            <h2>Нет типов защит!</h2>
+                        </p>
+                    ) : (
+                        <table>
+                            <tr>
+                                <th>Название</th>
+                                <th>Изменить</th>
+                                <th>Удалить</th>
+                            </tr>
+                            {typeProtections.map((typeProtection) => (
+                                <tr key={typeProtection.id}>
+                                    <td>{typeProtection.name}</td>
+                                    <td className="td-btn">
+                                        <AddElementButton
+                                            type_form="simple"
+                                            className="btn"
+                                            onSubmit={editClick}
+                                            name={"Изменить"}
+                                            value={typeProtection}
+                                        ></AddElementButton>
+                                    </td>
+                                    <td className="td-btn">
+                                        <button
+                                            className="btn"
+                                            onClick={(el) =>
+                                                deleteClick(
+                                                    el,
+                                                    typeProtection.id
+                                                )
+                                            }
+                                        >
+                                            Удалить
+                                        </button>
+                                    </td>
                                 </tr>
-                                {typeProtections.map((typeProtection) => (
-                                    <tr key={typeProtection.id}>
-                                        <td>{typeProtection.name}</td>
-                                        <td className="td-btn">
-                                            <AddElementButton
-                                                type_form="simple"
-                                                className="btn"
-                                                onSubmit={editClick}
-                                                name={"Изменить"}
-                                                value={typeProtection}
-                                            ></AddElementButton>
-                                        </td>
-                                        <td className="td-btn">
-                                            <button
-                                                className="btn"
-                                                onClick={(el) =>
-                                                    deleteClick(el, typeProtection.id)
-                                                }
-                                            >
-                                                Удалить
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    ))    
-                                }
-                            </table>
-                        )
-                    }   
+                            ))}
+                        </table>
+                    )}
                 </div>
             </div>
         </div>

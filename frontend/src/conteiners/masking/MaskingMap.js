@@ -5,6 +5,7 @@ import ModalTypeWork from "../../components/modal/ModalTypeWork";
 import ModalLocation from "../../components/modal/ModalLocation";
 import { type } from "@testing-library/user-event/dist/type";
 import ModalChoiceConditions from "../../components/modal/ModalChoiceConditions";
+import send_toast from "../../utils/toast";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -30,21 +31,33 @@ export default function MaskingMap() {
         },
     ]);
     // const [selectedConditions, setSelectedConditions] = useState([]);
+    const fetchQuestions = () => {
+        apiInst
+            .get("/rule/questions/")
+            .then((resp) => {
+                setConditions(resp.data.questions);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     useEffect(() => {
-        let params = {};
+        fetchQuestions();
     }, []);
 
     const handleTypeWorks = (selectedTypeWorks) => {
         console.log("type_works", typeWorks);
         setModalTypeWork(false);
         setTypeWorks(selectedTypeWorks);
+        fetchQuestions();
     };
 
     const handleLocations = (locations) => {
         console.log("locations", locations);
         setModalLocation(false);
         setLocations(locations);
+        fetchQuestions();
     };
 
     const handleConditions = (selectedConditions) => {
@@ -93,6 +106,30 @@ export default function MaskingMap() {
             });
     };
 
+    const handleGenerateMap = () => {
+        setResultGenerating({});
+        let generateMapData = {
+            locations: locations,
+            type_works: typeWorks,
+            conditions: conditions,
+        };
+        console.log("generateMapData", generateMapData);
+        apiInst
+            .get("/files/generate-masking/", {
+                params: params,
+            })
+            .then((resp) => {
+                setResultGenerating(resp.data);
+                setMapUuid(resp.data.masking_uuid);
+                // fetchPdfDocument(resp.data.masking_uuid);
+                send_toast("Карта сформирована!", "error");
+            })
+            .catch((err) => {
+                console.log(err);
+                send_toast("Не удалось сформировать карту!", "error");
+            });
+    };
+
     if (resultGenerating.result === true) {
         return (
             <div className="container">
@@ -125,8 +162,9 @@ export default function MaskingMap() {
                 <div className="col-md header-block">
                     <h1 className="text-center ">Заполните анкету</h1>
                     <p>
-                        Для заполнения отдельных блоков необходимо нажимать кнопку "Изменить" 
-                        и в появившемся окне необходимо выбрать соответсвующие пункты.
+                        Для заполнения отдельных блоков необходимо нажимать
+                        кнопку "Изменить" и в появившемся окне необходимо
+                        выбрать соответсвующие пункты.
                     </p>
                 </div>
             </div>
@@ -140,7 +178,10 @@ export default function MaskingMap() {
                         </td>
                         <td>
                             <label className="h6">Виды работ:</label>
-                            <button className="btn btn-secondary float-end" onClick={() => setModalTypeWork(true)}>
+                            <button
+                                className="btn btn-secondary float-end"
+                                onClick={() => setModalTypeWork(true)}
+                            >
                                 Изменить
                             </button>
                             <ul>
@@ -148,7 +189,7 @@ export default function MaskingMap() {
                                     <p key={work.id}>{work.name}</p>
                                 ))}
                             </ul>
-                            
+
                             <ModalTypeWork
                                 isModal={isModalTypeWork}
                                 onClose={() => setModalTypeWork(false)}
@@ -165,7 +206,10 @@ export default function MaskingMap() {
                         </td>
                         <td>
                             <label className="h6">Локации:</label>
-                            <button className="btn btn-secondary float-end" onClick={() => setModalLocation(true)}>
+                            <button
+                                className="btn btn-secondary float-end"
+                                onClick={() => setModalLocation(true)}
+                            >
                                 Изменить
                             </button>
                             <ul>
@@ -173,7 +217,7 @@ export default function MaskingMap() {
                                     <p key={location.id}>{location.name}</p>
                                 ))}
                             </ul>
-                            
+
                             <ModalLocation
                                 isModal={isModalLocation}
                                 onClose={() => setModalLocation(false)}
@@ -190,19 +234,26 @@ export default function MaskingMap() {
                         </td>
                         <td>
                             <label className="h6">Условия:</label>
-                            <button className="btn btn-secondary float-end" onClick={() => setModalCondition(true)}>
+                            <button
+                                className="btn btn-secondary float-end"
+                                onClick={() => setModalCondition(true)}
+                            >
                                 Изменить
                             </button>
                             <ul>
                                 {conditions.map((condition) => (
                                     <div>
-                                        <label key={condition.id}>{condition.name}</label>
+                                        <label key={condition.id}>
+                                            {condition.text}
+                                        </label>
                                         <label>
-                                            {
-                                                condition.answer_id 
-                                                ? condition.answers.filter(item => item.id === condition.answer_id)[0].name 
-                                                : "нет ответа"
-                                            }
+                                            {condition.answer_id
+                                                ? condition.answers.filter(
+                                                      (item) =>
+                                                          item.id ===
+                                                          condition.answer_id
+                                                  )[0].text
+                                                : "нет ответа"}
                                         </label>
                                     </div>
                                 ))}
@@ -292,7 +343,12 @@ export default function MaskingMap() {
             </div>
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
-                    <button className="btn btn-primary">Сформировать карту</button>
+                    <button
+                        onClick={handleGenerateMap}
+                        className="btn btn-primary"
+                    >
+                        Сформировать карту
+                    </button>
                 </div>
             </div>
         </div>

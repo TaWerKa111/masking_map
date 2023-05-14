@@ -19,21 +19,10 @@ export default function Rules() {
         apiInst
             .get("/rule/rules/", { params })
             .then((resp) => {
-                setRules(resp.data);
+                setRules(resp.data.rules);
             })
             .catch((e) => console.log(e));
     }, []);
-
-    const onClickDelete = (event, key) => {
-        let params = {
-            rule_id: key,
-        };
-        console.log(params);
-        apiInst
-            .delete("/rule/", (params = params))
-            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
-            .catch((e) => console.log(e));
-    };
 
     const onClick = (event, key) => {
         let params = {
@@ -48,10 +37,26 @@ export default function Rules() {
 
     const deleteClick = (event, key) => {
         console.log("delete el", key);
+        let params = {
+            rule_id: key,
+        };
+        console.log(params);
+        apiInst
+            .delete("/rule/", (params = params))
+            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
+            .catch((e) => console.log(e));
     };
 
     const editClick = (event, key) => {
         console.log("edit el", key);
+        let params = {
+            rule_id: key,
+        };
+        navigate({
+            pathname: `/expert/add-rule/`,
+            search: `?${createSearchParams(params)}`,
+            state: { rule_id: key },
+        });
     };
 
     return (
@@ -81,25 +86,43 @@ export default function Rules() {
                             </p>
                         ) : (
                             rules.rules.map((rule) => (
-                                <div key={rule.id} className="itemOfQuestions">
-                                    <p onClick={(el) => onClick(el, rule.id)}>
-                                        {rule.name}
-                                    </p>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) => editClick(el, rule.id)}
-                                    >
-                                        Изменить
-                                    </button>
-                                    <button
-                                        className="btn"
-                                        onClick={(el) =>
-                                            deleteClick(el, rule.id)
-                                        }
-                                    >
-                                        Удалить
-                                    </button>
-                                </div>
+                                <table>
+                                    <tr>
+                                        <th>Название Правила</th>
+                                        <th>Виды работ</th>
+                                        <th>Места проведения работ</th>
+                                        <th>Защиты</th>
+                                        <th>Компенсирующие мероприятия</th>
+                                        <th>Изменить</th>
+                                        <th>Удалить</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{rule.name}</td>
+                                        <td>{rule}</td>
+                                        <td>{rule}</td>
+                                        <td>{rule}</td>
+                                        <td>
+                                            <button
+                                                className="btn"
+                                                onClick={(el) =>
+                                                    editClick(el, rule.id)
+                                                }
+                                            >
+                                                Изменить
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="btn"
+                                                onClick={(el) =>
+                                                    deleteClick(el, rule.id)
+                                                }
+                                            >
+                                                Удалить
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
                             ))
                         )}
                     </ul>

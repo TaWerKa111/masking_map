@@ -7,62 +7,39 @@ import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
 import MyPagination from "../../components/Pagination";
-import Select from 'react-select';
+import Select from "react-select";
+import send_notify from "../../utils/toast";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
-export default function TypeWorks() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [typeWorks, setTypeWorks] = useState({
-        typeWorks: [
-            { name: "locatin1", id: 1, type: 1 },
-            { name: "locatin1", id: 1 },
-        ],
-    });
+export default function TypeWorksList() {
+    const [typeWorks, setTypeWorks] = useState([]);
     const [departments, setDepartments] = useState([{ name: "dep1", id: 1 }]);
     const [page, setPage] = useState(1);
     const [selectedDepartaments, setSelectedDepartaments] = useState([]);
     const pageSize = 10;
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        let params = {};
+    function fetchTypeWorks() {
+        let params = {
+            limit: 10,
+        };
         apiInst
             .get("/masking/type-work/", { params })
             .then((resp) => {
-                setTypeWorks(resp.data);
+                setTypeWorks(resp.data.type_works);
             })
             .catch((e) => console.log(e));
+    }
+
+    useEffect(() => {
+        fetchTypeWorks();
         apiInst
-            .get("/masking/departament-type-work/", { params })
+            .get("/masking/departament-type-work/")
             .then((resp) => {
-                setDepartments(resp.data);
+                setDepartments(resp.data.departaments);
             })
             .catch((e) => console.log(e));
     }, []);
-
-    const onClickDelete = (event, key) => {
-        let params = {
-            rule_id: key,
-        };
-        console.log(params);
-        apiInst
-            .delete("/rule/", (params = params))
-            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
-            .catch((e) => console.log(e));
-    };
-
-    const onClick = (event, key) => {
-        let params = {
-            rule_id: key,
-        };
-        console.log(params);
-        navigate({
-            pathname: `/rule/`,
-            search: `?${createSearchParams(params)}`,
-        });
-    };
 
     const handlePageChange = (page) => {
         setPage(page);
@@ -70,31 +47,67 @@ export default function TypeWorks() {
 
     const deleteClick = (event, key) => {
         console.log("delete el", key);
+        let params = {
+            rule_id: key,
+        };
+        console.log(params);
+        apiInst
+            .delete("/masking/type-work/", (params = params))
+            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
+            .catch((e) => console.log(e));
     };
+
     const editClick = (value) => {
         console.log("edit el", value);
+        let updateTypeWork = {
+            id: value.id,
+            name: value.name,
+            departament_id: value.type === "" ? null : value.type,
+        };
+        apiInst
+            .put("/masking/type-work/", updateTypeWork)
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeWorks();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
+
     const addClick = (value) => {
-        console.log("edit el", value);
+        console.log("add el", value);
+        let newTypeWork = {
+            name: value.name,
+            departament_id: value.type,
+        };
+        console.log(newTypeWork);
+        apiInst
+            .post("/masking/type-work/", newTypeWork)
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeWorks();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
-    const optionList = [
-        { value: "red", label: "Red" },
-        { value: "green", label: "Green" },
-        { value: "yellow", label: "Yellow" },
-        { value: "blue", label: "Blue" },
-        { value: "white", label: "White" }
-    ];
-
-    const handleSelect =(data) => {
+    const handleSelect = (data) => {
         setSelectedDepartaments(data);
         console.log("data", data);
-    }
+    };
 
     const handleFiltered = () => {
         console.log("fitering type-works...");
         apiInst.get();
-    }
+    };
 
     return (
         <div className="container">
@@ -114,30 +127,25 @@ export default function TypeWorks() {
                         <h2 className="text-center">Виды работ</h2>
                     </p>
                     <div className="d-flex">
-                        <label>
-                            Фильтры
-                        </label>
+                        <label>Фильтры</label>
                         <div className="">
-                            <label>
-                                Название
-                            </label>
-                            <input type="text">
-                            </input>
+                            <label>Название</label>
+                            <input type="text"></input>
                         </div>
                         <div>
-                            <label>
-                                Отдел
-                            </label>
+                            <label>Отдел</label>
                             <Select
-                                options={optionList}
+                                options={[]}
                                 placeholder="Select color"
                                 value={selectedDepartaments}
                                 onChange={handleSelect}
                                 isMulti
-                            >
-                            </Select>
+                            ></Select>
                         </div>
-                        <button className="btn btn-primary" onClick={handleFiltered}>
+                        <button
+                            className="btn btn-primary"
+                            onClick={handleFiltered}
+                        >
                             Применить фильтры
                         </button>
                     </div>
@@ -145,24 +153,26 @@ export default function TypeWorks() {
             </div>
             <div className="row">
                 <div className="col-md">
-                {typeWorks == null ? (
-                            <p>
-                                <h2>Нет видов работ!</h2>
-                            </p>
-                        ): (
-                            <table>
-                                <tr>
-                                    <th>Название</th>
-                                    <th>Отдел</th>
-                                    <th>Правила</th>
-                                    <th>Изменить</th>
-                                    <th>Удалить</th>
-                                </tr>{
-                            typeWorks.typeWorks.map((typeWork) => (
+                    {typeWorks == null ? (
+                        <p>
+                            <h2>Нет видов работ!</h2>
+                        </p>
+                    ) : (
+                        <table>
+                            <tr>
+                                <th>Название вида работ</th>
+                                <th>Отдел</th>
+                                <th>Изменить</th>
+                                <th>Удалить</th>
+                            </tr>
+                            {typeWorks.map((typeWork) => (
                                 <tr>
                                     <td>{typeWork.name}</td>
-                                    <td></td>
-                                    <td></td>
+                                    <td className="td-btn">
+                                        {typeWork.departament
+                                            ? typeWork.departament.name
+                                            : ""}
+                                    </td>
                                     <td className="td-btn">
                                         <AddElementButton
                                             is_edit={true}
@@ -185,10 +195,9 @@ export default function TypeWorks() {
                                         </button>
                                     </td>
                                 </tr>
-                            ))
-                            }
-                            </table>
-                        )}
+                            ))}
+                        </table>
+                    )}
                 </div>
             </div>
             <div className="row">

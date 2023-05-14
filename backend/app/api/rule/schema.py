@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, pre_load
 
 from app.api.helpers.schemas import PaginationSchema, PaginationResponseSchema
 from app.api.masking.schemas import ProtectionSchema
@@ -24,21 +24,44 @@ class CriteriaSchema(Schema):
 
 
 class QuestionAnswerSchema(Schema):
-    id = fields.Integer(dump_only=True)
+    id = fields.Integer(allow_none=True)
     text = fields.String()
-    is_right_answer = fields.Bool()
+
+    @pre_load
+    def preprocess(self, data, **kwargs):
+        if data.get("id"):
+            if isinstance(data["id"], str):
+                data["id"] = None
+        return data
 
 
 class QuestionSchema(Schema):
     id = fields.Integer()
     text = fields.String()
-    criteria = fields.List(fields.Nested(CriteriaSchema()))
-    responses = fields.List(fields.Nested(QuestionAnswerSchema()))
+    answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+
+
+class QuestionListSchema(Schema):
+    questions = fields.List(fields.Nested(QuestionSchema()))
+    pagination = fields.Nested(PaginationResponseSchema())
+
+
+class GetQuestionSchema(Schema):
+    id = fields.Integer(dump_only=True)
+
+
+class FilterQuestionsSchema(PaginationSchema):
+    question_ids = fields.List(fields.Integer(), data_key="question_ids[]")
+    text = fields.String()
 
 
 class AddQuestionSchema(Schema):
     text = fields.String()
     answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+
+
+class UpdateQuestionSchema(AddQuestionSchema):
+    id = fields.Integer()
 
 
 class RuleProtectionSchema(Schema):
@@ -54,6 +77,7 @@ class AddRuleSchema(Schema):
     type_location_id = fields.Integer()
     questions = fields.List(fields.Nested(AddQuestionSchema()))
     protections = fields.List(fields.Nested(RuleProtectionSchema()))
+    compensatory_measures = fields.String()
 
 
 class UpdateRuleSchema(AddRuleSchema):

@@ -12,7 +12,8 @@ from app.api.rule.helpers import (
     add_new_rule,
     get_rule,
     filter_list_rule,
-    update_rule,
+    update_rule, filter_list_question, get_question, add_question,
+    add_question_answer, update_question,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -20,7 +21,8 @@ from app.api.rule.schema import (
     RuleSchema,
     FilterRulesSchema,
     RuleListSchema,
-    UpdateRuleSchema,
+    UpdateRuleSchema, AddQuestionSchema, QuestionListSchema, QuestionSchema,
+    GetQuestionSchema, FilterQuestionsSchema, UpdateQuestionSchema,
 )
 
 bp = Blueprint("rules_api", __name__, url_prefix="/api/rule/")
@@ -278,6 +280,226 @@ def update_rule_view():
     )
 
 
+@bp.route("/questions/", methods=["GET"])
+def get_questions_view() -> tuple[dict, int]:
+    """
+
+    :return:
+    ---
+    get:
+        summary: Получить список вопросов для уточнения маскирования защит
+        description: Получить список вопросов для уточнения маскирования защит
+        parameters:
+            -   in: query
+                schema: FilterQuestionsSchema
+        responses:
+            '200':
+                description:
+                content:
+                    application/json:
+                        schema: QuestionListSchema
+            '400':
+                description: Ошибка при выполнении запроса
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - rule
+    """
+    data = request.args.to_dict()
+
+    try:
+        valid_data = FilterQuestionsSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(
+            f"Ошибка при валидации данных для схемы. {err}"
+        )
+        return (
+            BinaryResponseSchema().dump(
+                {"message": f"Ошибка валидации. {err}", "result": False}
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+
+    questions = filter_list_question(
+        questions_ids=valid_data.get("questions_ids"),
+        text=valid_data.get("text"),
+        page=valid_data.get("page"),
+        limit=valid_data.get("limit"),
+    )
+
+    questions_ser, pagination = serialize_paginate_object(questions)
+    result = {"questions": questions_ser, "pagination": pagination}
+    return QuestionListSchema().dump(result), http.HTTPStatus.OK
+
+
+@bp.route("/question/", methods=["GET"])
+def get_question_view() -> tuple[dict, int]:
+    """
+
+    :return:
+    ---
+    get:
+        summary: Получить вопрос для уточнения маскирования защит
+        description: Получить вопрос для уточнения маскирования защит
+        parameters:
+            -   in: query
+                schema: GetQuestionSchema
+        responses:
+            '200':
+                description:
+                content:
+                    application/json:
+                        schema: QuestionSchema
+            '400':
+                description: Ошибка при выполнении запроса
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - rule
+    """
+    data = request.args.to_dict()
+
+    try:
+        valid_data = GetQuestionSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(
+            f"Ошибка при валидации данных для схемы. {err}"
+        )
+        return BinaryResponseSchema().dump(
+            {
+                "message": f"{err}",
+                "result": False
+            }
+        ), http.HTTPStatus.BAD_REQUEST
+    question = get_question(
+        question_id=valid_data["id"]
+    )
+    return QuestionSchema().dump(question), http.HTTPStatus.OK
+
+
+@bp.route("/question/", methods=["POST"])
+def add_question_view() -> tuple[dict, int]:
+    """
+
+    :return:
+    post:
+        summary: Добавить вопрос для уточнения правила
+        description: Добавить вопрос для уточнения правила
+        requestBody:
+            content:
+                app/json:
+                    schema: AddQuestionSchema
+        responses:
+            '200':
+                description:
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+            '400':
+                description:
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - rule
+    """
+
+    if not request.json:
+        return (
+            BinaryResponseSchema().dump(MESSAGES_DICT["NO_JSON"]),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+
+    data = request.json
+    try:
+        question_data = AddQuestionSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.info(f"Validation error {err}")
+        return BinaryResponseSchema().dump(
+            {
+                "message": "Не удалось добавить вопрос!",
+                "result": False,
+            }
+        ), http.HTTPStatus.BAD_REQUEST
+    current_app.logger.info(question_data)
+    question = add_question(
+        text=question_data.get("text"),
+    )
+    for answer in question_data.get("answers"):
+        answer = add_question_answer(
+            text=answer.get("text"),
+            id_question=question.id,
+        )
+
+    return BinaryResponseSchema().dump(
+        {
+            "message": "Вопрос успешно добавлен!",
+            "result": True,
+        }
+    ), http.HTTPStatus.OK
+
+
+@bp.route("/question/", methods=["PUT"])
+def update_question_view() -> tuple[dict, int]:
+    """
+
+    :return:
+    put:
+        summary: Добавить вопрос для уточнения правила
+        description: Добавить вопрос для уточнения правила
+        requestBody:
+            content:
+                app/json:
+                    schema: UpdateQuestionSchema
+        responses:
+            '200':
+                description:
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+            '400':
+                description:
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - rule
+    """
+
+    if not request.json:
+        return (
+            BinaryResponseSchema().dump(MESSAGES_DICT["NO_JSON"]),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+
+    data = request.json
+    try:
+        question = UpdateQuestionSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.info(f"Validation error {err}")
+        return BinaryResponseSchema().dump(
+            {
+                "message": "Не удалось изменить вопрос!",
+                "result": False,
+            }
+        ), http.HTTPStatus.BAD_REQUEST
+    current_app.logger.info(question)
+    question = update_question(
+        question_id=question.get("id"),
+        text=question.get("text"),
+        answers=question.get("answers"),
+    )
+
+    return BinaryResponseSchema().dump(
+        {
+            "message": "Вопрос успешно изменен!",
+            "result": True,
+        }
+    ), http.HTTPStatus.OK
+
+
 # @bp.route("/criteria/", methods=["POST"])
 # def add_criteria_views() -> tuple[dict, int]:
 #     """
@@ -362,169 +584,6 @@ def update_rule_view():
 #     """
 #
 #
-# @bp.route("/question/", methods=["POST"])
-# def add_question_view() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     post:
-#         summary: Добавить вопрос для уточнения правила
-#         description: Добавить вопрос для уточнения правила
-#         requestBody:
-#             content:
-#                 app/json:
-#                     schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
 #
 #
-# @bp.route("/question/", methods=["GET"])
-# def get_question_view() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     ---
-#     get:
-#         summary: Получить вопрос для уточнения маскирования защит
-#         description: Получить вопрос для уточнения маскирования защит
-#         parameters:
-#             -   in: query
-#                 schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description: Ошибка при выполнении запроса
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
-#
-#
-# @bp.route("/questions/", methods=["GET"])
-# def get_questions_view() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     ---
-#     get:
-#         summary: Получить список вопросов для уточнения маскирования защит
-#         description: Получить список вопросов для уточнения маскирования защит
-#         parameters:
-#             -   in: query
-#                 schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description: Ошибка при выполнении запроса
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
-#
-#
-# @bp.route("/answer/", methods=["POST"])
-# def add_answer_view() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     post:
-#         summary: Добавить ответ на вопрос
-#         description: Добавление ответа
-#         requestBody:
-#             content:
-#                 app/json:
-#                     schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
 
-
-# @bp.route("/answer/", methods=["GET"])
-# def get_answer_view() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     ---
-#     get:
-#         summary: Получить ответ на уточняющий вопрос
-#         description: Получить ответ на уточняющий вопрос
-#         parameters:
-#             -   in: query
-#                 schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description: Ошибка при выполнении запроса
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
-#
-#
-# @bp.route("/answers/", methods=["GET"])
-# def get_answers_view() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     ---
-#     get:
-#         summary: Получить список ответов на уточняющий вопрос
-#         description: Получить список ответов на уточняющий вопрос
-#         parameters:
-#             -   in: query
-#                 schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description: Ошибка при выполнении запроса
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """

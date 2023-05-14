@@ -9,20 +9,19 @@ import AddElementButton from "../forms/AddElementForm";
 import { ToastContainer, toast } from "react-toastify";
 import send_notify from "../../utils/toast";
 
-
 export default function Departments() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [departments, setDepartments] = useState([{ name: "type1", id: 1 }]);
     const navigate = useNavigate();
 
-    const fetchDepartamentsData = (params=null) => {
+    const fetchDepartamentsData = (params = null) => {
         apiInst
             .get("/masking/departament-type-work/", { params })
             .then((resp) => {
                 setDepartments(resp.data.departaments);
             })
             .catch((e) => console.log(e));
-    }
+    };
 
     useEffect(() => {
         let params = {};
@@ -37,8 +36,16 @@ export default function Departments() {
         console.log("value", value);
         apiInst
             .put("/masking/departament-type-work/", value)
-            .catch((e) => console.log(e));
-        fetchDepartamentsData();
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchDepartamentsData();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     const addClick = (value) => {
@@ -49,11 +56,16 @@ export default function Departments() {
         console.log(departament);
         apiInst
             .post("/masking/departament-type-work/", departament)
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchDepartamentsData();
+                } else send_notify(resp.data.message, "error");
+            })
             .catch((e) => {
-                send_notify("Ошибка при добавлении отдела", "error");
-            }
-        );
-        fetchDepartamentsData();
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     return (
@@ -76,37 +88,40 @@ export default function Departments() {
             </div>
             <div className="row">
                 <div className="col-md">
-                {departments == null? (
-                            <p>
-                                <h2>Нет отделов!</h2>
-                            </p>
-                    ):(
-                    <table>
-                        <tr>
-                            <th>
-                                Название
-                            </th>
-                            <th>
-                                Виды работ
-                            </th>
-                            <th>Изменить</th>
-                            <th>Удалить</th>
-                        </tr>
-                        {
-                            departments.map((department) => (
+                    {departments == null ? (
+                        <p>
+                            <h2>Нет отделов!</h2>
+                        </p>
+                    ) : (
+                        <table>
+                            <tr>
+                                <th>Название отдела</th>
+                                <th>Изменить</th>
+                                <th>Удалить</th>
+                            </tr>
+                            {departments.map((department) => (
                                 <tr key={department.id}>
                                     <td>{department.name}</td>
-                                    <td>{department.type_work}</td>
-                                    <td className="td-btn"><button className="btn btn-primary">Изменить</button></td>
-                                    <td className="td-btn"><button className="btn btn-danger">Удалить</button></td>
+                                    <td className="td-btn">
+                                        <AddElementButton
+                                            type_form="simple"
+                                            className="btn"
+                                            onSubmit={editClick}
+                                            name={"Изменить"}
+                                            value={department}
+                                        ></AddElementButton>
+                                    </td>
+                                    <td className="td-btn">
+                                        <button className="btn btn-danger">
+                                            Удалить
+                                        </button>
+                                    </td>
                                 </tr>
-                            ))
-                        }
-                    </table> 
+                            ))}
+                        </table>
                     )}
                 </div>
             </div>
-
         </div>
     );
 }

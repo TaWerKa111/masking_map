@@ -8,22 +8,22 @@ import { apiInst } from "../../utils/axios";
 import MyPagination from "../../components/Pagination";
 
 export default function MaskingMaps() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [maskingMaps, setMaskingMaps] = useState({
-        masking_maps: [
-            { name: "locatin1", id: 1, type: 1 },
-            { name: "locatin1", id: 1 },
-        ],
-    });
+    const [maskingMaps, setMaskingMaps] = useState([]);
+    const [pagination, setPagination] = useState({});
     const [page, setPage] = useState(1);
-    const pageSize = 10;
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         let params = {};
         apiInst
             .get("/type-work/", { params })
+            .then((resp) => {
+                setMaskingMaps(resp.data.files);
+                setPagination(resp.data.pagination);
+                setPage(pagination.page);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/files/get-file/", { params })
             .then((resp) => {
                 setMaskingMaps(resp.data);
             })
@@ -48,12 +48,14 @@ export default function MaskingMaps() {
             <div className="row">
                 <div className="col-md">
                     <ul className="d-flex justify-content-end list-group">
-                        {maskingMaps == null ? (
+                        {maskingMaps ? (
                             <p>
-                                <h2>Нет карт маскирования!</h2>
+                                <h2 className="text-center">
+                                    Нет карт маскирования!
+                                </h2>
                             </p>
                         ) : (
-                            maskingMaps.masking_maps.map((maskingMap) => (
+                            maskingMaps.map((maskingMap) => (
                                 <div
                                     key={maskingMap.id}
                                     className="item-of-list"
@@ -75,9 +77,9 @@ export default function MaskingMaps() {
             </div>
             <div className="row">
                 <MyPagination
-                    totalItems={13}
-                    currentPage={page}
-                    pageSize={pageSize}
+                    totalItems={pagination.total_items}
+                    currentPage={pagination.page}
+                    pageSize={pagination.limit}
                     onPageChange={handlePageChange}
                 ></MyPagination>
             </div>

@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import send_notify from "../../utils/toast";
 
 export default function TypeLocations() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -14,17 +15,24 @@ export default function TypeLocations() {
     ]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        let params = {};
+    function fetchTypeLocations() {
+        let params = {
+            limit: 10,
+        };
         apiInst
-            .get("/masking/type-location/", { params })
+            .get("/masking/type-location/", { params: params })
             .then((resp) => {
                 setTypeLocations(resp.data);
             })
             .catch((e) => console.log(e));
+    }
+
+    useEffect(() => {
+        fetchTypeLocations();
     }, []);
 
-    const onClickDelete = (event, key) => {
+    const deleteClick = (event, key) => {
+        console.log("delete el", key);
         let params = {
             rule_id: key,
         };
@@ -35,15 +43,17 @@ export default function TypeLocations() {
             .catch((e) => console.log(e));
     };
 
-    const deleteClick = (event, key) => {
-        console.log("delete el", key);
-    };
-
     const editClick = (value) => {
         console.log("edit el", value);
         apiInst
-            .post("/masking/type-location/", value)
-            .catch((e) => console.log(e));
+            .put("/masking/type-location/", value)
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeLocations();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => send_notify(e.response.data.message, "error"));
     };
 
     const addClick = (value) => {
@@ -54,7 +64,16 @@ export default function TypeLocations() {
         console.log(type_location);
         apiInst
             .post("/masking/type-location/", type_location)
-            .catch((e) => console.log(e));
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeLocations();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     return (
@@ -78,53 +97,46 @@ export default function TypeLocations() {
             <div className="row">
                 <div className="col-md">
                     {typeLocations == null ? (
-                            <p>
-                                <h2>Нет типов локаций!</h2>
-                            </p>
-                        ) : (
-                            <table>
-                                <tr>
-                                    <th>
-                                        <p>Название</p>
-                                    </th>
-                                    <th>
-                                        Изменить
-                                    </th>
-                                    <th>
-                                        Удалить
-                                    </th>
+                        <p>
+                            <h2>Нет типов локаций!</h2>
+                        </p>
+                    ) : (
+                        <table>
+                            <tr>
+                                <th>
+                                    <p>Название</p>
+                                </th>
+                                <th>Изменить</th>
+                                <th>Удалить</th>
+                            </tr>
+                            {typeLocations.map((typeLocation) => (
+                                <tr key={typeLocation.id}>
+                                    <td>
+                                        <p>{typeLocation.name}</p>
+                                    </td>
+                                    <td className="td-btn">
+                                        <AddElementButton
+                                            type_form="simple"
+                                            className="btn"
+                                            onSubmit={editClick}
+                                            name={"Изменить"}
+                                            value={typeLocation}
+                                        ></AddElementButton>
+                                    </td>
+                                    <td className="td-btn">
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={(el) =>
+                                                deleteClick(el, typeLocation.id)
+                                            }
+                                        >
+                                            Удалить
+                                        </button>
+                                    </td>
                                 </tr>
-                                {
-                                    typeLocations.map((typeLocation) => (
-                                        <tr key={typeLocation.id}>
-                                            <td>
-                                                <p>{typeLocation.name}</p>
-                                            </td>
-                                            <td className="td-btn">
-                                                <AddElementButton
-                                                    type_form="simple"
-                                                    className="btn"
-                                                    onSubmit={editClick}
-                                                    name={"Изменить"}
-                                                    value={typeLocation}
-                                                ></AddElementButton>
-                                            </td>
-                                            <td className="td-btn">
-                                                <button
-                                                    className="btn btn-danger"
-                                                    onClick={(el) =>
-                                                        deleteClick(el, typeLocation.id)
-                                                    }
-                                                >
-                                                    Удалить
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))    
-                                }
-                            </table>
-                        )
-                    }
+                            ))}
+                        </table>
+                    )}
                 </div>
             </div>
         </div>

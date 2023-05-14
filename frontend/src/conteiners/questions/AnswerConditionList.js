@@ -7,24 +7,22 @@ export default function AnswerConditionList({
 }) {
     const [conditions, setConditions] = useState(selectedConditions);
 
-    useEffect(() => {}, []);
-
     const handleChangeChekedAnswer = (event, answer_id, condition_id) => {
         let temp = Object.assign([], conditions);
-        setConditions(temp.map(
-            item => {
-                if (item.id === condition_id && item.answer_id !== answer_id){
+        setConditions(
+            temp.map((item) => {
+                if (item.id === condition_id && item.answer_id !== answer_id) {
                     return {
                         ...item,
-                        answer_id: answer_id
-                    }
+                        answer_id: answer_id,
+                    };
                 }
                 return {
                     ...item,
-                    answer_id: null 
-                }
-            }
-        ));
+                    answer_id: null,
+                };
+            })
+        );
         console.log("temp", temp, answer_id);
     };
 
@@ -38,7 +36,9 @@ export default function AnswerConditionList({
             <form onSubmit={handleSubmit}>
                 <div className="row">
                     <div className="col-md">
-                        <button type="submit" className="btn btn-primary">Принять ответы</button>
+                        <button type="submit" className="btn btn-primary">
+                            Принять ответы
+                        </button>
                     </div>
                 </div>
                 <div className="row">
@@ -49,11 +49,16 @@ export default function AnswerConditionList({
                             </p>
                         ) : (
                             conditions.map((condition) => (
-                                <div key={condition.id} className="form-check question">
-                                    <p className="h4">{condition.name}?</p>
+                                <div
+                                    key={condition.id}
+                                    className="form-check question"
+                                >
+                                    <p className="h4">{condition.text}?</p>
                                     {condition.answers.map((answer) => (
                                         <div key={answer.id} className="answer">
-                                            <label className="form-check-label">{answer.name}</label>
+                                            <label className="form-check-label">
+                                                {answer.text}
+                                            </label>
                                             <input
                                                 type="checkbox"
                                                 name="is_right"

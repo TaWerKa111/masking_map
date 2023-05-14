@@ -17,13 +17,25 @@ export default function AddRule() {
     });
 
     useEffect(() => {
-        setRule({
-            name: "",
-            works: [],
-            locations: [],
-            conditions: [],
-            protections: [],
-        });
+        let rule_id = searchParams.get("id");
+        if (rule_id) {
+            let params = {
+                rule_id: searchParams.get("rule_id"),
+            };
+            apiInst.get("/rule/rule/", { params: params }).then((res) => {
+                setRule(res.data);
+                console.log(res.data);
+                console.log(searchParams.get("id"));
+            });
+        } else {
+            setRule({
+                name: "",
+                works: [],
+                locations: [],
+                conditions: [],
+                protections: [],
+            });
+        }
         console.log("add rule", rule);
     }, []);
 

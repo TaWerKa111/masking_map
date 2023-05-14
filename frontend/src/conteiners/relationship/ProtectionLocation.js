@@ -18,6 +18,23 @@ export default function LocationProtection() {
     const [searchTextLocation, setSearchTextLocation] = useState("");
     const [searchTextProtection, setSearchTextProtection] = useState("");
 
+    useEffect(() => {
+        let params = {
+            limit: 100,
+        };
+        apiInst
+            .get("/masking/location-list/", { params: params })
+            .then((resp) => {
+                setLocations(resp.data.locations);
+            });
+        let protectionParams = {};
+        apiInst
+            .get("/masking/protection/", { protectionParams })
+            .then((resp) => {
+                setProtections(resp.data.protections);
+            });
+    }, []);
+
     // Обработчик изменения поля поиска первого списка
     const handleSearchTextLocationChange = (event) => {
         setSearchTextLocation(event.target.value);
