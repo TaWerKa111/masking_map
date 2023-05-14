@@ -94,6 +94,12 @@ components:
         id_parent:
           example: 1
           type: integer
+        id_type_location:
+          example: 1
+          type: integer
+        ind_location:
+          example: 1
+          type: integer
         name:
           example: "\u0417\u0430\u0449\u0438\u0442\u0430 \u0430\u0433\u0440\u0435\u0433\
             \u0430\u0442\u0430 \u21161"
@@ -309,7 +315,7 @@ components:
     QuestionAnswer:
       properties:
         id:
-          readOnly: true
+          nullable: true
           type: integer
         text:
           type: string
@@ -421,6 +427,10 @@ components:
         id:
           type: integer
         id_parent:
+          nullable: true
+          type: integer
+        id_type_location:
+          nullable: true
           type: integer
         name:
           type: string
@@ -530,7 +540,7 @@ paths:
           type: string
       - explode: true
         in: query
-        name: ids_type_protection[]
+        name: ids_type_mn_object[]
         required: false
         schema:
           example:
@@ -542,7 +552,7 @@ paths:
         style: form
       - explode: true
         in: query
-        name: ids_type_mn_object[]
+        name: ids_type_protection[]
         required: false
         schema:
           example:
@@ -730,15 +740,6 @@ paths:
       description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
         \u0441\u043E\u043A \u0437\u0430\u0449\u0438\u0442"
       parameters:
-      - explode: true
-        in: query
-        name: type_protections_ids[]
-        required: false
-        schema:
-          items:
-            type: integer
-          type: array
-        style: form
       - in: query
         name: name
         required: false
@@ -751,6 +752,15 @@ paths:
           default: 10
           example: 10
           type: integer
+      - explode: true
+        in: query
+        name: type_protections_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
       - in: query
         name: page
         required: false
@@ -1045,13 +1055,25 @@ paths:
       description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
         \u0441\u043E\u043A \u043B\u043E\u043A\u0430\u0446\u0438\u0439"
       parameters:
-      - in: query
-        name: name
+      - explode: true
+        in: query
+        name: ids_type_mn_location[]
         required: false
         schema:
-          example: example
+          example:
+          - 1
+          items:
+            type: integer
           nullable: true
-          type: string
+          type: array
+        style: form
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          example: 10
+          type: integer
       - explode: true
         in: query
         name: ids_type_protection[]
@@ -1061,19 +1083,16 @@ paths:
           - 1
           items:
             type: integer
+          nullable: true
           type: array
         style: form
-      - explode: true
-        in: query
-        name: ids_type_mn_object[]
+      - in: query
+        name: name
         required: false
         schema:
-          example:
-          - 1
-          items:
-            type: integer
-          type: array
-        style: form
+          example: example
+          nullable: true
+          type: string
       - in: query
         name: page
         required: false
@@ -1081,13 +1100,6 @@ paths:
           default: 1
           example: 1
           minimum: 0
-          type: integer
-      - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
           type: integer
       responses:
         '200':
@@ -1535,6 +1547,13 @@ paths:
         required: false
         schema:
           type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          example: 10
+          type: integer
       - explode: true
         in: query
         name: rule_ids[]
@@ -1544,13 +1563,6 @@ paths:
             type: integer
           type: array
         style: form
-      - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
-          type: integer
       - in: query
         name: page
         required: false
@@ -1595,6 +1607,15 @@ paths:
           default: 10
           example: 10
           type: integer
+      - explode: true
+        in: query
+        name: question_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
       - in: query
         name: text
         required: false
@@ -1608,15 +1629,6 @@ paths:
           example: 1
           minimum: 0
           type: integer
-      - explode: true
-        in: query
-        name: question_ids[]
-        required: false
-        schema:
-          items:
-            type: integer
-          type: array
-        style: form
       responses:
         '200':
           content:
