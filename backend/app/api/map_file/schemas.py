@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, EXCLUDE
 
 from app.api.helpers.schemas import (
     PaginationSchema,
@@ -31,10 +31,27 @@ class Question(Schema):
     id = fields.Integer()
     answer_id = fields.Integer()
 
+    class Meta:
+        unknown = EXCLUDE
+
+
+class LocationGenerateMapSchema(Schema):
+    id = fields.Integer(validate=[is_not_exist_mn_object])
+
+    class Meta:
+        unknown = EXCLUDE
+
+
+class TypeWorkGenerateMapSchema(Schema):
+    id = fields.Integer(validate=[is_not_exist_type_work])
+
+    class Meta:
+        unknown = EXCLUDE
+
 
 class GenerateMaskingPlanSchema(Schema):
-    location_id = fields.Integer(validate=[is_not_exist_mn_object])
-    type_work_id = fields.Integer(validate=[is_not_exist_type_work])
+    location_id = fields.List(fields.Nested(LocationGenerateMapSchema()))
+    type_work_id = fields.List(fields.Nested(TypeWorkGenerateMapSchema()))
     questions = fields.List(fields.Nested(Question()))
     is_test = fields.Boolean()
 

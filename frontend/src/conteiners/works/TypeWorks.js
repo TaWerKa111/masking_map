@@ -9,6 +9,7 @@ import AddElementButton from "../forms/AddElementForm";
 import MyPagination from "../../components/Pagination";
 import Select from "react-select";
 import send_notify from "../../utils/toast";
+import FilterButton from "../forms/FilterForm";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -126,31 +127,14 @@ export default function TypeWorksList() {
                     <p>
                         <h2 className="text-center">Виды работ</h2>
                     </p>
-                    <div className="d-flex">
-                        <label>Фильтры</label>
-                        <div className="">
-                            <label>Название</label>
-                            <input type="text"></input>
-                        </div>
-                        <div>
-                            <label>Отдел</label>
-                            <Select
-                                options={[]}
-                                placeholder="Select color"
-                                value={selectedDepartaments}
-                                onChange={handleSelect}
-                                isMulti
-                            ></Select>
-                        </div>
-                        <button
-                            className="btn btn-primary"
-                            onClick={handleFiltered}
-                        >
-                            Применить фильтры
-                        </button>
-                    </div>
                 </div>
             </div>
+            <FilterButton
+                optionTypeLocations={[]}
+                onClickFiltered={handleFiltered}
+                name=""
+                departaments={departments}
+            ></FilterButton>
             <div className="row">
                 <div className="col-md">
                     {typeWorks == null ? (

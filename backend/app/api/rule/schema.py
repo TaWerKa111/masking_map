@@ -56,8 +56,9 @@ class FilterQuestionsSchema(PaginationSchema):
 
 
 class AddQuestionSchema(Schema):
-    text = fields.String()
-    answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+    id = fields.Integer()
+    # text = fields.String()
+    # answers = fields.List(fields.Nested(QuestionAnswerSchema()))
 
 
 class UpdateQuestionSchema(AddQuestionSchema):
@@ -70,14 +71,26 @@ class RuleProtectionSchema(Schema):
     is_demasking = fields.Bool()
 
 
+class LocationRuleSchema(Schema):
+    id = fields.Integer()
+
+
+class TypeWorkRuleSchema(Schema):
+    id = fields.Integer()
+
+
+class TypeLocationRuleSchema(Schema):
+    id = fields.Integer()
+
+
 class AddRuleSchema(Schema):
     name = fields.String()
-    type_work_id = fields.Integer()
-    location_id = fields.Integer()
-    type_location_id = fields.Integer()
+    type_works = fields.List(fields.Nested(TypeWorkRuleSchema()))
+    locations = fields.List(fields.Nested(LocationRuleSchema()))
+    type_locations = fields.List(fields.Nested(TypeLocationRuleSchema()))
     questions = fields.List(fields.Nested(AddQuestionSchema()))
     protections = fields.List(fields.Nested(RuleProtectionSchema()))
-    compensatory_measures = fields.String()
+    compensatory_measures = fields.String(allow_none=True)
 
 
 class UpdateRuleSchema(AddRuleSchema):

@@ -20,16 +20,11 @@ export default function MaskingMap() {
     const [isModalCondition, setModalCondition] = useState(false);
     const [locations, setLocations] = useState([]);
     const [typeWorks, setTypeWorks] = useState([]);
-    const [conditions, setConditions] = useState([
-        {
-            name: "name1",
-            id: 1,
-            answers: [
-                { name: 1, id: 1 },
-                { name: 2, id: 2 },
-            ],
-        },
-    ]);
+    const [conditions, setConditions] = useState([]);
+    const [styleBtn, setStyleBtn] = useState({
+        display: "block"
+    });
+
     // const [selectedConditions, setSelectedConditions] = useState([]);
     const fetchQuestions = () => {
         apiInst
@@ -123,38 +118,18 @@ export default function MaskingMap() {
                 setMapUuid(resp.data.masking_uuid);
                 // fetchPdfDocument(resp.data.masking_uuid);
                 send_toast("Карта сформирована!", "error");
+                setStyleBtn({
+                    display: "none"
+                });
             })
             .catch((err) => {
                 console.log(err);
                 send_toast("Не удалось сформировать карту!", "error");
             });
+        setStyleBtn({
+            display: "none"
+        });
     };
-
-    if (resultGenerating.result === true) {
-        return (
-            <div className="container">
-                <div className="row">
-                    <div className="col-md">
-                        <iframe
-                            title="MAP"
-                            srcDoc={mapHtml}
-                            style={{ width: "100%", height: "100vh" }}
-                        />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md d-flex justify-content-center">
-                        <button
-                            className="downloadButton"
-                            onClick={handleDownloadClick}
-                        >
-                            Скачать файл
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="container">
@@ -181,6 +156,8 @@ export default function MaskingMap() {
                             <button
                                 className="btn btn-secondary float-end"
                                 onClick={() => setModalTypeWork(true)}
+                                style={styleBtn
+                                }
                             >
                                 Изменить
                             </button>
@@ -209,6 +186,7 @@ export default function MaskingMap() {
                             <button
                                 className="btn btn-secondary float-end"
                                 onClick={() => setModalLocation(true)}
+                                style={styleBtn}
                             >
                                 Изменить
                             </button>
@@ -237,6 +215,7 @@ export default function MaskingMap() {
                             <button
                                 className="btn btn-secondary float-end"
                                 onClick={() => setModalCondition(true)}
+                                style={styleBtn}
                             >
                                 Изменить
                             </button>
@@ -268,79 +247,33 @@ export default function MaskingMap() {
                     </tr>
                 </table>
             </div>
-            {/* <div className="masking-form">
-                <div className="row">
-                    <div className="col-md-4 d-flex h3 justify-content-center align-items-center">
-                        <label>Виды работ:</label>
-                    </div>
-                    <div className="col-md ">
-                        <label className="h6">Виды работ:</label>
-                        <button className="btn btn-secondary float-end" onClick={() => setModalTypeWork(true)}>
-                            Изменить
-                        </button>
-                        <ul>
-                            {typeWorks.map((work) => (
-                                <p key={work.id}>{work.name}</p>
-                            ))}
-                        </ul>
-                        
-                        <ModalTypeWork
-                            isModal={isModalTypeWork}
-                            onClose={() => setModalTypeWork(false)}
-                            handleClickAdd={handleTypeWorks}
-                            works={typeWorks}
-                        ></ModalTypeWork>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-4 d-flex h3 justify-content-center align-items-center">
-                        <label>Локации:</label>
-                    </div>
-                    <div className="col-md">
-                        <label className="h6">Локации:</label>
-                        <button className="btn btn-secondary float-end" onClick={() => setModalLocation(true)}>
-                            Изменить
-                        </button>
-                        <ul>
-                            {locations.map((location) => (
-                                <p key={location.id}>{location.name}</p>
-                            ))}
-                        </ul>
-                        
-                        <ModalLocation
-                            isModal={isModalLocation}
-                            onClose={() => setModalLocation(false)}
-                            handleClickAdd={handleLocations}
-                            locations={locations}
-                        ></ModalLocation>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-4 d-flex h3 justify-content-center align-items-center">
-                        <label>Условия:</label>
-                    </div>
-                    <div className="col-md">
-                        <label className="h6">Условия:</label>
-                        <button className="btn btn-secondary float-end" onClick={() => setModalCondition(true)}>
-                            Изменить
-                        </button>
-                        <ul>
-                            {conditions.map((condition) => (
-                                <p key={condition.id}>{condition.name}</p>
-                            ))}
-                        </ul>
-                        <ModalChoiceConditions
-                            isModal={isModalCondition}
-                            onClose={() => setModalCondition(false)}
-                            handleClickAdd={handleConditions}
-                            conditions={conditions}
-                        ></ModalChoiceConditions>
-                    </div>
-                </div>
-            </div> */}
-            <div className="row">
-                <div className="col-md"></div>
-            </div>
+                {
+                    resultGenerating.result ?
+                    (
+                        <div>
+                            <div className="row">
+                            <div className="col-md">
+                                <iframe
+                                    title="MAP"
+                                    srcDoc={mapHtml}
+                                    style={{ width: "100%", height: "100vh" }}
+                                />
+                            </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md d-flex justify-content-center">
+                                    <button
+                                        className="downloadButton"
+                                        onClick={handleDownloadClick}
+                                    >
+                                        Скачать файл
+                                    </button>
+                                </div>
+                            </div>
+                        </div> 
+                    )
+                    : <div></div>
+                }
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <button

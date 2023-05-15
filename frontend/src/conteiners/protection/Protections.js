@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
 import send_notify from "../../utils/toast";
+import FilterButton from "../forms/FilterForm";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -90,6 +91,10 @@ export default function Protections() {
             });
     };
 
+    const handleFiltered = (params) => {
+        console.log("params", params);
+    };
+
     return (
         <div className="container">
             <div className="row">
@@ -109,6 +114,11 @@ export default function Protections() {
                     </p>
                 </div>
             </div>
+            <FilterButton
+                typeProtections={typeProtections}
+                onClickFiltered={handleFiltered}
+                name="protections"
+            ></FilterButton>
             <div className="row">
                 <div className="col-md">
                     {protections == null ? (

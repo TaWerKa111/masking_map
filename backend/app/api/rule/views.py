@@ -8,12 +8,11 @@ from app.api.helpers.messages import MESSAGES_DICT
 from app.api.helpers.schemas import BinaryResponseSchema
 from app.api.helpers.utils import serialize_paginate_object
 from app.api.rule.helpers import (
-    get_location_work_type_location_type,
     add_new_rule,
     get_rule,
     filter_list_rule,
     update_rule, filter_list_question, get_question, add_question,
-    add_question_answer, update_question,
+    add_question_answer, update_question, get_locations_work_types_location_types,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -82,10 +81,10 @@ def add_rule_view() -> tuple[dict, int]:
             http.HTTPStatus.BAD_REQUEST,
         )
 
-    location, type_work, type_location = get_location_work_type_location_type(
-        location_id=rule.get("location_id"),
-        type_work_id=rule.get("type_work_id"),
-        type_location_id=rule.get("type_location_id"),
+    location, type_work, type_location = get_locations_work_types_location_types(
+        location_ids=[loc["id"] for loc in rule.get("locations")],
+        type_work_ids=[tw["id"] for tw in rule.get("type_works")],
+        type_location_ids=[tl["id"] for tl in rule.get("type_locations")],
     )
 
     add_new_rule(
@@ -95,6 +94,7 @@ def add_rule_view() -> tuple[dict, int]:
         type_location=type_location,
         questions=rule.get("questions"),
         protections=rule.get("protections"),
+        compensatory_measures=rule.get("compensatory_measures")
     )
 
     return BinaryResponseSchema().dump(

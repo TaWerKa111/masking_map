@@ -43,7 +43,7 @@ export default function AnswerConditionList({
                 </div>
                 <div className="row">
                     <div className="col-md">
-                        {conditions == null ? (
+                        {conditions.length === 0 ? (
                             <p>
                                 <h2>Нет вопросов!</h2>
                             </p>

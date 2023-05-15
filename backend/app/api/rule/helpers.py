@@ -15,14 +15,14 @@ from common.postgres.models import (
 )
 
 
-def add_rule(name: str) -> Rule:
+def add_rule(name: str, compensatory_measures: str = None) -> Rule:
     """
     Добавление правила
     :param name: str,
         название правила
     :return: Rule
     """
-    rule = Rule(name=name)
+    rule = Rule(name=name, compensatory_measures=compensatory_measures)
 
     db.session.add(rule)
     db.session.commit()
@@ -78,11 +78,12 @@ def add_question_answer(text: str, id_question: int) -> QuestionAnswer:
 
 def add_new_rule(
     name_rule,
-    type_work: TypeWork,
-    location: Location,
-    type_location: TypeLocation,
+    type_works: list[TypeWork],
+    locations: list[Location],
+    type_locations: list[TypeLocation],
     questions: list[dict],
     protections: list[dict],
+    compensatory_measures: str
 ) -> Rule:
     """
     Добавление нового правила со всеми критериями и защитами к нему
@@ -129,24 +130,36 @@ def add_new_rule(
                 NAMES[type_criteria]["name"],
                 type_criteria
             )
+        else:
+            criteria = (
+                db.session.query(Criteria)
+                .get(criteria.id)
+            )
 
         return criteria
 
-    rule = add_rule(name_rule)
+    rule = add_rule(name_rule, compensatory_measures)
 
-    criteria_work = add_criteria(
-        "Критерий работы", Criteria.TypeCriteria.type_work
-    )
-    criteria_location = add_criteria(
-        "Критерий локации", Criteria.TypeCriteria.location
-    )
-    criteria_type_location = add_criteria(
-        "Критерий типа локации", Criteria.TypeCriteria.type_location
-    )
+    criteria_location = []
+    for location in locations:
+        cr_loc = get_criteria(
+            Criteria.TypeCriteria.location, "id_location", location.id
+        )
+        criteria_location.append(cr_loc)
 
-    criteria_work.works.append(type_work)
-    criteria_location.locations.append(location)
-    criteria_type_location.locations_type.append(type_location)
+    # criteria_work = add_criteria(
+    #     "Критерий работы", Criteria.TypeCriteria.type_work
+    # )
+    # criteria_location = add_criteria(
+    #     "Критерий локации", Criteria.TypeCriteria.location
+    # )
+    # criteria_type_location = add_criteria(
+    #     "Критерий типа локации", Criteria.TypeCriteria.type_location
+    # )
+
+    # criteria_work.works.append(type_work)
+    # criteria_location.locations.append(location)
+    # criteria_type_location.locations_type.append(type_location)
 
     questions_list = []
     right_answers = dict()
@@ -160,9 +173,9 @@ def add_new_rule(
                 right_answers[question.id] = answer.id
         questions_list.append(question)
 
-    rule.criteria.extend(
-        [criteria_work, criteria_location, criteria_type_location]
-    )
+    # rule.criteria.extend(
+    #     [criteria_work, criteria_location, criteria_type_location]
+    # )
     criteria_question = add_criteria(
         "Критерий вопросов", Criteria.TypeCriteria.question
     )
@@ -181,8 +194,8 @@ def add_new_rule(
         rule_protection = RuleProtection(
             id_rule=rule.id,
             id_protection=protection.get("id"),
-            is_need_masking=protection.get("is_need_masking"),
-            is_need_demasking=protection.get("is_need_demasking"),
+            is_need_masking=protection.get("is_masking"),
+            is_need_demasking=protection.get("is_demasking"),
         )
         db.session.add(rule_protection)
         db.session.commit()
@@ -191,8 +204,8 @@ def add_new_rule(
     return rule
 
 
-def get_location_work_type_location_type(
-    location_id, type_work_id, type_location_id
+def get_locations_work_types_location_types(
+    location_ids, type_work_ids, type_location_ids
 ):
     """
     Получить локацию, тип работы и тип локации
@@ -204,21 +217,22 @@ def get_location_work_type_location_type(
         идентификатор типа локации
     :return:
     """
-    location = (
-        db.session.query(Location).filter(Location.id == location_id).first()
+
+    locations = (
+        db.session.query(Location).filter(Location.id.in_(location_ids)).all()
     )
 
-    type_work = (
-        db.session.query(TypeWork).filter(TypeWork.id == type_work_id).first()
+    type_works = (
+        db.session.query(TypeWork).filter(TypeWork.id.in_(type_work_ids)).all()
     )
 
-    type_location = (
+    type_locations = (
         db.session.query(TypeLocation)
-        .filter(TypeLocation.id == type_location_id)
-        .first()
+        .filter(TypeLocation.id.in_(type_location_ids))
+        .all()
     )
 
-    return location, type_work, type_location
+    return locations, type_works, type_locations
 
 
 def get_rule(rule_id: int) -> Rule:

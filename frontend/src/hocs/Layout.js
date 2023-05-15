@@ -9,8 +9,8 @@ const Layout = (props) => {
 
     return (
         <div>
-            {user === "true" ? <NavAuthBar /> : <Navbar />}
-            {/* <NavAuthBar /> */}
+            {/* {user === "true" ? <NavAuthBar /> : <Navbar />} */}
+            <NavAuthBar />
             {props.children}
             <Foot />
         </div>

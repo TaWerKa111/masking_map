@@ -186,3 +186,16 @@ button a:hover {
     margin-left: 80%;
 }
 
+.btn-save-rule {
+    width: 100%;
+    margin-top: 2%;
+}
+
+.rule-td-name {
+    width: 15%;
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 2%;
+}

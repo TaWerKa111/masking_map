@@ -3,6 +3,7 @@ import http
 from flask import Blueprint, request, current_app, Response
 from marshmallow import ValidationError
 
+from app.api.helpers.messages import MESSAGES_DICT
 from app.api.helpers.schemas import BinaryResponseSchema
 from app.api.helpers.utils import serialize_paginate_object
 from app.api.map_file.helpers import (
@@ -194,16 +195,20 @@ def generate_masking_view():
             - map_files
     """
 
-    data = request.args.to_dict()
-    # data["location_id"] = request.args.get("location_id")
-    # data["type_work_id"] = request.args.get("type_work_id")
+    if not request.json:
+        return (
+            BinaryResponseSchema().dump(MESSAGES_DICT["NO_JSON"]),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+
+    data = request.json
 
     try:
         data_for_masking = GenerateMaskingPlanSchema().load(data)
     except ValidationError as err:
         current_app.logger.debug(f"Validation error - {err}")
         return (
-            BinaryResponseSchema().dump({"message": "", "result": False}),
+            BinaryResponseSchema().dump({"message": f"{err}", "result": False}),
             http.HTTPStatus.BAD_REQUEST,
         )
 

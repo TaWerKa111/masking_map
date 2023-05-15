@@ -118,12 +118,11 @@ export default function Locations() {
                     </p>
                 </div>
             </div>
-            <div className="row">
-                <FilterButton
-                    optionTypeLocations={optionTypeLocations}
-                    onClickFiltered={handleFiltered}
-                ></FilterButton>
-            </div>
+            <FilterButton
+                optionTypeLocations={optionTypeLocations}
+                onClickFiltered={handleFiltered}
+                name="locations"
+            ></FilterButton>
             <div className="row">
                 <div className="col-md">
                     {locations == null ? (
