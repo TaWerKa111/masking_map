@@ -89,9 +89,9 @@ def add_rule_view() -> tuple[dict, int]:
 
     add_new_rule(
         name_rule=rule.get("name"),
-        type_work=type_work,
-        location=location,
-        type_location=type_location,
+        type_works=type_work,
+        locations=location,
+        type_locations=type_location,
         questions=rule.get("questions"),
         protections=rule.get("protections"),
         compensatory_measures=rule.get("compensatory_measures")
@@ -178,7 +178,7 @@ def get_rules_view() -> tuple[dict, int]:
     """
     data = dict()
     data["rule_ids[]"] = request.args.getlist("rule_ids[]")
-    data["name"] = request.args.getlist("name")
+    data["name"] = request.args.get("name")
 
     try:
         valid_data = FilterRulesSchema().load(data)
@@ -202,7 +202,7 @@ def get_rules_view() -> tuple[dict, int]:
 
     rules_ser, pagination = serialize_paginate_object(rules)
     result = {"rules": rules_ser, "pagination": pagination}
-
+    current_app.logger.debug(f"cr - {rules_ser[0].criteria[3].questions[0].answers[0].__dict__}")
     return RuleListSchema().dump(result), http.HTTPStatus.OK
 
 

@@ -85,7 +85,7 @@ class AppConfig(BaseSetting):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     # SQLALCHEMY_ECHO = True
     Access_Control_Allow_Credentials = True
-    DEBUG = True
+    FLASK_DEBUG = True
     FLASK_ENV = "development"
     FILES_PATHS = FilesData
     ROLE = Role

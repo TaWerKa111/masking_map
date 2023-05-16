@@ -61,6 +61,13 @@ def login() -> tuple[dict, int]:
             http.HTTPStatus.BAD_REQUEST,
         )
     user = get_user_by_login(user_data.get("login"))
+    if not user:
+        return (
+            BinaryResponseSchema().dump(
+                {"message": "Пользователь не найден!", "result": False}
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
     login_user(user)
     return BinaryResponseSchema().dump(
         {"message": "Успешная авторизация!", "result": True}
@@ -129,6 +136,7 @@ def profile() -> tuple[dict, int]:
             ),
             http.HTTPStatus.OK,
         )
+    
     return BinaryResponseSchema().dump({
         "message": "Пользователь не авторизован!",
         "result": False

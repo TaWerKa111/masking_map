@@ -58,6 +58,7 @@ export default function Rules() {
             state: { rule_id: key },
         });
     };
+    console.log("rules", rules);
 
     return (
         <div className="container">
@@ -80,17 +81,19 @@ export default function Rules() {
             <div className="row">
                 <div className="col-md">
                     <ul className="d-flex justify-content-center">
-                        {rules == null ? (
+                        {!rules ? (
                             <p>
                                 <h2>Нет правил!</h2>
                             </p>
                         ) : (
-                            rules.rules.map((rule) => (
+                            rules.map((rule) => (
                                 <table>
                                     <tr>
                                         <th>Название Правила</th>
                                         <th>Виды работ</th>
                                         <th>Места проведения работ</th>
+                                        <th>Типы локаций</th>
+                                        <th>Условия</th>
                                         <th>Защиты</th>
                                         <th>Компенсирующие мероприятия</th>
                                         <th>Изменить</th>
@@ -98,9 +101,43 @@ export default function Rules() {
                                     </tr>
                                     <tr>
                                         <td>{rule.name}</td>
-                                        <td>{rule}</td>
-                                        <td>{rule}</td>
-                                        <td>{rule}</td>
+                                        <td>{
+                                            rule.criteria.find(
+                                                item => item.type_criteria === "type_work"
+                                            ).works.map(
+                                                item => (item.name)
+                                            )
+                                        }
+                                        </td>
+                                        <td>{
+                                            rule.criteria.find(
+                                                item => item.type_criteria === "location"
+                                            ).locations.map(
+                                                item => (item.name)
+                                            )
+                                        }</td>
+                                        <td>{
+                                            rule.criteria.find(
+                                                item => item.type_criteria === "type_location"
+                                            ).locations_type.map(
+                                                item => (item.name)
+                                            )    
+                                        }</td>
+                                        <td>{
+                                            rule.criteria.find(
+                                                item => item.type_criteria === "question"
+                                            ).questions.map(
+                                                item => (item.name)
+                                            )    
+                                        }</td>
+                                        <td>
+                                            {
+                                                rule.protections.map(
+                                                    item => item.name
+                                                )
+                                            }
+                                        </td>
+                                        <td>{rule.compensatory_measures}</td>
                                         <td>
                                             <button
                                                 className="btn"

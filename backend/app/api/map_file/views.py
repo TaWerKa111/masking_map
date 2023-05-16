@@ -212,7 +212,12 @@ def generate_masking_view():
             http.HTTPStatus.BAD_REQUEST,
         )
 
-    masking_uuid = check_generate_masking_plan(**data_for_masking)
+    masking_uuid = check_generate_masking_plan(
+        locations=data_for_masking.get("locations"),
+        type_works=data_for_masking.get("type_works"),
+        questions=data_for_masking.get("questions"),
+        is_test=data_for_masking.get("is_test"),
+    )
 
     if masking_uuid:
         return (

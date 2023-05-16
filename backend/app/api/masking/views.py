@@ -99,7 +99,7 @@ def get_type_work_view() -> tuple[dict, int]:
         )
 
     type_works, pagination = serialize_paginate_object(type_work_list)
-    current_app.logger.info(f"type works {type_works[1].departament}")
+    # current_app.logger.info(f"type works {type_works[1].departament}")
     result = {"type_works": type_works, "pagination": pagination}
 
     return (
@@ -465,6 +465,7 @@ def get_protection_view() -> tuple[dict, int]:
 
     protections, pagination = serialize_paginate_object(protection_list)
     result = {"protections": protections, "pagination": pagination}
+    current_app.logger.debug(f"protection list - {protections[0].type_protection}")
 
     return (
         ProtectionListSchema().dump(result),
@@ -530,6 +531,7 @@ def add_protection_view() -> tuple[dict, int]:
         protection_data.get("name"),
         protection_data.get("id_type_protection"),
         protection_data.get("id_location"),
+        protection_data.get("is_end"),
     )
     current_app.logger.debug(f"protection add id - {protection.id}")
 
@@ -876,7 +878,7 @@ def get_mn_location_list_view() -> tuple[dict, int]:
 
     locations_ser, pagination = serialize_paginate_object(locations)
     result = {"locations": locations_ser, "pagination": pagination}
-    current_app.logger.debug(f"result - {locations.items}")
+    current_app.logger.debug(f"result - {locations.items[0].id_type}")
 
     return (
         LocationListSchema().dump(result),

@@ -144,7 +144,7 @@ def get_departament_work_list(name: str) -> list[DepartamentOfWork]:
 
 
 # Protections
-def add_protection(name, id_type_protection, id_location: int = None) -> Protection:
+def add_protection(name, id_type_protection, id_location: int = None, is_end=False) -> Protection:
     """
     Добавление защиты на объекте
     :param id_type_protection:
@@ -152,7 +152,7 @@ def add_protection(name, id_type_protection, id_location: int = None) -> Protect
     :return:
     """
     protection: Protection = Protection(
-        name=name, id_type_protection=id_type_protection
+        name=name, id_type_protection=id_type_protection, is_end=is_end
     )
 
     if id_location:

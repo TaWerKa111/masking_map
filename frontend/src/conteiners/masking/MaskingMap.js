@@ -106,13 +106,11 @@ export default function MaskingMap() {
         let generateMapData = {
             locations: locations,
             type_works: typeWorks,
-            conditions: conditions,
+            questions: conditions,
         };
         console.log("generateMapData", generateMapData);
         apiInst
-            .get("/files/generate-masking/", {
-                params: params,
-            })
+            .post("/files/generate-masking/", generateMapData)
             .then((resp) => {
                 setResultGenerating(resp.data);
                 setMapUuid(resp.data.masking_uuid);
@@ -278,7 +276,7 @@ export default function MaskingMap() {
                 <div className="col-md d-flex justify-content-center">
                     <button
                         onClick={handleGenerateMap}
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-generate"
                     >
                         Сформировать карту
                     </button>

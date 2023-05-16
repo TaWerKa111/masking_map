@@ -28,9 +28,11 @@ import ExpertInstraction from "./conteiners/instractions/ExpertInstraction";
 import BankQuestions from "./conteiners/questions/BankQuestions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import LoadingSpinner from "./components/main/LoadingSpinner";
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchCurrentUser = () => {
@@ -59,6 +61,7 @@ function App() {
     }, []);
 
     const handleLogin = () => {
+        setIsLoading(true);
         apiInst
             .get("/auth/current-user/", {
                 headers: {
@@ -67,21 +70,32 @@ function App() {
                     )}:${localStorage.getItem("password")}`,
                 },
             })
-            .then((response) => setUser(response.data))
-            .catch((e) => console.log(e));
-        console.log("log user", user);
+            .then((response) => {
+                setUser(true);
+                console.log("login", response.data);
+                setIsLoading(false);
+            })
+            .catch(
+                (e) => {
+                    setUser(false);
+                    setIsLoading(false);
+                    console.log(e);
+                });
     };
 
     const handleLogout = () => {
         apiInst.get("/auth/logout/").catch((e) => console.log(e));
         setUser(null);
+        setIsLoading(true);
         localStorage.setItem("is_login", false);
         localStorage.removeItem("username");
         localStorage.removeItem("password");
+        setIsLoading(false);
     };
 
     return (
-        <BrowserRouter>
+        isLoading ? (<LoadingSpinner></LoadingSpinner>) : (
+            <BrowserRouter>
             <ToastContainer />
             <Layout user={user}>
                 <Routes>
@@ -179,6 +193,8 @@ function App() {
                 </Routes>
             </Layout>
         </BrowserRouter>
+        )
+        
     );
 }
 

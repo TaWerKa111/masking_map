@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, pre_load
+from marshmallow import Schema, fields, pre_load, EXCLUDE
 
 from app.api.helpers.schemas import PaginationSchema, PaginationResponseSchema
 from app.api.masking.schemas import ProtectionSchema
@@ -17,15 +17,22 @@ class AddTypeCriteriaSchema(Schema):
         pass
 
 
-class CriteriaSchema(Schema):
+class LocationSchema(Schema):
     id = fields.Integer()
     name = fields.String()
-    type = fields.Nested(TypeCriteriaSchema())
 
+class WorkSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+class LocationTypeSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
 
 class QuestionAnswerSchema(Schema):
     id = fields.Integer(allow_none=True)
     text = fields.String()
+    is_right = fields.Bool()
 
     @pre_load
     def preprocess(self, data, **kwargs):
@@ -33,6 +40,26 @@ class QuestionAnswerSchema(Schema):
             if isinstance(data["id"], str):
                 data["id"] = None
         return data
+
+
+class QuestionSchema(Schema):
+    id = fields.Integer()
+    text = fields.String()
+    answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+
+
+class CriteriaSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+    type_criteria = fields.Method("get_criteria_type")
+    locations = fields.List(fields.Nested(LocationSchema()))
+    works = fields.List(fields.Nested(WorkSchema()))
+    locations_type = fields.List(fields.Nested(LocationTypeSchema()))
+    questions = fields.List(fields.Nested(QuestionSchema()))
+
+    def get_criteria_type(self, obj):
+        return obj.type_criteria.value
+
 
 
 class QuestionSchema(Schema):
@@ -57,8 +84,12 @@ class FilterQuestionsSchema(PaginationSchema):
 
 class AddQuestionSchema(Schema):
     id = fields.Integer()
-    # text = fields.String()
-    # answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+    text = fields.String()
+    answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+    right_answer_id = fields.Integer(allow_none=True)
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class UpdateQuestionSchema(AddQuestionSchema):
@@ -70,17 +101,29 @@ class RuleProtectionSchema(Schema):
     is_masking = fields.Bool()
     is_demasking = fields.Bool()
 
+    class Meta:
+        unknown = EXCLUDE
+
 
 class LocationRuleSchema(Schema):
     id = fields.Integer()
 
+    class Meta:
+        unknown = EXCLUDE
+
 
 class TypeWorkRuleSchema(Schema):
     id = fields.Integer()
+    
+    class Meta:
+        unknown = EXCLUDE
 
 
 class TypeLocationRuleSchema(Schema):
     id = fields.Integer()
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class AddRuleSchema(Schema):
@@ -102,6 +145,7 @@ class RuleSchema(Schema):
     name = fields.String()
     criteria = fields.List(fields.Nested(CriteriaSchema()))
     protections = fields.List(fields.Nested(ProtectionSchema()))
+    compensatory_measures = fields.String(allow_none=True)
 
 
 class RuleListSchema(Schema):
@@ -115,4 +159,4 @@ class GetRuleSchema(Schema):
 
 class FilterRulesSchema(PaginationSchema):
     rule_ids = fields.List(fields.Integer(), data_key="rule_ids[]")
-    name = fields.String()
+    name = fields.String(allow_none=True)

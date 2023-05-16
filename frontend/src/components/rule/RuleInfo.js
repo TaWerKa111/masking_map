@@ -115,6 +115,7 @@ export default function RuleInfo(props) {
                 id: condition.value,
                 text: condition.label,
                 answers: condition.answers,
+                right_answer_id: condition.answers.find(item => item.is_right).id,
             };
         });
         setRule(temp);
@@ -133,22 +134,22 @@ export default function RuleInfo(props) {
                 text: type.label,
             })),
             protections: rule.protections,
-            works: rule.works,
+            type_works: rule.works,
             locations: rule.locations,
             questions: rule.conditions,
         };
         console.log("newRule", newRule);
-        // apiInst
-        //     .post("/rule/rule/", newRule)
-        //     .then((resp) => {
-        //         if (resp.data.result) {
-        //             send_notify(resp.data.message, "success");
-        //         } else send_notify(resp.data.message, "error");
-        //     })
-        //     .catch((e) => {
-        //         send_notify(e.response.data.message, "error");
-        //         console.log(e.response.data.message);
-        //     });
+        apiInst
+            .post("/rule/rule/", newRule)
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     console.log("rule", rule);

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiInst } from "../utils/axios";
+import send_notify from "../utils/toast";
 
 const LoginForm = ({ onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -14,16 +16,20 @@ const LoginForm = ({ onLogin }) => {
         apiInst.post("/auth/login/", userdata)
             .then(resp => {
                 if (resp.status === 200){
-                    onLogin();
-                    navigate("/");
                     localStorage.setItem("username", username);
                     localStorage.setItem("password", password);
                     localStorage.setItem("is_login", true);
+                    onLogin();
+                    navigate("/");
+                    // window.location.reload(false);
+                    send_notify(resp.data.message, "success");
                 }
             })
             .catch(
-                e => (console.log(e))
-            );
+            e => {
+                console.log(e);
+                send_notify(e.response.data.message, "error");
+            });
     };
 
     return (

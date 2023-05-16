@@ -75,6 +75,8 @@ export default function Protections() {
         console.log("value", value);
         let newProtection = {
             name: value.name,
+            is_end: value.is_end,
+            id_type_protection: value.type
         };
         console.log(newProtection);
         apiInst
@@ -138,10 +140,14 @@ export default function Protections() {
                             {protections.map((protection) => (
                                 <tr key={protection.id}>
                                     <td>{protection.name}</td>
-                                    <td>{protection.type}</td>
+                                    <td>{
+                                        protection.id_type_protection 
+                                        ? typeProtections.find(item => item.id === protection.id_type_protection).name
+                                        : "Отсутсвует"
+                                    }</td>
                                     <td>{protection.status}</td>
                                     <td>
-                                        {protection.is_end ? "Вход" : "Выход"}
+                                        {protection.is_end ? "Выход" : "Вход"}
                                     </td>
                                     <td className="td-btn">
                                         <AddElementButton

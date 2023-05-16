@@ -108,6 +108,7 @@ class Protection(Base):
     # relationship
     type_protection = relationship(
         "TypeProtection",
+        uselist=False,
         backref=backref("protections", uselist=True),
         foreign_keys=[id_type_protection],
         post_update=True
@@ -268,6 +269,7 @@ class Criteria(Base):
     name = Column(String(255))
     type_criteria = Column(
         Enum(TypeCriteria, values_callable=lambda obj: [x.value for x in obj]))
+    rule_id = Column(Integer, ForeignKey("rule.id"))
 
     # relationships
     locations = relationship(
@@ -286,7 +288,7 @@ class Criteria(Base):
     )
     works = relationship(
         "TypeWork",
-        lazy="dynamic",
+        lazy="select",
         uselist=True,
         back_populates="criteria",
         secondary="criteria_work_type"
@@ -295,8 +297,7 @@ class Criteria(Base):
         "Rule",
         lazy="select",
         uselist=True,
-        back_populates="criteria",
-        secondary="rule_criteria"
+        backref="criteria",
     )
     questions = relationship(
         "Question",
@@ -331,16 +332,16 @@ class CriteriaTypeWork(Base):
     id_type_work = Column(Integer, ForeignKey("type_work.id"))
 
 
-class CriteriaRule(Base):
-    """
+# class CriteriaRule(Base):
+#     """
 
-    """
+#     """
 
-    __tablename__ = "rule_criteria"
+#     __tablename__ = "rule_criteria"
 
-    id = Column(Integer, primary_key=True)
-    id_rule = Column(Integer, ForeignKey("rule.id"))
-    id_criteria = Column(Integer, ForeignKey("criteria.id"))
+#     id = Column(Integer, primary_key=True)
+#     id_rule = Column(Integer, ForeignKey("rule.id"))
+#     id_criteria = Column(Integer, ForeignKey("criteria.id"))
 
 
 class Rule(Base):
@@ -356,13 +357,13 @@ class Rule(Base):
     compensatory_measures = Column(Text)
 
     # relationship
-    criteria = relationship(
-        "Criteria",
-        lazy="select",
-        uselist=True,
-        back_populates="rules",
-        secondary="rule_criteria"
-    )
+    # criteria = relationship(
+    #     "Criteria",
+    #     lazy="select",
+    #     uselist=True,
+    #     back_populates="rules",
+    #     # secondary="rule_criteria"
+    # )
     protections = relationship(
         "Protection",
         lazy="select",

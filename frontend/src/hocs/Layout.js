@@ -7,10 +7,14 @@ import { useState } from "react";
 const Layout = (props) => {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
 
+    useEffect(() => {
+        setUser(localStorage.getItem("is_login"));
+    }, []);
+
     return (
         <div>
-            {/* {user === "true" ? <NavAuthBar /> : <Navbar />} */}
-            <NavAuthBar />
+            {user === "true" ? <NavAuthBar /> : <Navbar />}
+            {/* <NavAuthBar /> */}
             {props.children}
             <Foot />
         </div>

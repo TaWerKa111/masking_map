@@ -37,6 +37,7 @@ class Question(Schema):
 
 class LocationGenerateMapSchema(Schema):
     id = fields.Integer(validate=[is_not_exist_mn_object])
+    id_type = fields.Integer(allow_none=True)
 
     class Meta:
         unknown = EXCLUDE
@@ -50,8 +51,8 @@ class TypeWorkGenerateMapSchema(Schema):
 
 
 class GenerateMaskingPlanSchema(Schema):
-    location_id = fields.List(fields.Nested(LocationGenerateMapSchema()))
-    type_work_id = fields.List(fields.Nested(TypeWorkGenerateMapSchema()))
+    locations = fields.List(fields.Nested(LocationGenerateMapSchema()))
+    type_works = fields.List(fields.Nested(TypeWorkGenerateMapSchema()), allow_none=True)
     questions = fields.List(fields.Nested(Question()))
     is_test = fields.Boolean()
 

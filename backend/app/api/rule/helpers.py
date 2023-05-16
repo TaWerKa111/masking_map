@@ -102,90 +102,50 @@ def add_new_rule(
         список защит, на которые воздействует правило
     :return: Rule
     """
-    def get_criteria(type_criteria, field, model_id):
-        NAMES = {
-            Criteria.TypeCriteria.type_work: {
-                "name": "Критерий работы",
-                "model": CriteriaTypeWork
-            },
-            Criteria.TypeCriteria.location: {
-                "name": "Критерий локации",
-                "model": CriteriaLocation
-            },
-            Criteria.TypeCriteria.type_location: {
-                "name": "Критерий типа локации",
-                "model": CriteriaTypeLocation
-            },
-        }
-
-        criteria = (
-            db.session.query(NAMES[type_criteria]["model"])
-            .filter(
-                NAMES[type_criteria]["model"].__dict__.get(field) == model_id)
-            .first()
-        )
-
-        if not criteria:
-            criteria = add_criteria(
-                NAMES[type_criteria]["name"],
-                type_criteria
-            )
-        else:
-            criteria = (
-                db.session.query(Criteria)
-                .get(criteria.id)
-            )
-
-        return criteria
 
     rule = add_rule(name_rule, compensatory_measures)
 
-    criteria_location = []
-    for location in locations:
-        cr_loc = get_criteria(
-            Criteria.TypeCriteria.location, "id_location", location.id
-        )
-        criteria_location.append(cr_loc)
+    criteria_work = add_criteria(
+        "Критерий работы", Criteria.TypeCriteria.type_work
+    )
+    criteria_location = add_criteria(
+        "Критерий локации", Criteria.TypeCriteria.location
+    )
+    criteria_type_location = add_criteria(
+        "Критерий типа локации", Criteria.TypeCriteria.type_location
+    )
 
-    # criteria_work = add_criteria(
-    #     "Критерий работы", Criteria.TypeCriteria.type_work
-    # )
-    # criteria_location = add_criteria(
-    #     "Критерий локации", Criteria.TypeCriteria.location
-    # )
-    # criteria_type_location = add_criteria(
-    #     "Критерий типа локации", Criteria.TypeCriteria.type_location
-    # )
-
-    # criteria_work.works.append(type_work)
-    # criteria_location.locations.append(location)
-    # criteria_type_location.locations_type.append(type_location)
+    criteria_work.works.extend(type_works)
+    criteria_location.locations.extend(locations)
+    criteria_type_location.locations_type.extend(type_locations)
 
     questions_list = []
     right_answers = dict()
-    for question_data in questions:
-        question = add_question(question_data.get("text"))
-        for answer_data in question_data.get("answers"):
-            answer = add_question_answer(
-                answer_data.get("text"), id_question=question.id
-            )
-            if answer_data.get("is_right_answer"):
-                right_answers[question.id] = answer.id
-        questions_list.append(question)
 
-    # rule.criteria.extend(
-    #     [criteria_work, criteria_location, criteria_type_location]
-    # )
+    # for question_data in questions:
+    #     question = add_question(question_data.get("text"))
+    #     for answer_data in question_data.get("answers"):
+    #         answer = add_question_answer(
+    #             answer_data.get("text"), id_question=question.id
+    #         )
+    #         if answer_data.get("is_right_answer"):
+    #             right_answers[question.id] = answer.id
+    #     questions_list.append(question)
+
+    rule.criteria.extend(
+        [criteria_work, criteria_location, criteria_type_location]
+    )
     criteria_question = add_criteria(
         "Критерий вопросов", Criteria.TypeCriteria.question
     )
     rule.criteria.append(criteria_question)
 
-    for question in questions_list:
+    for question in questions:
         qu_ans = CriteriaQuestion(
-            id_question=question.id,
+            id_question=question.get("id"),
             id_criteria=criteria_question.id,
-            id_right_answer=right_answers[question.id]
+            # id_right_answer=right_answers[question.id]
+            id_right_answer=question.get("right_answer_id")
         )
         db.session.add(qu_ans)
         db.session.commit()

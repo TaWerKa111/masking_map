@@ -1,5 +1,3 @@
-from tkinter.scrolledtext import example
-
 from flask import current_app
 from marshmallow import Schema, fields, post_load, EXCLUDE
 
@@ -109,6 +107,7 @@ class AddProtectionSchema(Schema):
     name = fields.String(example="Защита агрегата №1")
     id_type_protection = fields.Integer(example=1)
     id_location = fields.Integer(example=1)
+    is_end = fields.Boolean(example=True)
 
     class Meta:
         unknown = EXCLUDE
@@ -133,6 +132,8 @@ class ProtectionSchema(Schema):
     id = fields.Integer(example=1)
     name = fields.String(example="")
     id_type_protection = fields.Integer()
+    # type_protection = fields.List(fields.Dict())
+    is_end = fields.Boolean(example=True)
 
 
 class ProtectionListSchema(Schema):
@@ -200,6 +201,7 @@ class LocationSchema(Schema):
     name = fields.String(example="")
     id_parent = fields.Integer()
     # id_protection = fields.Integer()
+    id_type = fields.Integer(allow_none=True)
 
 
 class LocationListSchema(Schema):
