@@ -26,7 +26,7 @@ const NavAuthBar = (props) => {
                         <h2 className="navButton">Инструкция</h2>
                     </a>
                 </div>
-                <div className="col">
+                {/* <div className="col">
                     <a href="/expert/type-works/" style={aStyle}>
                         <h2 className="navButton">Виды работ</h2>
                     </a>
@@ -40,7 +40,7 @@ const NavAuthBar = (props) => {
                     <a href="/expert/protections/" style={aStyle}>
                         <h2 className="navButton">Защиты</h2>
                     </a>
-                </div>
+                </div> */}
                 <div className="col">
                     <a href="/expert/rules/" style={aStyle}>
                         <h2 className="navButton">Правила</h2>
@@ -56,6 +56,15 @@ const NavAuthBar = (props) => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
+                            <Dropdown.Item href="/expert/type-works/">
+                                Виды работ
+                            </Dropdown.Item>
+                            <Dropdown.Item href="/expert/locations/">
+                                Места проведения работ
+                            </Dropdown.Item>
+                            <Dropdown.Item href="/expert/protections/">
+                                Защиты
+                            </Dropdown.Item>
                             <Dropdown.Item href="/expert/questions/">
                                 Банк вопросов
                             </Dropdown.Item>

@@ -123,12 +123,14 @@ function FilterTypeWork(props) {
     );
 }
 
-
 function FilterProtection(props) {
     const [searchName, setSearchName] = useState(null);
     const [optionList, setOptionList] = useState([]);
     const [optionTypeProtections, setOptionTypeProtections] = useState(
-        props.typeProtections.map((item) => ({ value: item.id, label: item.name }))
+        props.typeProtections.map((item) => ({
+            value: item.id,
+            label: item.name,
+        }))
     );
     const [selectedTypeProtections, setSelectedTypeProtections] = useState([]);
 
@@ -185,7 +187,6 @@ function FilterProtection(props) {
     );
 }
 
-
 function FilterButton(props) {
     const [showForm, setShowForm] = useState(false);
     let name = "Фильтры";
@@ -193,42 +194,36 @@ function FilterButton(props) {
     const handleClick = () => {
         setShowForm(!showForm);
     };
-    let filterForm = <div></div> 
-    
-    if (props.name === "locations")
-    {
+    let filterForm = <div></div>;
+
+    if (props.name === "locations") {
         filterForm = (
             <FilterElementForm
                 optionTypeLocations={props.optionTypeLocations}
                 onClickFiltered={props.onClickFiltered}
             ></FilterElementForm>
-        )
-    }
-    else if (props.name === "works")
-    {
+        );
+    } else if (props.name === "works") {
         filterForm = (
             <FilterTypeWork
                 optionTypeLocations={props.optionTypeLocations}
                 onClickFiltered={props.onClickFiltered}
             ></FilterTypeWork>
-        )
-    }
-    else if (props.name === "protections")
-    {
+        );
+    } else if (props.name === "protections") {
         filterForm = (
             <FilterProtection
                 typeProtections={props.typeProtections}
                 onClickFiltered={props.onClickFiltered}
             ></FilterProtection>
-        )
-    }
-    else {
-        filterForm =  (
+        );
+    } else {
+        filterForm = (
             <FilterElementForm
                 optionTypeLocations={props.optionTypeLocations}
                 onClickFiltered={props.onClickFiltered}
             ></FilterElementForm>
-        )
+        );
     }
 
     return (
@@ -236,11 +231,7 @@ function FilterButton(props) {
             <button onClick={handleClick} className="btn btn-primary">
                 {name}
             </button>
-            {showForm && (
-                <div>
-                    {filterForm}
-                </div>
-            )}
+            {showForm && <div>{filterForm}</div>}
         </div>
     );
 }

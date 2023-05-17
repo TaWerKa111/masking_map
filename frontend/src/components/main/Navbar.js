@@ -28,16 +28,12 @@ const Navbar = (props) => {
                 </div>
                 <div className="col">
                     <a href="/masking-map/" style={aStyle}>
-                        <h2 className="navButton">
-                            Составить карту
-                        </h2>
+                        <h2 className="navButton">Составить карту</h2>
                     </a>
                 </div>
                 <div className="col">
                     <a href="/list-masking-map/" style={aStyle}>
-                        <h2 className="navButton">
-                            Посмотреть карты
-                        </h2>
+                        <h2 className="navButton">Посмотреть карты</h2>
                     </a>
                 </div>
                 <div className="col">

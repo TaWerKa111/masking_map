@@ -94,7 +94,9 @@ export default function ParentLocation() {
                             <li key={index}>{item.name}</li>
                         ))}
                     </ul>
-                    <button onClick={addClick}>Добавить связь</button>
+                    <button className="btn btn-primary" onClick={addClick}>
+                        Добавить связь
+                    </button>
                 </div>
             </div>
             <div className="row">

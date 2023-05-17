@@ -20,25 +20,23 @@ export default function AddRule() {
             };
             apiInst.get("/rule/rule/", { params: params }).then((res) => {
                 setIsLoading(false);
-                setRule(
-                    {
-                        name: res.data.name,
-                        works: res.data.criteria.find(
-                                item => item.type_criteria === "type_work"
-                            ).works,
-                        locations: res.data.criteria.find(
-                                item => item.type_criteria === "location"
-                            ).locations,
-                        conditions: res.data.criteria.find(
-                                item => item.type_criteria === "question"
-                            ).questions,
-                        protections: [],
-                        type_locations: res.data.criteria.find(
-                                item => item.type_criteria === "type_location"
-                            ).locations_type,
-                        compensatory_measures: res.data.compensatory_measures
-                    }
-                );
+                setRule({
+                    name: res.data.name,
+                    works: res.data.criteria.find(
+                        (item) => item.type_criteria === "type_work"
+                    ).works,
+                    locations: res.data.criteria.find(
+                        (item) => item.type_criteria === "location"
+                    ).locations,
+                    conditions: res.data.criteria.find(
+                        (item) => item.type_criteria === "question"
+                    ).questions,
+                    protections: [],
+                    type_locations: res.data.criteria.find(
+                        (item) => item.type_criteria === "type_location"
+                    ).locations_type,
+                    compensatory_measures: res.data.compensatory_measures,
+                });
                 console.log(res.data);
                 console.log(searchParams.get("id"));
             });
@@ -50,15 +48,16 @@ export default function AddRule() {
                 conditions: [],
                 protections: [],
                 type_locations: [],
-                compensatory_measures: ""
+                compensatory_measures: "",
             });
             setIsLoading(false);
         }
         console.log("rule", rule);
     }, []);
 
-    return (
-        isLoading ? (<LoadingSpinner></LoadingSpinner>) : (
-            <RuleInfo rule={rule}></RuleInfo>)
+    return isLoading ? (
+        <LoadingSpinner></LoadingSpinner>
+    ) : (
+        <RuleInfo rule={rule}></RuleInfo>
     );
 }

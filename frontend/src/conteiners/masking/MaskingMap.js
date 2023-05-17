@@ -22,7 +22,7 @@ export default function MaskingMap() {
     const [typeWorks, setTypeWorks] = useState([]);
     const [conditions, setConditions] = useState([]);
     const [styleBtn, setStyleBtn] = useState({
-        display: "block"
+        display: "block",
     });
 
     // const [selectedConditions, setSelectedConditions] = useState([]);
@@ -117,7 +117,7 @@ export default function MaskingMap() {
                 // fetchPdfDocument(resp.data.masking_uuid);
                 send_toast("Карта сформирована!", "error");
                 setStyleBtn({
-                    display: "none"
+                    display: "none",
                 });
             })
             .catch((err) => {
@@ -125,7 +125,7 @@ export default function MaskingMap() {
                 send_toast("Не удалось сформировать карту!", "error");
             });
         setStyleBtn({
-            display: "none"
+            display: "none",
         });
     };
 
@@ -154,8 +154,7 @@ export default function MaskingMap() {
                             <button
                                 className="btn btn-secondary float-end"
                                 onClick={() => setModalTypeWork(true)}
-                                style={styleBtn
-                                }
+                                style={styleBtn}
                             >
                                 Изменить
                             </button>
@@ -245,33 +244,31 @@ export default function MaskingMap() {
                     </tr>
                 </table>
             </div>
-                {
-                    resultGenerating.result ?
-                    (
-                        <div>
-                            <div className="row">
-                            <div className="col-md">
-                                <iframe
-                                    title="MAP"
-                                    srcDoc={mapHtml}
-                                    style={{ width: "100%", height: "100vh" }}
-                                />
-                            </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-md d-flex justify-content-center">
-                                    <button
-                                        className="downloadButton"
-                                        onClick={handleDownloadClick}
-                                    >
-                                        Скачать файл
-                                    </button>
-                                </div>
-                            </div>
-                        </div> 
-                    )
-                    : <div></div>
-                }
+            {resultGenerating.result ? (
+                <div>
+                    <div className="row">
+                        <div className="col-md">
+                            <iframe
+                                title="MAP"
+                                srcDoc={mapHtml}
+                                style={{ width: "100%", height: "100vh" }}
+                            />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md d-flex justify-content-center">
+                            <button
+                                className="downloadButton"
+                                onClick={handleDownloadClick}
+                            >
+                                Скачать файл
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div></div>
+            )}
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <button

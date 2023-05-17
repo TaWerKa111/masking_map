@@ -13,9 +13,10 @@ const LoginForm = ({ onLogin }) => {
         event.preventDefault();
         let userdata = { login: username, password: password };
         console.log(userdata);
-        apiInst.post("/auth/login/", userdata)
-            .then(resp => {
-                if (resp.status === 200){
+        apiInst
+            .post("/auth/login/", userdata)
+            .then((resp) => {
+                if (resp.status === 200) {
                     localStorage.setItem("username", username);
                     localStorage.setItem("password", password);
                     localStorage.setItem("is_login", true);
@@ -25,8 +26,7 @@ const LoginForm = ({ onLogin }) => {
                     send_notify(resp.data.message, "success");
                 }
             })
-            .catch(
-            e => {
+            .catch((e) => {
                 console.log(e);
                 send_notify(e.response.data.message, "error");
             });
@@ -37,36 +37,39 @@ const LoginForm = ({ onLogin }) => {
             <div className="row">
                 <div className="col-md">
                     <div className="login-form">
-                    <form onSubmit={handleSubmit}>
-                        <div class="mb-3">
-                        <label className="form-label h5">
-                            Имя пользователя:
-                        </label>
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={(event) => setUsername(event.target.value)}
-                            className="form-control"
-                        />
-                        </div>
-                        <div class="mb-3">
-                        <label className="form-label h5">
-                            Пароль:
-                        </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(event) => setPassword(event.target.value)}
-                            className="form-control"
-                        />
-                        </div>
-                        <button type="submit" class="btn btn-primary">Войти</button>
-                    </form>
+                        <form onSubmit={handleSubmit}>
+                            <div class="mb-3">
+                                <label className="form-label h5">
+                                    Имя пользователя:
+                                </label>
+                                <input
+                                    type="text"
+                                    value={username}
+                                    onChange={(event) =>
+                                        setUsername(event.target.value)
+                                    }
+                                    className="form-control"
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <label className="form-label h5">Пароль:</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(event.target.value)
+                                    }
+                                    className="form-control"
+                                />
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                Войти
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-
     );
 };
 

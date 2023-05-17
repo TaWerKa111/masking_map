@@ -89,7 +89,8 @@ export default function Rules() {
                             rules.map((rule) => (
                                 <table>
                                     <tr>
-                                        <th>Название Правила</th>
+                                        {/* <th>Название Правила</th> */}
+                                        <th>Номер правила</th>
                                         <th>Виды работ</th>
                                         <th>Места проведения работ</th>
                                         <th>Типы локаций</th>
@@ -100,42 +101,53 @@ export default function Rules() {
                                         <th>Удалить</th>
                                     </tr>
                                     <tr>
-                                        <td>{rule.name}</td>
-                                        <td>{
-                                            rule.criteria.find(
-                                                item => item.type_criteria === "type_work"
-                                            ).works.map(
-                                                item => (item.name)
-                                            )
-                                        }
-                                        </td>
-                                        <td>{
-                                            rule.criteria.find(
-                                                item => item.type_criteria === "location"
-                                            ).locations.map(
-                                                item => (item.name)
-                                            )
-                                        }</td>
-                                        <td>{
-                                            rule.criteria.find(
-                                                item => item.type_criteria === "type_location"
-                                            ).locations_type.map(
-                                                item => (item.name)
-                                            )    
-                                        }</td>
-                                        <td>{
-                                            rule.criteria.find(
-                                                item => item.type_criteria === "question"
-                                            ).questions.map(
-                                                item => (item.name)
-                                            )    
-                                        }</td>
+                                        <td>{rule.id}</td>
                                         <td>
-                                            {
-                                                rule.protections.map(
-                                                    item => item.name
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "type_work"
                                                 )
-                                            }
+                                                .works.map((item) => item.name)}
+                                        </td>
+                                        <td>
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "location"
+                                                )
+                                                .locations.map(
+                                                    (item) => item.name
+                                                )}
+                                        </td>
+                                        <td>
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "type_location"
+                                                )
+                                                .locations_type.map(
+                                                    (item) => item.name
+                                                )}
+                                        </td>
+                                        <td>
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "question"
+                                                )
+                                                .questions.map(
+                                                    (item) => item.name
+                                                )}
+                                        </td>
+                                        <td>
+                                            {rule.protections.map(
+                                                (item) => item.name
+                                            )}
                                         </td>
                                         <td>{rule.compensatory_measures}</td>
                                         <td>
