@@ -21,9 +21,12 @@ const LoginForm = ({ onLogin }) => {
                     localStorage.setItem("password", password);
                     localStorage.setItem("is_login", true);
                     onLogin();
+                    send_notify(
+                        "Пользователь успешно авторизовался!",
+                        "success"
+                    );
                     navigate("/");
                     // window.location.reload(false);
-                    send_notify(resp.data.message, "success");
                 }
             })
             .catch((e) => {

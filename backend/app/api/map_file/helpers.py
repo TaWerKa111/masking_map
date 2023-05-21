@@ -7,8 +7,19 @@ from flask_sqlalchemy import Pagination
 from sqlalchemy import desc
 
 from app import db
-from common.postgres.models import MaskingMapFile, TypeWork, Location, \
-    CriteriaTypeWork, Criteria, CriteriaLocation, CriteriaTypeLocation, Rule, Protection, RuleProtection, CriteriaQuestion
+from common.postgres.models import (
+    MaskingMapFile,
+    TypeWork,
+    Location,
+    CriteriaTypeWork,
+    Criteria,
+    CriteriaLocation,
+    CriteriaTypeLocation,
+    Rule,
+    Protection,
+    RuleProtection,
+    CriteriaQuestion,
+)
 from config import AppConfig
 
 
@@ -76,7 +87,7 @@ def get_filtered_files(page: int, limit: int) -> Pagination:
 
 
 def check_generate_masking_plan(
-        locations, type_works, questions, is_test=False
+    locations, type_works, questions, is_test=False
 ) -> uuid.UUID or None:
     """
     Проверка возможности сгенерировать карту для заданных критериев
@@ -91,24 +102,28 @@ def check_generate_masking_plan(
 
     criteria = (
         db.session.query(Criteria)
-        # .outerjoin(
-        #     CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id
-        # )
-        # .outerjoin(
-        #     CriteriaLocation, CriteriaLocation.id_criteria == Criteria.id
-        # )
-        # .outerjoin(
-        #     CriteriaTypeLocation, CriteriaTypeLocation.id_criteria == Criteria.id
-        # )
         .filter(
-            CriteriaTypeWork.id_type_work.in_([type_work["id"] for type_work in type_works]),
+            CriteriaTypeWork.id_type_work.in_(
+                [type_work["id"] for type_work in type_works]
+            ),
             # CriteriaTypeLocation.id_type_location.in_([type_location["id_type"] for type_location in locations]),
-            CriteriaLocation.id_location.in_([location["id"] for location in locations]),
-            CriteriaQuestion.id_question.in_([question["id"] for question in questions]),
-            
+            CriteriaLocation.id_location.in_(
+                [location["id"] for location in locations]
+            ),
+            # CriteriaQuestion.id_question.in_([question["id"] for question in questions]),
         )
         .all()
     )
+
+    criteria_question: list[CriteriaQuestion] = db.session.query(
+        CriteriaQuestion
+    ).filter(CriteriaQuestion.id_criteria.in_([cr.id for cr in criteria]))
+
+    answers_d = {int(q.get("id")): q.get("answer_id") for q in questions}
+    # cr_id_right = []
+    # for cr_qu in criteria_question:
+    #     if answers_d.get(cr_qu.id) and answers_d[cr_qu.id] == cr_qu.id_right_answer:
+    #         cr_id_right.append(cr_qu.id_criteria)
 
     criteria_ids = [cr.id for cr in criteria]
     current_app.logger.debug(f"criteria_ids - {criteria_ids}")
@@ -116,8 +131,8 @@ def check_generate_masking_plan(
 
     rules = (
         db.session.query(Rule)
-        .filter(Criteria.id.in_(criteria_ids))
-        .all()
+        # .filter(Criteria.id.in_(cr_id_right))
+        .filter(Criteria.id.in_(criteria_ids)).all()
     )
 
     current_app.logger.debug(f"rules - {rules}")
@@ -133,7 +148,8 @@ def check_generate_masking_plan(
     )
 
     prot = (
-        db.session.query(Protection)
+        db.session.query(Protection, RuleProtection)
+        .join(RuleProtection)
         .filter(
             Protection.id.in_([p.id for p in protections]),
             # Rule.is_test == is_test,
@@ -141,30 +157,38 @@ def check_generate_masking_plan(
         .all()
     )
 
-    current_app.logger.debug(f"protections - {[p.id for p in protections]}")
-    current_app.logger.debug(f"prot - {[p.id for p in prot]}")
+    current_app.logger.debug(
+        f"protections relationship - {[p.id for p in protections]}"
+    )
+    # current_app.logger.debug(f"prot - {[p.__dict__ for p in prot]}")
+    current_app.logger.debug(f"prot - {prot}")
+    for protection, rel in prot:
+        current_app.logger.debug(
+            f"pr - {protection.id}, rel - {rel.is_need_masking}"
+        )
 
-    # for protection in type_work.protections:
-    #     if protection.id == location.id_protection:
-    #         masking_uuid = uuid.uuid4()
-    #         masking_data = {
-    #             "number_pril": "",
-    #             "number_project": "",
-    #             "date": datetime.date.today().strftime("%d.%m.%Y"),
-    #             "name_nps": "",
-    #             "protection_cspa": [
-    #                 {"name": protection.name, "is_no_demask": False}
-    #             ],
-    #         }
+        masking_uuid = uuid.uuid4()
+        masking_data = {
+            "number_pril": "",
+            "number_project": "",
+            "date": datetime.date.today().strftime("%d.%m.%Y"),
+            "name_nps": "",
+            "protection_cspa": [
+                {
+                    "name": protection.name,
+                    "is_no_demask": rel.is_need_demasking,
+                }
+            ],
+        }
 
-    #         masking_map = MaskingMapFile(
-    #             description="",
-    #             filename="",
-    #             data_masking=masking_data,
-    #             masking_uuid=masking_uuid,
-    #         )
-    #         db.session.add(masking_map)
-    #         db.session.commit()
-    #         return masking_uuid
+        masking_map = MaskingMapFile(
+            description="",
+            filename="",
+            data_masking=masking_data,
+            masking_uuid=masking_uuid,
+        )
+        db.session.add(masking_map)
+        db.session.commit()
+        return masking_map
 
     return None

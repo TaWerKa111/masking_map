@@ -3,7 +3,7 @@ import { apiInst } from "../../utils/axios";
 import { useState, useEffect } from "react";
 
 export default function TypeWorkQuestions({ handleClickAdd, selectedWorks }) {
-    const [typeWorks, setTypeWorks] = useState([]);
+    const [typeWorks, setTypeWorks] = useState([{ name: "Loc1", id: 1 }]);
 
     useEffect(() => {
         apiInst

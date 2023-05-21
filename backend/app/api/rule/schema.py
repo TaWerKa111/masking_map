@@ -21,13 +21,16 @@ class LocationSchema(Schema):
     id = fields.Integer()
     name = fields.String()
 
+
 class WorkSchema(Schema):
     id = fields.Integer()
     name = fields.String()
 
+
 class LocationTypeSchema(Schema):
     id = fields.Integer()
     name = fields.String()
+
 
 class QuestionAnswerSchema(Schema):
     id = fields.Integer(allow_none=True)
@@ -59,7 +62,6 @@ class CriteriaSchema(Schema):
 
     def get_criteria_type(self, obj):
         return obj.type_criteria.value
-
 
 
 class QuestionSchema(Schema):
@@ -97,7 +99,7 @@ class UpdateQuestionSchema(AddQuestionSchema):
 
 
 class RuleProtectionSchema(Schema):
-    protection_id = fields.Integer()
+    id = fields.Integer()
     is_masking = fields.Bool()
     is_demasking = fields.Bool()
 
@@ -114,7 +116,7 @@ class LocationRuleSchema(Schema):
 
 class TypeWorkRuleSchema(Schema):
     id = fields.Integer()
-    
+
     class Meta:
         unknown = EXCLUDE
 
@@ -128,10 +130,11 @@ class TypeLocationRuleSchema(Schema):
 
 class AddRuleSchema(Schema):
     name = fields.String()
-    type_works = fields.List(fields.Nested(TypeWorkRuleSchema()))
-    locations = fields.List(fields.Nested(LocationRuleSchema()))
-    type_locations = fields.List(fields.Nested(TypeLocationRuleSchema()))
-    questions = fields.List(fields.Nested(AddQuestionSchema()))
+    # type_works = fields.List(fields.Nested(TypeWorkRuleSchema()))
+    # locations = fields.List(fields.Nested(LocationRuleSchema()))
+    # type_locations = fields.List(fields.Nested(TypeLocationRuleSchema()))
+    # questions = fields.List(fields.Nested(AddQuestionSchema()))
+    criteria = fields.List(fields.Dict())
     protections = fields.List(fields.Nested(RuleProtectionSchema()))
     compensatory_measures = fields.String(allow_none=True)
 

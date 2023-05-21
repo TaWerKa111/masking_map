@@ -24,7 +24,7 @@ class FileMaskingSchema(Schema):
 
 class ListFileMaskingSchema(Schema):
     pagination = fields.Nested(PaginationResponseSchema())
-    files = fields.Nested(FileMaskingSchema())
+    files = fields.List(fields.Nested(FileMaskingSchema()))
 
 
 class Question(Schema):
@@ -52,10 +52,13 @@ class TypeWorkGenerateMapSchema(Schema):
 
 class GenerateMaskingPlanSchema(Schema):
     locations = fields.List(fields.Nested(LocationGenerateMapSchema()))
-    type_works = fields.List(fields.Nested(TypeWorkGenerateMapSchema()), allow_none=True)
+    type_works = fields.List(
+        fields.Nested(TypeWorkGenerateMapSchema()), allow_none=True
+    )
     questions = fields.List(fields.Nested(Question()))
     is_test = fields.Boolean()
 
 
 class MaskingResponseFileSchema(BinaryResponseSchema):
     masking_uuid = fields.UUID()
+    description = fields.String()

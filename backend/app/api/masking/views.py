@@ -12,10 +12,7 @@ from app.api.masking.schemas import (
     AddTypeWorkSchema,
     AddLocationSchema,
     DepartamentListSchema,
-    DepartamentSchema,
-    TypeWorkSchema,
     TypeProtectionSchema,
-    ProtectionSchema,
     LocationSchema,
     FilterParamTypeWorkSchema,
     FilterParamLocationSchema,
@@ -32,20 +29,27 @@ from app.api.masking.schemas import (
     FileterParamProtectionSchema,
     AddTypeLocationSchema,
     LocationListSchema,
-    GetLocationSchema, ProtectionListSchema,
-    RelationshipLocationLocationSchema, RelationshipLocationProtectionSchema,
+    GetLocationSchema,
+    ProtectionListSchema,
+    RelationshipLocationLocationSchema,
+    RelationshipLocationProtectionSchema,
 )
 from app.api.helpers.schemas import BinaryResponseSchema
 from app.api.masking.helpers import (
     get_protection_list,
-    get_location_list,
-    get_type_work_list,
     get_type_protection_list,
     get_type_location_list,
-    get_departament_work_list, update_type_work, add_departament,
-    update_departament, add_protection, update_protection, add_type_protection,
-    update_type_protection, add_location, update_location,
-    update_type_location, update_rel_location_location,
+    get_departament_work_list,
+    update_type_work,
+    add_departament,
+    update_departament,
+    add_protection,
+    update_protection,
+    update_type_protection,
+    add_location,
+    update_location,
+    update_type_location,
+    update_rel_location_location,
     update_rel_location_protection,
 )
 
@@ -81,11 +85,12 @@ def get_type_work_view() -> tuple[dict, int]:
     """
 
     data = dict()
-    data["ids_type_protection[]"] = request.args.getlist(
-        "ids_type_protection[]"
+    data["type_protection_ids[]"] = request.args.getlist(
+        "type_protection_ids[]"
     )
-    data["ids_type_mn_object[]"] = request.args.getlist("ids_type_mn_object[]")
-    data["name_type_work"] = request.args.get("name_type_work")
+    data["type_location_ids[]"] = request.args.getlist("type_location_ids[]")
+    data["departament_ids[]"] = request.args.getlist("departament_ids[]")
+    data["name"] = request.args.get("name")
 
     try:
         type_work_list = FilterParamTypeWorkSchema().load(data)
@@ -97,6 +102,7 @@ def get_type_work_view() -> tuple[dict, int]:
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
+    current_app.logger.debug(f"tw params - {data}")
 
     type_works, pagination = serialize_paginate_object(type_work_list)
     # current_app.logger.info(f"type works {type_works[1].departament}")
@@ -145,7 +151,7 @@ def add_type_work_view() -> tuple[dict, int]:
     data = request.json
 
     try:
-        type_work = AddTypeWorkSchema().load(data)
+        AddTypeWorkSchema().load(data)
     except ValidationError as err:
         current_app.logger.debug(
             f"Ошибка при валидации данных для схемы. {err}"
@@ -219,16 +225,13 @@ def update_type_work_view() -> tuple[dict, int]:
     result_update = update_type_work(
         type_work_data.get("id"),
         type_work_data.get("name"),
-        type_work_data.get("departament_id")
+        type_work_data.get("departament_id"),
     )
 
     if not result_update:
         return (
             BinaryResponseSchema().dump(
-                {
-                    "message": "Не удалось изменить данные!",
-                    "result": False
-                }
+                {"message": "Не удалось изменить данные!", "result": False}
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
@@ -401,10 +404,7 @@ def update_departament_type_work_view() -> tuple[dict, int]:
     if not result_update:
         return (
             BinaryResponseSchema().dump(
-                {
-                    "message": "Не удалось изменить данные!",
-                    "result": False
-                }
+                {"message": "Не удалось изменить данные!", "result": False}
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
@@ -440,7 +440,9 @@ def get_protection_view() -> tuple[dict, int]:
         tags:
             - masking
     """
-    data = request.args.to_dict()
+    data = dict()
+    data["name"] = request.args.get("name")
+    data["type_protections_ids[]"] = request.args.getlist("type_protections_ids[]")
 
     try:
         data = FileterParamProtectionSchema().load(data)
@@ -455,7 +457,7 @@ def get_protection_view() -> tuple[dict, int]:
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
-
+    current_app.logger.debug(f"param - {data}")
     protection_list = get_protection_list(
         name=data.get("name"),
         type_protection_ids=data.get("type_protections_ids"),
@@ -465,7 +467,9 @@ def get_protection_view() -> tuple[dict, int]:
 
     protections, pagination = serialize_paginate_object(protection_list)
     result = {"protections": protections, "pagination": pagination}
-    current_app.logger.debug(f"protection list - {protections[0].type_protection}")
+    current_app.logger.debug(
+        f"protection list - {protections[0].type_protection}"
+    )
 
     return (
         ProtectionListSchema().dump(result),
@@ -598,10 +602,7 @@ def update_protection_view() -> tuple[dict, int]:
     if not result_update:
         return (
             BinaryResponseSchema().dump(
-                {
-                    "message": "Не удалось изменить данные!",
-                    "result": False
-                }
+                {"message": "Не удалось изменить данные!", "result": False}
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
@@ -770,10 +771,7 @@ def update_type_protection_view() -> tuple[dict, int]:
     if not result_update:
         return (
             BinaryResponseSchema().dump(
-                {
-                    "message": "Не удалось изменить данные!",
-                    "result": False
-                }
+                {"message": "Не удалось изменить данные!", "result": False}
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
@@ -857,12 +855,12 @@ def get_mn_location_list_view() -> tuple[dict, int]:
             - masking
     """
 
-    data = request.args.to_dict()
-    # data["ids_type_protection[]"] = request.args.getlist(
-    #     "ids_type_protection[]"
-    # )
-    # data["ids_type_location[]"] = request.args.getlist("ids_type_location[]")
-    # data["name"] = request.args.get("name")
+    data = dict()
+    data["type_protection_ids[]"] = request.args.getlist(
+        "type_protection_ids[]"
+    )
+    data["type_location_ids[]"] = request.args.getlist("type_location_ids[]")
+    data["name"] = request.args.get("name")
     current_app.logger.debug(f"mn objects data - {data}")
 
     try:
@@ -878,7 +876,7 @@ def get_mn_location_list_view() -> tuple[dict, int]:
 
     locations_ser, pagination = serialize_paginate_object(locations)
     result = {"locations": locations_ser, "pagination": pagination}
-    current_app.logger.debug(f"result - {locations.items[0].id_type}")
+    # current_app.logger.debug(f"result - {locations.items[0].id_type}")
 
     return (
         LocationListSchema().dump(result),
@@ -1015,10 +1013,7 @@ def update_mn_location_view() -> tuple[dict, int]:
     if not result_update:
         return (
             BinaryResponseSchema().dump(
-                {
-                    "message": "Не удалось изменить данные!",
-                    "result": False
-                }
+                {"message": "Не удалось изменить данные!", "result": False}
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
@@ -1094,7 +1089,7 @@ def add_type_location_view() -> tuple[dict, int]:
     data = request.json
 
     try:
-        type_location = AddTypeLocationSchema().load(data)
+        AddTypeLocationSchema().load(data)
     except ValidationError as err:
         current_app.logger.debug(
             f"Ошибка при валидации данных для схемы. {err}"
@@ -1166,10 +1161,7 @@ def update_type_location_view() -> tuple[dict, int]:
     if not result_update:
         return (
             BinaryResponseSchema().dump(
-                {
-                    "message": "Не удалось изменить данные!",
-                    "result": False
-                }
+                {"message": "Не удалось изменить данные!", "result": False}
             ),
             http.HTTPStatus.BAD_REQUEST,
         )

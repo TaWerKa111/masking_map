@@ -70,7 +70,7 @@ export default function MaskingMap() {
         masking_uuid = "5ca8fa4d-72f6-4031-b04b-a5c1cab61930"
     ) => {
         apiInst
-            .get("/masking/get-html/", {
+            .get("/files/get-html/", {
                 params: { masking_uuid: masking_uuid },
             })
             .then((resp) => {
@@ -81,7 +81,7 @@ export default function MaskingMap() {
 
     const handleDownloadClick = () => {
         apiInst({
-            url: "/masking/get-pdf/", // замените на URL файла на сервере
+            url: "/files/get-pdf/", // замените на URL файла на сервере
             params: { masking_uuid: mapUuid },
             method: "GET",
             responseType: "blob", // важно указать, что ожидаем blob-данные в ответе
@@ -114,8 +114,8 @@ export default function MaskingMap() {
             .then((resp) => {
                 setResultGenerating(resp.data);
                 setMapUuid(resp.data.masking_uuid);
-                // fetchPdfDocument(resp.data.masking_uuid);
-                send_toast("Карта сформирована!", "error");
+                fetchPdfDocument(resp.data.masking_uuid);
+                send_toast("Карта сформирована!", "success");
                 setStyleBtn({
                     display: "none",
                 });
@@ -246,6 +246,11 @@ export default function MaskingMap() {
             </div>
             {resultGenerating.result ? (
                 <div>
+                    <div className="row">
+                        <div className="col-md">
+                            <div>{resultGenerating.description}</div>
+                        </div>
+                    </div>
                     <div className="row">
                         <div className="col-md">
                             <iframe

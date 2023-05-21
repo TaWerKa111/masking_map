@@ -1,4 +1,5 @@
 import http
+from itertools import chain
 
 from flask import Blueprint, request, current_app
 from marshmallow import ValidationError
@@ -11,8 +12,13 @@ from app.api.rule.helpers import (
     add_new_rule,
     get_rule,
     filter_list_rule,
-    update_rule, filter_list_question, get_question, add_question,
-    add_question_answer, update_question, get_locations_work_types_location_types,
+    update_rule,
+    filter_list_question,
+    get_question,
+    add_question,
+    add_question_answer,
+    update_question,
+    get_locations_work_types_location_types,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -20,8 +26,13 @@ from app.api.rule.schema import (
     RuleSchema,
     FilterRulesSchema,
     RuleListSchema,
-    UpdateRuleSchema, AddQuestionSchema, QuestionListSchema, QuestionSchema,
-    GetQuestionSchema, FilterQuestionsSchema, UpdateQuestionSchema,
+    UpdateRuleSchema,
+    AddQuestionSchema,
+    QuestionListSchema,
+    QuestionSchema,
+    GetQuestionSchema,
+    FilterQuestionsSchema,
+    UpdateQuestionSchema,
 )
 
 bp = Blueprint("rules_api", __name__, url_prefix="/api/rule/")
@@ -55,6 +66,20 @@ def add_rule_view() -> tuple[dict, int]:
             - rule
     """
 
+    def get_list_value(key, type_cr):
+        criteria = [
+            cr.get(key)
+            for cr in rule.get("criteria")
+            if cr.get("type_criteria")
+            and cr.get("type_criteria").get("value") == type_cr
+        ]
+        result = []
+
+        for tw in criteria:
+            if tw:
+                result.extend(tw)
+        return result
+
     if not request.json:
         return (
             BinaryResponseSchema().dump(MESSAGES_DICT["NO_JSON"]),
@@ -81,10 +106,30 @@ def add_rule_view() -> tuple[dict, int]:
             http.HTTPStatus.BAD_REQUEST,
         )
 
-    location, type_work, type_location = get_locations_work_types_location_types(
-        location_ids=[loc["id"] for loc in rule.get("locations")],
-        type_work_ids=[tw["id"] for tw in rule.get("type_works")],
-        type_location_ids=[tl["id"] for tl in rule.get("type_locations")],
+    current_app.logger.debug(f"rule_data prot - {rule.get('protections')}")
+
+    type_works = get_list_value("type_works", "type_work")
+    questions = get_list_value("questions", "question")
+    type_locations = get_list_value("type_locations", "type_location")
+    locations = get_list_value("locations", "location")
+    current_app.logger.debug(
+        f"type_works - {type_works}, "
+        f"question - {questions}\n"
+        f"loca - {locations}\n"
+        f"tl - {type_locations}\n"
+    )
+
+    (
+        location,
+        type_work,
+        type_location,
+    ) = get_locations_work_types_location_types(
+        # location_ids=[loc["id"] for loc in rule.get("locations")],
+        # type_work_ids=[tw["id"] for tw in rule.get("type_works")],
+        # type_location_ids=[tl["id"] for tl in rule.get("type_locations")],
+        location_ids=[loc["id"] for loc in locations],
+        type_work_ids=[tw["id"] for tw in type_works],
+        type_location_ids=[tl["id"] for tl in type_locations],
     )
 
     add_new_rule(
@@ -92,9 +137,10 @@ def add_rule_view() -> tuple[dict, int]:
         type_works=type_work,
         locations=location,
         type_locations=type_location,
-        questions=rule.get("questions"),
+        # questions=rule.get("questions"),
+        questions=questions,
         protections=rule.get("protections"),
-        compensatory_measures=rule.get("compensatory_measures")
+        compensatory_measures=rule.get("compensatory_measures"),
     )
 
     return BinaryResponseSchema().dump(
@@ -202,7 +248,9 @@ def get_rules_view() -> tuple[dict, int]:
 
     rules_ser, pagination = serialize_paginate_object(rules)
     result = {"rules": rules_ser, "pagination": pagination}
-    current_app.logger.debug(f"cr - {rules_ser[0].criteria[3].questions[0].answers[0].__dict__}")
+    current_app.logger.debug(
+        f"cr - {rules_ser[0].criteria[3].questions[0].answers[0].__dict__}"
+    )
     return RuleListSchema().dump(result), http.HTTPStatus.OK
 
 
@@ -260,20 +308,20 @@ def update_rule_view():
             http.HTTPStatus.BAD_REQUEST,
         )
 
-    location, type_work, type_location = get_location_work_type_location_type(
-        location_id=rule.get("location_id"),
-        type_work_id=rule.get("type_work_id"),
-        type_location_id=rule.get("type_location_id"),
-    )
-
-    update_rule(
-        name_rule=rule.get("name"),
-        type_work=type_work,
-        location=location,
-        type_location=type_location,
-        questions=rule.get("questions"),
-        protections=rule.get("protections"),
-    )
+    # location, type_work, type_location = get_locations_work_types_location_types(
+    #     location_id=rule.get("location_id"),
+    #     type_work_id=rule.get("type_work_id"),
+    #     type_location_id=rule.get("type_location_id"),
+    # )
+    #
+    # update_rule(
+    #     name_rule=rule.get("name"),
+    #     type_work=type_work,
+    #     location=location,
+    #     type_location=type_location,
+    #     questions=rule.get("questions"),
+    #     protections=rule.get("protections"),
+    # )
 
     return BinaryResponseSchema().dump(
         {"message": "Правило успешно изменено!", "result": True}
@@ -367,15 +415,13 @@ def get_question_view() -> tuple[dict, int]:
         current_app.logger.debug(
             f"Ошибка при валидации данных для схемы. {err}"
         )
-        return BinaryResponseSchema().dump(
-            {
-                "message": f"{err}",
-                "result": False
-            }
-        ), http.HTTPStatus.BAD_REQUEST
-    question = get_question(
-        question_id=valid_data["id"]
-    )
+        return (
+            BinaryResponseSchema().dump(
+                {"message": f"{err}", "result": False}
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+    question = get_question(question_id=valid_data["id"])
     return QuestionSchema().dump(question), http.HTTPStatus.OK
 
 
@@ -417,12 +463,15 @@ def add_question_view() -> tuple[dict, int]:
         question_data = AddQuestionSchema().load(data)
     except ValidationError as err:
         current_app.logger.info(f"Validation error {err}")
-        return BinaryResponseSchema().dump(
-            {
-                "message": "Не удалось добавить вопрос!",
-                "result": False,
-            }
-        ), http.HTTPStatus.BAD_REQUEST
+        return (
+            BinaryResponseSchema().dump(
+                {
+                    "message": "Не удалось добавить вопрос!",
+                    "result": False,
+                }
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
     current_app.logger.info(question_data)
     question = add_question(
         text=question_data.get("text"),
@@ -433,12 +482,15 @@ def add_question_view() -> tuple[dict, int]:
             id_question=question.id,
         )
 
-    return BinaryResponseSchema().dump(
-        {
-            "message": "Вопрос успешно добавлен!",
-            "result": True,
-        }
-    ), http.HTTPStatus.OK
+    return (
+        BinaryResponseSchema().dump(
+            {
+                "message": "Вопрос успешно добавлен!",
+                "result": True,
+            }
+        ),
+        http.HTTPStatus.OK,
+    )
 
 
 @bp.route("/question/", methods=["PUT"])
@@ -479,12 +531,15 @@ def update_question_view() -> tuple[dict, int]:
         question = UpdateQuestionSchema().load(data)
     except ValidationError as err:
         current_app.logger.info(f"Validation error {err}")
-        return BinaryResponseSchema().dump(
-            {
-                "message": "Не удалось изменить вопрос!",
-                "result": False,
-            }
-        ), http.HTTPStatus.BAD_REQUEST
+        return (
+            BinaryResponseSchema().dump(
+                {
+                    "message": "Не удалось изменить вопрос!",
+                    "result": False,
+                }
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
     current_app.logger.info(question)
     question = update_question(
         question_id=question.get("id"),
@@ -492,12 +547,15 @@ def update_question_view() -> tuple[dict, int]:
         answers=question.get("answers"),
     )
 
-    return BinaryResponseSchema().dump(
-        {
-            "message": "Вопрос успешно изменен!",
-            "result": True,
-        }
-    ), http.HTTPStatus.OK
+    return (
+        BinaryResponseSchema().dump(
+            {
+                "message": "Вопрос успешно изменен!",
+                "result": True,
+            }
+        ),
+        http.HTTPStatus.OK,
+    )
 
 
 # @bp.route("/criteria/", methods=["POST"])
@@ -586,4 +644,3 @@ def update_question_view() -> tuple[dict, int]:
 #
 #
 #
-

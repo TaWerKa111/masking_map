@@ -9,6 +9,7 @@ import CheckboxProtection from "../checkbox/CheckBoxProtection";
 import ModalQuestions from "../modal/ModalQuestions";
 import Select from "react-select";
 import send_notify from "../../utils/toast";
+import ModalChangeValue from "../modal/ModalChangeValue";
 
 const TYPES_CRITERIA_OPTIONS = [
     { value: "type_work", label: "Виды работы" },
@@ -27,6 +28,7 @@ export default function RuleInfo(props) {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState(
         rule.type_locations
     );
+    const [isModalTypeWork, setIsModalTypeWork] = useState(false);
     const [isModal, setModal] = useState(false);
     const [isModalLocation, setModalLocation] = useState(false);
     const [isModalProtection, setModalProtection] = useState(false);
@@ -34,6 +36,9 @@ export default function RuleInfo(props) {
     const [protections, setProtections] = useState(rule.protections);
     const [selectedTypeCriteria, setSelectedTypeCriteria] = useState({});
     const [criteriaList, setCriteriaList] = useState([]);
+    const [selectedCriteriaEditindId, setSelectedCriteriaEditindId] =
+        useState(null);
+    const [isConfirmationOpen, setConfirmationOpen] = useState(false);
 
     useEffect(() => {
         apiInst
@@ -56,39 +61,33 @@ export default function RuleInfo(props) {
         console.log("temp", event.target.value);
     };
 
-    const handleOptionSelect = (event) => {
-        const optionValue = event.target.value;
-        const optionIndex = selectedTypeLocations.indexOf(optionValue);
-        if (optionIndex > -1) {
-            // Remove the option from the selected options
-            setSelectedTypeLocations([
-                ...selectedTypeLocations.slice(0, optionIndex),
-                ...selectedTypeLocations.slice(optionIndex + 1),
-            ]);
-        } else {
-            // Add the option to the selected options
-            setSelectedTypeLocations([...selectedTypeLocations, optionValue]);
-        }
-        let temp_rule = Object.assign({}, rule);
-        temp_rule.type_locations = selectedTypeLocations;
-        setRule(temp_rule);
-        console.log("rule", rule.type_locations);
-    };
-
     const handleTypeWorks = (typeWorks) => {
         console.log("type_works", typeWorks);
         setModal(false);
-        let temp = Object.assign({}, rule);
-        temp["works"] = typeWorks;
-        setRule(temp);
+        // let temp = Object.assign({}, rule);
+        // temp["works"] = typeWorks;
+        setCriteriaList(
+            criteriaList.map((cr) => {
+                if (cr.id === selectedCriteriaEditindId) {
+                    return { ...cr, type_works: typeWorks };
+                } else return cr;
+            })
+        );
     };
 
     const handleLocations = (locations) => {
         console.log("locations", locations);
         setModalLocation(false);
-        let temp = Object.assign({}, rule);
-        temp["locations"] = locations;
-        setRule(temp);
+        // let temp = Object.assign({}, rule);
+        // temp["locations"] = locations;
+        // setRule(temp);
+        setCriteriaList(
+            criteriaList.map((cr) => {
+                if (cr.id === selectedCriteriaEditindId) {
+                    return { ...cr, locations: locations };
+                } else return cr;
+            })
+        );
     };
 
     const handleProtections = (protections) => {
@@ -101,25 +100,40 @@ export default function RuleInfo(props) {
     };
 
     const handleCheckboxChange = (id, field, isChecked) => {
-        setProtections((prevTypes) =>
-            prevTypes.map((type) => {
-                if (type.id === id) {
-                    return {
-                        ...type,
-                        [field]: isChecked,
-                    };
-                } else {
-                    return type;
-                }
-            })
-        );
+        console.log("id", id);
+        console.log("field", field);
+        console.log("isChecked", isChecked);
+        let newProtections = protections.map((type) => {
+            if (type.id == id) {
+                return {
+                    ...type,
+                    [field]: isChecked,
+                };
+            } else {
+                return type;
+            }
+        });
+        setProtections(newProtections);
+        let temp = Object.assign({}, rule);
+        temp["protections"] = newProtections;
+        setRule(temp);
     };
 
     const handleConditions = (conditions) => {
         console.log("conditions", conditions);
         setModalCondition(false);
-        let temp = Object.assign({}, rule);
-        temp["conditions"] = conditions.map((condition) => {
+        // let temp = Object.assign({}, rule);
+        // temp["conditions"] = conditions.map((condition) => {
+        //     return {
+        //         id: condition.value,
+        //         text: condition.label,
+        //         answers: condition.answers,
+        //         right_answer_id: condition.answers.find((item) => item.is_right)
+        //             .id,
+        //     };
+        // });
+        // setRule(temp);
+        let questions = conditions.map((condition) => {
             return {
                 id: condition.value,
                 text: condition.label,
@@ -128,7 +142,13 @@ export default function RuleInfo(props) {
                     .id,
             };
         });
-        setRule(temp);
+        setCriteriaList(
+            criteriaList.map((cr) => {
+                if (cr.id === selectedCriteriaEditindId) {
+                    return { ...cr, questions: questions };
+                } else return cr;
+            })
+        );
     };
 
     const handleSelect = (data) => {
@@ -150,7 +170,12 @@ export default function RuleInfo(props) {
     };
 
     const handleDelete = (itemId) => {
-        setCriteriaList(criteriaList.filter((item) => item.id !== itemId));
+        const result = window.confirm(
+            "Вы уверены, что хотите удалить элемент?"
+        );
+        if (result) {
+            setCriteriaList(criteriaList.filter((item) => item.id !== itemId));
+        }
     };
 
     const handleEdit = (itemId) => {
@@ -166,22 +191,45 @@ export default function RuleInfo(props) {
                 value: "",
                 label: "",
                 type_criteria: null,
+                type_works: [],
+                locations: [],
+                type_locations: [],
+                questions: [],
             },
         ]);
     };
 
     const handleAddRule = () => {
+        let criteria = criteriaList.filter((criteria) => {
+            if (criteria.type_criteria) {
+                return criteria;
+            }
+        });
+
+        let type_locations = selectedTypeLocations.map((type) => ({
+            id: type.value,
+            text: type.label,
+        }));
+
         let newRule = {
             // name: rule.name,
             compensatory_measures: rule.compensatory_measures,
-            type_locations: selectedTypeLocations.map((type) => ({
-                id: type.value,
-                text: type.label,
-            })),
+            // type_locations: selectedTypeLocations.map((type) => ({
+            //     id: type.value,
+            //     text: type.label,
+            // })),
             protections: rule.protections,
-            type_works: rule.works,
-            locations: rule.locations,
-            questions: rule.conditions,
+            // type_works: rule.works,
+            // locations: rule.locations,
+            criteria: criteria.map((criteria) => {
+                if (criteria.type_criteria.value === "type_location") {
+                    return {
+                        ...criteria,
+                        type_locations: type_locations,
+                    };
+                } else return criteria;
+            }),
+            // questions: rule.conditions,
         };
         console.log("newRule", newRule);
         apiInst
@@ -197,6 +245,86 @@ export default function RuleInfo(props) {
             });
     };
 
+    const handleOpenModal = (criteria) => {
+        setSelectedCriteriaEditindId(criteria.id);
+        console.log("criteria", criteria);
+        if (!criteria.type_criteria) return;
+        switch (criteria.type_criteria.value) {
+            case "type_work":
+                setModal(true);
+                break;
+            case "location":
+                setModalLocation(true);
+                break;
+            case "type_location":
+                // setIsModalTypeLocation(true);
+                break;
+            case "question":
+                setModalCondition(true);
+                break;
+            default:
+                break;
+        }
+    };
+
+    const listSelectedValue = (criteria) => {
+        if (!criteria.type_criteria) return;
+        switch (criteria.type_criteria.value) {
+            case "type_work":
+                return (
+                    <div>
+                        <p>Виды работ:</p>
+                        <ul>
+                            {criteria.type_works.map((work) => (
+                                <p key={work.id}>{work.name}</p>
+                            ))}
+                        </ul>
+                    </div>
+                );
+            case "location":
+                return (
+                    <div>
+                        <p>Локации:</p>
+                        <ul>
+                            {criteria.locations.map((location) => (
+                                <p key={location.id}>{location.name}</p>
+                            ))}
+                        </ul>
+                    </div>
+                );
+            case "type_location":
+                return (
+                    <Select
+                        options={typeOptionLocations}
+                        placeholder="Выберите тип места проведения работ"
+                        value={selectedTypeLocations}
+                        onChange={handleSelect}
+                        isMulti
+                    ></Select>
+                );
+            case "question":
+                return (
+                    <div>
+                        <p>Условия:</p>
+                        <ul>
+                            {criteria.questions.map((condition) => (
+                                <p key={condition.id}>
+                                    {condition.text}{" "}
+                                    {
+                                        condition.answers.find(
+                                            (answer) => answer.is_right === true
+                                        ).text
+                                    }
+                                </p>
+                            ))}
+                        </ul>
+                    </div>
+                );
+            default:
+                return <> </>;
+        }
+    };
+
     console.log("criteriaList", criteriaList);
     console.log("rule", rule);
     return (
@@ -206,21 +334,6 @@ export default function RuleInfo(props) {
                     <h2 className="text-center">Правило</h2>
                 </div>
             </div>
-            {/* <div className="row">
-                <div className="col-md">
-                    <label className="form">Название: </label>
-                    <input
-                        name="name"
-                        type="text"
-                        disabled={false}
-                        value={rule.name}
-                        onChange={handleChange}
-                        className="form-control"
-                        placeholder="Введите название правила"
-                    ></input>
-                </div>
-            </div> */}
-
             <div className="row">
                 <div className="col-md-10 d-flex align-items-end">
                     <label className="form">Критерии: </label>
@@ -258,125 +371,45 @@ export default function RuleInfo(props) {
                                         }
                                     ></Select>
                                 </td>
-                                <td></td>
-                                <td>
-                                    <button className="btn btn-primary">
+                                <td>{listSelectedValue(criteria)}</td>
+                                <td className="td-action-rule">
+                                    <button
+                                        onClick={() =>
+                                            handleOpenModal(criteria)
+                                        }
+                                        className="btn btn-primary btn-action-rule"
+                                    >
                                         Изменить
                                     </button>
+                                    <ModalChangeValue
+                                        isModal={isModal}
+                                        criteria={criteria}
+                                        isModalLocation={isModalLocation}
+                                        isModalCondition={isModalCondition}
+                                        handleModalTypeWork={() =>
+                                            setModal(false)
+                                        }
+                                        handleModalLocation={() =>
+                                            setModalLocation(false)
+                                        }
+                                        handleModalQuestion={() =>
+                                            setModalCondition(false)
+                                        }
+                                        handleLocations={handleLocations}
+                                        handleTypeWorks={handleTypeWorks}
+                                        handleConditions={handleConditions}
+                                    ></ModalChangeValue>
                                     <button
                                         onClick={() =>
                                             handleDelete(criteria.id)
                                         }
-                                        className="btn btn-danger"
+                                        className="btn btn-danger btn-action-rule"
                                     >
                                         Удалить
                                     </button>
                                 </td>
                             </tr>
                         ))}
-                        {/* <tr>
-                            <td className="rule-td-name">
-                                <label>Виды работ:</label>
-                            </td>
-                            <td>
-                                <p>Виды работ:</p>
-                                <ul>
-                                    {rule.works.map((work) => (
-                                        <p key={work.id}>{work.name}</p>
-                                    ))}
-                                </ul>
-                            </td>
-                            <td className="td-btn">
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => setModal(true)}
-                                >
-                                    Изменить
-                                </button>
-                                <ModalTypeWork
-                                    isModal={isModal}
-                                    onClose={() => setModal(false)}
-                                    handleClickAdd={handleTypeWorks}
-                                    works={rule.works}
-                                ></ModalTypeWork>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="rule-td-name">
-                                <label>Локации:</label>
-                            </td>
-                            <td>
-                                <p>Локации:</p>
-                                <ul>
-                                    {rule.locations.map((location) => (
-                                        <p key={location.id}>{location.name}</p>
-                                    ))}
-                                </ul>
-                            </td>
-                            <td className="td-btn">
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => setModalLocation(true)}
-                                >
-                                    Изменить
-                                </button>
-                                <ModalLocation
-                                    isModal={isModalLocation}
-                                    onClose={() => setModalLocation(false)}
-                                    handleClickAdd={handleLocations}
-                                    locations={rule.locations}
-                                ></ModalLocation>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="rule-td-name">
-                                <p>Тип Локаций:</p>
-                            </td>
-                            <td colspan="2">
-                                <Select
-                                    options={typeOptionLocations}
-                                    placeholder="Select color"
-                                    value={selectedTypeLocations}
-                                    onChange={handleSelect}
-                                    isMulti
-                                ></Select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="rule-td-name">
-                                <label>Условия:</label>
-                            </td>
-                            <td>
-                                <p>Условия:</p>
-                                <ul>
-                                    {rule.conditions.map((condition) => (
-                                        <p key={condition.id}>
-                                            {condition.text}{" "}
-                                            {
-                                                condition.answers.find(
-                                                    (answer) =>
-                                                        answer.is_right === true
-                                                ).text
-                                            }
-                                        </p>
-                                    ))}
-                                </ul>
-                            </td>
-                            <td className="td-btn">
-                                <ModalQuestions
-                                    isModal={isModalCondition}
-                                    onClose={() => setModalCondition(false)}
-                                    handleClickAdd={handleConditions}
-                                    conditions={rule.conditions}
-                                ></ModalQuestions>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => setModalCondition(true)}
-                                >
-                                    Изменить
-                                </button>
-                            </td>
-                        </tr> */}
                     </table>
                 </div>
             </div>

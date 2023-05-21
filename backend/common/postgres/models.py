@@ -54,14 +54,6 @@ class TypeWork(Base):
         Integer, ForeignKey("departament_of_work.id"), nullable=True)
 
     # relationship
-    protections = relationship(
-        "Protection",
-        lazy="dynamic",
-        uselist=True,
-        back_populates="works",
-        secondary="type_work_protection"
-    )
-
     departament = relationship(
         "DepartamentOfWork",
         lazy="select",
@@ -98,7 +90,6 @@ class Protection(Base):
     id_type_protection = Column(
         Integer, ForeignKey("type_protection.id"), nullable=True, index=True)
     is_end = Column(Boolean)
-    is_need_masking = Column(Boolean)
     id_status = Column(
         Integer, ForeignKey("protection_status.id"), nullable=True
     )
@@ -113,13 +104,6 @@ class Protection(Base):
         foreign_keys=[id_type_protection],
         post_update=True
     )
-    works = relationship(
-        "TypeWork",
-        lazy="dynamic",
-        uselist=True,
-        back_populates="protections",
-        secondary="type_work_protection"
-    )
     status = relationship(
         "StatusProtection",
         lazy="joined",
@@ -132,7 +116,7 @@ class Protection(Base):
         back_populates="protections",
         secondary="rule_protection"
     )
-    protection = relationship("Location", backref="protections")
+    location = relationship("Location", backref="protections")
 
 
 class TypeProtection(Base):
@@ -143,17 +127,6 @@ class TypeProtection(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-
-
-class TypeWorkProtection(Base):
-    """
-
-    """
-    __tablename__ = "type_work_protection"
-
-    id = Column(Integer, primary_key=True)
-    id_protection = Column(Integer, ForeignKey("protection.id"))
-    id_type_work = Column(Integer, ForeignKey("type_work.id"))
 
 
 class Location(Base, TimestampsMixin):
@@ -332,18 +305,6 @@ class CriteriaTypeWork(Base):
     id_type_work = Column(Integer, ForeignKey("type_work.id"))
 
 
-# class CriteriaRule(Base):
-#     """
-
-#     """
-
-#     __tablename__ = "rule_criteria"
-
-#     id = Column(Integer, primary_key=True)
-#     id_rule = Column(Integer, ForeignKey("rule.id"))
-#     id_criteria = Column(Integer, ForeignKey("criteria.id"))
-
-
 class Rule(Base):
     """
 
@@ -357,13 +318,6 @@ class Rule(Base):
     compensatory_measures = Column(Text)
 
     # relationship
-    # criteria = relationship(
-    #     "Criteria",
-    #     lazy="select",
-    #     uselist=True,
-    #     back_populates="rules",
-    #     # secondary="rule_criteria"
-    # )
     protections = relationship(
         "Protection",
         lazy="select",

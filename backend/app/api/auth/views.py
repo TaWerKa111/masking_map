@@ -3,8 +3,13 @@ import http
 from flask import Blueprint, request, current_app
 from marshmallow import ValidationError
 
-from app.api.auth.helpers import login_user, logout_user, get_user, add_user, \
-    get_user_by_login
+from app.api.auth.helpers import (
+    login_user,
+    logout_user,
+    get_user,
+    add_user,
+    get_user_by_login,
+)
 from app.api.auth.schemas import LoginSchema, UserSchema
 from app.api.helpers.decorators import login_required
 from app.api.helpers.messages import MESSAGES_DICT
@@ -125,24 +130,21 @@ def profile() -> tuple[dict, int]:
     """
 
     # user = get_user()
-    username, password = request.headers.get(
-        "Authorization").split(":")
+    username, password = request.headers.get("Authorization").split(":")
     user = get_user_by_login(username)
 
     if user and user.check_password(password):
         return (
-            UserSchema().dump(
-                user
-            ),
+            UserSchema().dump(user),
             http.HTTPStatus.OK,
         )
-    
-    return BinaryResponseSchema().dump({
-        "message": "Пользователь не авторизован!",
-        "result": False
-    }), http.HTTPStatus.UNAUTHORIZED
 
-
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Пользователь не авторизован!", "result": False}
+        ),
+        http.HTTPStatus.UNAUTHORIZED,
+    )
 
 
 @bp.route("/test/")

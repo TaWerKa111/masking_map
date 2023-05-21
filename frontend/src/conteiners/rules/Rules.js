@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import FilterButton from "../forms/FilterForm";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -49,14 +50,17 @@ export default function Rules() {
 
     const editClick = (event, key) => {
         console.log("edit el", key);
-        let params = {
-            rule_id: key,
-        };
-        navigate({
-            pathname: `/expert/add-rule/`,
-            search: `?${createSearchParams(params)}`,
-            state: { rule_id: key },
-        });
+        if (key) {
+            let params = {
+                rule_id: key,
+            };
+            navigate({
+                pathname: `/expert/add-rule/`,
+                search: `?${createSearchParams(params)}`,
+                state: { rule_id: key },
+            });
+        }
+        navigate("/expert/add-rule/");
     };
     console.log("rules", rules);
 
@@ -64,10 +68,8 @@ export default function Rules() {
         <div className="container">
             <div className="row">
                 <div className="col-md d-flex header-list">
-                    <button className="btn btn-primary">
-                        <a href="/expert/add-rule/" color="black">
-                            Добавить правило
-                        </a>
+                    <button onClick={editClick} className="btn btn-primary">
+                        Добавить правило
                     </button>
                 </div>
             </div>
@@ -78,28 +80,33 @@ export default function Rules() {
                     </p>
                 </div>
             </div>
+            <FilterButton
+                // onClickFiltered={handleFiltered}
+                name="rules"
+                // departaments={departments}
+            ></FilterButton>
             <div className="row">
                 <div className="col-md">
-                    <ul className="d-flex justify-content-center">
+                    <ul className=" justify-content-center">
                         {!rules ? (
                             <p>
                                 <h2>Нет правил!</h2>
                             </p>
                         ) : (
-                            rules.map((rule) => (
-                                <table>
-                                    <tr>
-                                        {/* <th>Название Правила</th> */}
-                                        <th>Номер правила</th>
-                                        <th>Виды работ</th>
-                                        <th>Места проведения работ</th>
-                                        <th>Типы локаций</th>
-                                        <th>Условия</th>
-                                        <th>Защиты</th>
-                                        <th>Компенсирующие мероприятия</th>
-                                        <th>Изменить</th>
-                                        <th>Удалить</th>
-                                    </tr>
+                            <table>
+                                <tr>
+                                    {/* <th>Название Правила</th> */}
+                                    <th>Номер правила</th>
+                                    <th>Виды работ</th>
+                                    <th>Места проведения работ</th>
+                                    <th>Типы локаций</th>
+                                    <th>Условия</th>
+                                    <th>Защиты</th>
+                                    <th>Компенсирующие мероприятия</th>
+                                    <th>Изменить</th>
+                                    <th>Удалить</th>
+                                </tr>
+                                {rules.map((rule) => (
                                     <tr>
                                         <td>{rule.id}</td>
                                         <td>
@@ -152,7 +159,7 @@ export default function Rules() {
                                         <td>{rule.compensatory_measures}</td>
                                         <td>
                                             <button
-                                                className="btn"
+                                                className="btn btn-primary"
                                                 onClick={(el) =>
                                                     editClick(el, rule.id)
                                                 }
@@ -162,7 +169,7 @@ export default function Rules() {
                                         </td>
                                         <td>
                                             <button
-                                                className="btn"
+                                                className="btn btn-danger"
                                                 onClick={(el) =>
                                                     deleteClick(el, rule.id)
                                                 }
@@ -171,8 +178,8 @@ export default function Rules() {
                                             </button>
                                         </td>
                                     </tr>
-                                </table>
-                            ))
+                                ))}
+                            </table>
                         )}
                     </ul>
                 </div>

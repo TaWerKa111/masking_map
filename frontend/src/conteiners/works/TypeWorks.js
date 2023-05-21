@@ -105,9 +105,17 @@ export default function TypeWorksList() {
         console.log("data", data);
     };
 
-    const handleFiltered = () => {
-        console.log("fitering type-works...");
-        apiInst.get();
+    const handleFiltered = (params) => {
+        console.log("fitering type-works...", params);
+        apiInst
+            .get("/masking/type-work/", { params })
+            .then((resp) => {
+                setTypeWorks(resp.data.type_works);
+                setPage(1);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     };
 
     return (
@@ -130,9 +138,8 @@ export default function TypeWorksList() {
                 </div>
             </div>
             <FilterButton
-                optionTypeLocations={[]}
                 onClickFiltered={handleFiltered}
-                name=""
+                name="works"
                 departaments={departments}
             ></FilterButton>
             <div className="row">
@@ -170,7 +177,7 @@ export default function TypeWorksList() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn btn-primary"
+                                            className="btn btn-danger"
                                             onClick={(el) =>
                                                 deleteClick(el, typeWork.id)
                                             }

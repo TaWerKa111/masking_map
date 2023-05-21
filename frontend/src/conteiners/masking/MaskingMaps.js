@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import MyPagination from "../../components/Pagination";
+import send_notify from "../../utils/toast";
 
 export default function MaskingMaps() {
     const [maskingMaps, setMaskingMaps] = useState([]);
@@ -15,22 +16,44 @@ export default function MaskingMaps() {
     useEffect(() => {
         let params = {};
         apiInst
-            .get("/type-work/", { params })
+            .get("/masking/type-work/", { params })
             .then((resp) => {
-                setMaskingMaps(resp.data.files);
+                setMaskingMaps(resp.data.type_works);
                 setPagination(resp.data.pagination);
                 setPage(pagination.page);
             })
             .catch((e) => console.log(e));
         apiInst
-            .get("/files/get-file/", { params })
+            .get("/files/get-files/", { params })
             .then((resp) => {
-                setMaskingMaps(resp.data);
+                setMaskingMaps(resp.data.files);
             })
             .catch((e) => console.log(e));
     }, []);
 
-    const onClick = (el, key) => {};
+    const onClick = (el, mapUuid) => {
+        apiInst({
+            url: "/files/get-pdf/",
+            params: { masking_uuid: mapUuid },
+            method: "GET",
+            responseType: "blob", // важно указать, что ожидаем blob-данные в ответе
+        })
+            .then((response) => {
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "file.pdf"); // задаем имя файла для сохранения на компьютере
+                document.body.appendChild(link);
+                link.click();
+                send_notify("Файл успешно скачан", "success");
+            })
+            .catch((error) => {
+                console.error(error);
+                send_notify("Не удалось скачать файл", "error");
+            });
+    };
 
     const handlePageChange = (page) => {
         setPage(page);
@@ -48,29 +71,34 @@ export default function MaskingMaps() {
             <div className="row">
                 <div className="col-md">
                     <ul className="d-flex justify-content-end list-group">
-                        {maskingMaps ? (
+                        {!maskingMaps ? (
                             <p>
                                 <h2 className="text-center">
                                     Нет карт маскирования!
                                 </h2>
                             </p>
                         ) : (
-                            maskingMaps.map((maskingMap) => (
-                                <div
-                                    key={maskingMap.id}
-                                    className="item-of-list"
-                                >
-                                    <label>{maskingMap.name}</label>
-                                    <button
-                                        className="btn btn-primary float-end"
-                                        onClick={(el) =>
-                                            onClick(el, maskingMap.id)
-                                        }
-                                    >
-                                        Скачать
-                                    </button>
-                                </div>
-                            ))
+                            <table>
+                                <tr>
+                                    <th>ID</th>
+                                    <th className="text-center">Скачать</th>
+                                </tr>
+                                {maskingMaps.map((maskingMap) => (
+                                    <tr>
+                                        <td>{maskingMap.id}</td>
+                                        <td className="td-btn">
+                                            <button
+                                                className="btn btn-primary float-end"
+                                                onClick={(el) =>
+                                                    onClick(el, maskingMap.id)
+                                                }
+                                            >
+                                                Скачать
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </table>
                         )}
                     </ul>
                 </div>

@@ -12,7 +12,9 @@ from app.api.masking.helpers import (
     add_location,
     add_type_protection,
     get_type_work_list,
-    get_location_list, get_location, add_type_location,
+    get_location_list,
+    get_location,
+    add_type_location,
 )
 from app.api.masking.validators import (
     is_not_exist_mn_object,
@@ -78,26 +80,33 @@ class TypeWorkListSchema(Schema):
 
 
 class FilterParamTypeWorkSchema(Schema):
-    ids_type_protection = fields.List(
+    type_protection_ids = fields.List(
         fields.Integer,
         example=[1],
-        data_key="ids_type_protection[]",
+        data_key="type_protection_ids[]",
         allow_none=True,
     )
-    ids_type_mn_object = fields.List(
+    type_location_ids = fields.List(
         fields.Integer,
         example=[1],
-        data_key="ids_type_mn_object[]",
+        data_key="type_location_ids[]",
         allow_none=True,
     )
-    name_type_work = fields.String(example="Work 1", allow_none=True)
+    name = fields.String(example="Work 1", allow_none=True)
+    group_by = fields.String(example="dep", allow_none=True)
+    departament_ids = fields.List(
+        fields.String(),
+        data_key="departament_ids[]",
+        allow_none=True
+    )
 
     @post_load
     def get_filter_type_work(self, data, **kwargs):
         return get_type_work_list(
-            name=data.get("name_type_work"),
-            ids_type_mn_object=data.get("ids_type_mn_object"),
-            ids_type_protection=data.get("ids_type_protection"),
+            name=data.get("name"),
+            type_location_ids=data.get("type_location_ids"),
+            type_protection_ids=data.get("type_protection_ids"),
+            departament_ids=data.get("departament_ids")
         )
 
 
@@ -122,9 +131,9 @@ class UpdateProtectionSchema(AddProtectionSchema):
 
 
 class FileterParamProtectionSchema(PaginationSchema):
-    name = fields.String()
+    name = fields.String(allow_none=True)
     type_protections_ids = fields.List(
-        fields.Integer(), data_key="type_protections_ids[]"
+        fields.Integer(), data_key="type_protections_ids[]", allow_none=True
     )
 
 
@@ -168,6 +177,24 @@ class TypeProtectionSchema(Schema):
     name = fields.String(example="")
 
 
+class AddTypeLocationSchema(Schema):
+    name = fields.String()
+
+    @post_load()
+    def add_type_location_process(self, data, **kwargs):
+        return add_type_location(data.get("name"))
+
+
+class UpdateTypeLocationSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+
+class TypeLocationSchema(Schema):
+    id = fields.Integer()
+    name = fields.Str(example="защита 1")
+
+
 class AddLocationSchema(Schema):
     """ """
 
@@ -202,6 +229,7 @@ class LocationSchema(Schema):
     id_parent = fields.Integer()
     # id_protection = fields.Integer()
     id_type = fields.Integer(allow_none=True)
+    type_location = fields.Nested(TypeLocationSchema())
 
 
 class LocationListSchema(Schema):
@@ -210,11 +238,17 @@ class LocationListSchema(Schema):
 
 
 class FilterParamLocationSchema(PaginationSchema):
-    ids_type_protection = fields.List(
-        fields.Integer, example=[1], data_key="ids_type_protection[]", allow_none=True
+    type_protection_ids = fields.List(
+        fields.Integer,
+        example=[1],
+        data_key="type_protection_ids[]",
+        allow_none=True,
     )
-    ids_type_location = fields.List(
-        fields.Integer, example=[1], data_key="ids_type_mn_location[]", allow_none=True
+    type_location_ids = fields.List(
+        fields.Integer,
+        example=[1],
+        data_key="type_location_ids[]",
+        allow_none=True,
     )
     name = fields.String(example="example", allow_none=True)
 
@@ -223,29 +257,12 @@ class FilterParamLocationSchema(PaginationSchema):
         current_app.logger.info(data)
         return get_location_list(
             name=data.get("name"),
-            ids_type_mn_object=data.get("ids_type_location"),
-            ids_type_protection=data.get("ids_type_protection"),
+            type_location_ids=data.get("type_location_ids"),
+            type_protection_ids=data.get("type_protection_ids"),
         )
 
 
-class AddTypeLocationSchema(Schema):
-    name = fields.String()
 
-    @post_load()
-    def add_type_location_process(self, data, **kwargs):
-        return add_type_location(
-            data.get("name")
-        )
-
-
-class UpdateTypeLocationSchema(Schema):
-    id = fields.Integer()
-    name = fields.String()
-
-
-class TypeLocationSchema(Schema):
-    id = fields.Integer()
-    name = fields.Str(example="защита 1")
 
 
 class RelationshipLocationLocationSchema(Schema):
@@ -256,6 +273,3 @@ class RelationshipLocationLocationSchema(Schema):
 class RelationshipLocationProtectionSchema(Schema):
     location_id = fields.Integer()
     protection_ids = fields.List(fields.Integer())
-
-
-

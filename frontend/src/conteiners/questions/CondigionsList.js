@@ -5,11 +5,13 @@ import Select from "react-select";
 
 export default function CondigionsList({ handleClickAdd, selectedConditions }) {
     const [selectedQuestion, setSelectedQuestions] = useState(
-        selectedConditions.map((condition) => ({
-            value: condition.id,
-            label: condition.text,
-            answers: condition.answers,
-        }))
+        selectedConditions
+            ? selectedConditions.map((condition) => ({
+                  value: condition.id,
+                  label: condition.text,
+                  answers: condition.answers,
+              }))
+            : []
     );
     const [questions, setQuestions] = useState([]);
     const [value, setValue] = useState({ name: "", answers: [] });

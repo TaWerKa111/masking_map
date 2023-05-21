@@ -29,6 +29,7 @@ import BankQuestions from "./conteiners/questions/BankQuestions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import LoadingSpinner from "./components/main/LoadingSpinner";
+import InstructionModal from "./components/modal/InstractionModal";
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
@@ -75,12 +76,11 @@ function App() {
                 console.log("login", response.data);
                 setIsLoading(false);
             })
-            .catch(
-                (e) => {
-                    setUser(false);
-                    setIsLoading(false);
-                    console.log(e);
-                });
+            .catch((e) => {
+                setUser(false);
+                setIsLoading(false);
+                console.log(e);
+            });
     };
 
     const handleLogout = () => {
@@ -92,10 +92,20 @@ function App() {
         localStorage.removeItem("password");
         setIsLoading(false);
     };
+    const [showModal, setShowModal] = useState(false);
 
-    return (
-        isLoading ? (<LoadingSpinner></LoadingSpinner>) : (
-            <BrowserRouter>
+    const handleOpenModal = () => {
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
+
+    return isLoading ? (
+        <LoadingSpinner></LoadingSpinner>
+    ) : (
+        <BrowserRouter>
             <ToastContainer />
             <Layout user={user}>
                 <Routes>
@@ -193,8 +203,6 @@ function App() {
                 </Routes>
             </Layout>
         </BrowserRouter>
-        )
-        
     );
 }
 

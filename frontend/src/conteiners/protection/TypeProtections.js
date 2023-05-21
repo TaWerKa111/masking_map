@@ -129,7 +129,7 @@ export default function TypeProtections() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn"
+                                            className="btn btn-danger"
                                             onClick={(el) =>
                                                 deleteClick(
                                                     el,

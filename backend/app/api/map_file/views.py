@@ -208,9 +208,13 @@ def generate_masking_view():
     except ValidationError as err:
         current_app.logger.debug(f"Validation error - {err}")
         return (
-            BinaryResponseSchema().dump({"message": f"{err}", "result": False}),
+            BinaryResponseSchema().dump(
+                {"message": f"{err}", "result": False}
+            ),
             http.HTTPStatus.BAD_REQUEST,
         )
+
+    current_app.logger.debug(f"mask data - {data_for_masking}")
 
     masking_uuid = check_generate_masking_plan(
         locations=data_for_masking.get("locations"),
@@ -224,8 +228,9 @@ def generate_masking_view():
             MaskingResponseFileSchema().dump(
                 {
                     "message": "Возможно сделать карту маскирования!",
-                    "masking_uuid": masking_uuid,
+                    "masking_uuid": masking_uuid.masking_uuid,
                     "result": True,
+                    "description": masking_uuid.description,
                 }
             ),
             http.HTTPStatus.OK,

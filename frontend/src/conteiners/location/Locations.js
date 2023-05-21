@@ -27,6 +27,7 @@ export default function Locations() {
             .get("/masking/location-list/", { params: params })
             .then((resp) => {
                 setLocations(resp.data.locations);
+                console.log(resp.data.locations);
             })
             .catch((e) => console.log(e));
     };
@@ -79,6 +80,7 @@ export default function Locations() {
         console.log("add value", value);
         let newLocation = {
             name: value.name,
+            id_type_location: value.type,
         };
         console.log(newLocation);
         apiInst
@@ -97,6 +99,15 @@ export default function Locations() {
 
     const handleFiltered = (params) => {
         console.log("params", params);
+        apiInst
+            .get("/masking/location-list/", { params: params })
+            .then((resp) => {
+                setLocations(resp.data.locations);
+                console.log(resp.data);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     };
 
     return (
@@ -119,7 +130,7 @@ export default function Locations() {
                 </div>
             </div>
             <FilterButton
-                optionTypeLocations={optionTypeLocations}
+                typeLocations={typeLocations}
                 onClickFiltered={handleFiltered}
                 name="locations"
             ></FilterButton>
@@ -141,7 +152,11 @@ export default function Locations() {
                             {locations.map((location) => (
                                 <tr key={location.id}>
                                     <td>{location.name}</td>
-                                    <td>{location.type}</td>
+                                    <td>
+                                        {location.type_location
+                                            ? location.type_location.name
+                                            : ""}
+                                    </td>
                                     <td>{location.protection}</td>
                                     <td className="td-btn">
                                         <AddElementButton

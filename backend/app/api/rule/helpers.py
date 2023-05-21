@@ -10,7 +10,10 @@ from common.postgres.models import (
     QuestionAnswer,
     TypeWork,
     Location,
-    TypeLocation, CriteriaLocation, CriteriaTypeWork, CriteriaTypeLocation,
+    TypeLocation,
+    CriteriaLocation,
+    CriteriaTypeWork,
+    CriteriaTypeLocation,
     CriteriaQuestion,
 )
 
@@ -83,7 +86,7 @@ def add_new_rule(
     type_locations: list[TypeLocation],
     questions: list[dict],
     protections: list[dict],
-    compensatory_measures: str
+    compensatory_measures: str,
 ) -> Rule:
     """
     Добавление нового правила со всеми критериями и защитами к нему
@@ -145,7 +148,7 @@ def add_new_rule(
             id_question=question.get("id"),
             id_criteria=criteria_question.id,
             # id_right_answer=right_answers[question.id]
-            id_right_answer=question.get("right_answer_id")
+            id_right_answer=question.get("right_answer_id"),
         )
         db.session.add(qu_ans)
         db.session.commit()
@@ -209,8 +212,7 @@ def get_rule(rule_id: int) -> Rule:
 
 
 def filter_list_rule(
-        rules_ids: list[int], name: str,
-        page: int = 1, limit: int = 10
+    rules_ids: list[int], name: str, page: int = 1, limit: int = 10
 ) -> Pagination:
     """
     Получить список правил с пагинацией
@@ -320,7 +322,9 @@ def update_rule(
     return rule
 
 
-def filter_list_question(questions_ids: list[int], text:str, page: int = 1, limit: int =10):
+def filter_list_question(
+    questions_ids: list[int], text: str, page: int = 1, limit: int = 10
+):
     """
 
     :param questions_ids:
@@ -349,7 +353,12 @@ def get_question(question_id: int) -> Question:
         идентификатор вопроса
     :return: Question
     """
-    question = db.session.query(Question).filter(Question.id == question_id).limit(1).first()
+    question = (
+        db.session.query(Question)
+        .filter(Question.id == question_id)
+        .limit(1)
+        .first()
+    )
 
     return question
 
@@ -363,7 +372,9 @@ def update_question(question_id: int, text: str, answers: list[dict]):
     :return:
     """
 
-    question = db.session.query(Question).filter(Question.id ==question_id).first()
+    question = (
+        db.session.query(Question).filter(Question.id == question_id).first()
+    )
     if not question:
         return None
 
@@ -374,11 +385,13 @@ def update_question(question_id: int, text: str, answers: list[dict]):
         new_answers = []
         for answer_data in answers:
             new_answers.append(
-                add_question_answer(
-                    answer_data.get("text"), question.id))
+                add_question_answer(answer_data.get("text"), question.id)
+            )
         current_app.logger.info(f"new answers {new_answers}")
         question.answers = new_answers
 
-    db.session.query(QuestionAnswer).filter(QuestionAnswer.id_question.is_(None)).delete()
+    db.session.query(QuestionAnswer).filter(
+        QuestionAnswer.id_question.is_(None)
+    ).delete()
     db.session.commit()
     return question

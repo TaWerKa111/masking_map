@@ -43,7 +43,7 @@ def get_user() -> User or None:
 
 
 def get_user_by_login(username) -> User or None:
-    user = db.session.query(User).filter(User.username==username).first()
+    user = db.session.query(User).filter(User.username == username).first()
     return user
 
 

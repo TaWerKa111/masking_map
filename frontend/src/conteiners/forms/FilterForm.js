@@ -1,19 +1,23 @@
 import { useState } from "react";
 import Select from "react-select";
 
-function FilterElementForm(props) {
+function FilterLocations(props) {
     const [searchName, setSearchName] = useState(null);
-    const [optionList, setOptionList] = useState([]);
-    const [optionTypeLocations, setOptionTypeLocations] = useState(
-        props.optionTypeLocations
+    const [optionTypeLocations, setTypeLocations] = useState(
+        props.typeLocations.map((typeLocation) => ({
+            value: typeLocation.id,
+            label: typeLocation.name,
+        }))
     );
-    const [selectedTypeLocation, setSelectedTypeLocation] = useState([]);
+    const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
         let params = {
             name: searchName,
-            type_location: selectedTypeLocation,
+            "type_location_ids[]": selectedTypeLocations.map(
+                (typeLocation) => typeLocation.value
+            ),
         };
         props.onClickFiltered(params);
     };
@@ -23,13 +27,13 @@ function FilterElementForm(props) {
     };
 
     const handleSelect = (data) => {
-        setSelectedTypeLocation(data);
+        setSelectedTypeLocations(data);
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <div className="row">
-                <div class="col-md-4">
+                <div className="col-md-4">
                     <label className="">Название:</label>
                     <input
                         type="text"
@@ -40,11 +44,11 @@ function FilterElementForm(props) {
                     />
                 </div>
                 <div className="col-md-4">
-                    <label>Типы локаций</label>
+                    <label>Отделы</label>
                     <Select
                         options={optionTypeLocations}
                         placeholder="Выберите типы локаций"
-                        value={selectedTypeLocation}
+                        value={selectedTypeLocations}
                         onChange={handleSelect}
                         isMulti
                         className=""
@@ -64,17 +68,16 @@ function FilterElementForm(props) {
 
 function FilterTypeWork(props) {
     const [searchName, setSearchName] = useState(null);
-    const [optionList, setOptionList] = useState([]);
     const [optionDepartaments, setOptionDepartaments] = useState(
         props.departaments.map((item) => ({ value: item.id, label: item.name }))
     );
     const [selectedDepataments, setSelectedDepartaments] = useState([]);
-
+    console.log("departaments", optionDepartaments);
     const handleSubmit = (event) => {
         event.preventDefault();
         let params = {
             name: searchName,
-            departaments: selectedDepataments,
+            "departament_ids[]": selectedDepataments.map((item) => item.value),
         };
         props.onClickFiltered(params);
     };
@@ -90,7 +93,7 @@ function FilterTypeWork(props) {
     return (
         <form onSubmit={handleSubmit}>
             <div className="row">
-                <div class="col-md-4">
+                <div className="col-md-4">
                     <label className="">Название:</label>
                     <input
                         type="text"
@@ -108,7 +111,6 @@ function FilterTypeWork(props) {
                         value={selectedDepataments}
                         onChange={handleSelect}
                         isMulti
-                        className=""
                     ></Select>
                 </div>
             </div>
@@ -138,7 +140,9 @@ function FilterProtection(props) {
         event.preventDefault();
         let params = {
             name: searchName,
-            typeProtections: selectedTypeProtections,
+            "type_protections_ids[]": selectedTypeProtections.map(
+                (item) => item.value
+            ),
         };
         props.onClickFiltered(params);
     };
@@ -148,13 +152,13 @@ function FilterProtection(props) {
     };
 
     const handleSelect = (data) => {
-        setOptionTypeProtections(data);
+        setSelectedTypeProtections(data);
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <div className="row">
-                <div class="col-md-4">
+                <div className="col-md-4">
                     <label className="">Название:</label>
                     <input
                         type="text"
@@ -187,6 +191,53 @@ function FilterProtection(props) {
     );
 }
 
+function FilterRules(props) {
+    const [searchName, setSearchName] = useState(null);
+    const [optionList, setOptionList] = useState([]);
+    const [optionTypeProtections, setOptionTypeProtections] = useState([]);
+    const [selectedTypeProtections, setSelectedTypeProtections] = useState([]);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        let params = {
+            name: searchName,
+            "type_protections_ids[]": selectedTypeProtections.map(
+                (item) => item.value
+            ),
+        };
+        props.onClickFiltered(params);
+    };
+
+    const handleSelect = (data) => {
+        setSelectedTypeProtections(data);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="row">
+                <div className="col-md-4">
+                    <label>Система АСУТП</label>
+                    <Select
+                        options={[]}
+                        placeholder="Выберите систему АСУТП"
+                        value={[]}
+                        onChange={handleSelect}
+                        isMulti
+                        className=""
+                    ></Select>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md">
+                    <button type="submit" className="btn btn-primary btn-full">
+                        Применить фильтр
+                    </button>
+                </div>
+            </div>
+        </form>
+    );
+}
+
 function FilterButton(props) {
     const [showForm, setShowForm] = useState(false);
     let name = "Фильтры";
@@ -198,15 +249,15 @@ function FilterButton(props) {
 
     if (props.name === "locations") {
         filterForm = (
-            <FilterElementForm
-                optionTypeLocations={props.optionTypeLocations}
+            <FilterLocations
+                typeLocations={props.typeLocations}
                 onClickFiltered={props.onClickFiltered}
-            ></FilterElementForm>
+            ></FilterLocations>
         );
     } else if (props.name === "works") {
         filterForm = (
             <FilterTypeWork
-                optionTypeLocations={props.optionTypeLocations}
+                departaments={props.departaments}
                 onClickFiltered={props.onClickFiltered}
             ></FilterTypeWork>
         );
@@ -217,12 +268,19 @@ function FilterButton(props) {
                 onClickFiltered={props.onClickFiltered}
             ></FilterProtection>
         );
+    } else if (props.name === "rules") {
+        filterForm = (
+            <FilterRules
+                typeProtections={props.typeProtections}
+                onClickFiltered={props.onClickFiltered}
+            ></FilterRules>
+        );
     } else {
         filterForm = (
-            <FilterElementForm
+            <FilterLocations
                 optionTypeLocations={props.optionTypeLocations}
                 onClickFiltered={props.onClickFiltered}
-            ></FilterElementForm>
+            ></FilterLocations>
         );
     }
 

@@ -98,7 +98,7 @@ button {
 table {
     border-collapse: collapse;
     border: 4px solid #000;
-    margin-bottom: 2%;
+    margin-bottom: 100px;
     margin-top: 2%;
     width: 100%;
 }
@@ -229,4 +229,37 @@ button a:hover {
     justify-content: center;
     align-items: center;
     height: 350px;
+}
+
+.td-action-rule {
+    max-width: 15%;
+    width: 10%;
+}
+
+.btn-action-rule {
+    width: 100%;
+    padding: 0%;
+    margin-top: 2px;
+    margin-bottom: 5px;
+}
+
+.instruction-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.modal-dialog {
+margin-left: 0;
+margin-right: auto;
+max-width: 80%;
+}
+  
+.modal-content {
+border-radius: 0;
 }
