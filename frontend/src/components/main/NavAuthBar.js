@@ -52,36 +52,36 @@ const NavAuthBar = (props) => {
                             id="dropdown-basic"
                             className="btn btn-secondary btn-nav"
                         >
-                            Прочее
+                            Справочники
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
                             <Dropdown.Item href="/expert/type-works/">
                                 Виды работ
                             </Dropdown.Item>
+                            <Dropdown.Item href="/expert/dep/">
+                                Отделы
+                            </Dropdown.Item>
                             <Dropdown.Item href="/expert/locations/">
                                 Места проведения работ
+                            </Dropdown.Item>
+                            <Dropdown.Item href="/expert/type-locations/">
+                                Типы мест проведения работ
                             </Dropdown.Item>
                             <Dropdown.Item href="/expert/protections/">
                                 Защиты
                             </Dropdown.Item>
-                            <Dropdown.Item href="/expert/questions/">
-                                Банк вопросов
-                            </Dropdown.Item>
-                            <Dropdown.Item href="/expert/dep/">
-                                Отделы работы
-                            </Dropdown.Item>
-                            <Dropdown.Item href="/expert/type-locations/">
-                                Типы локаций
-                            </Dropdown.Item>
                             <Dropdown.Item href="/expert/type-protections/">
-                                Типы защит
+                                Системы защит
+                            </Dropdown.Item>
+                            <Dropdown.Item href="/expert/questions/">
+                                Список уточняющих вопросов
                             </Dropdown.Item>
                             <Dropdown.Item href="/expert/relationship-location-location/">
-                                Связать локации и их компоненты
+                                Связать места проведения работ и их составляющие
                             </Dropdown.Item>
                             <Dropdown.Item href="/expert/relationship-location-protection/">
-                                Связать локации и их защиты
+                                Связать места проведения работ и их защиты
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>

@@ -78,17 +78,19 @@ export default function ParentLocation() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center header-list">
                     <p>
-                        <h2>Связать локации и их компоненты</h2>
+                        <h2>
+                            Связать место проведения работ и с его компонентами
+                        </h2>
                     </p>
                 </div>
             </div>
             <div className="row">
                 <div className="col-md">
                     <p>
-                        Выбранная локация:{" "}
+                        Выбранное место проведения работ:{" "}
                         {selectedItem ? selectedItem.name : ""}
                     </p>
-                    <p>Выбранные локации:</p>
+                    <p>Выбранное место проведения работ:</p>
                     <ul>
                         {selectedItems.map((item, index) => (
                             <li key={index}>{item.name}</li>
@@ -101,10 +103,10 @@ export default function ParentLocation() {
             </div>
             <div className="row">
                 <div className="col-md ">
-                    <h2 className="text-center">Локации</h2>
+                    <h2 className="text-center">Места проведения работ</h2>
                     <input
                         type="text"
-                        placeholder="Название локации"
+                        placeholder="Название места проведения работ"
                         value={searchTextOneLocation}
                         onChange={handleSearchTextOneLocationChange}
                         className="form-control search-location"
@@ -123,10 +125,10 @@ export default function ParentLocation() {
                     </div>
                 </div>
                 <div className="col-md ">
-                    <h2 className="text-center">Локации</h2>
+                    <h2 className="text-center">Места проведения работ</h2>
                     <input
                         type="text"
-                        placeholder="Название локации"
+                        placeholder="Название места проведения работ"
                         value={searchTextSecLocation}
                         onChange={handleSearchTextSecLocationChange}
                         className="form-control search-location"

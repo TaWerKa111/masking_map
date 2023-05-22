@@ -87,14 +87,14 @@ export default function LocationProtection() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center header-list">
                     <p>
-                        <h2>Связать локации и их защит</h2>
+                        <h2>Связать место проведения работ и с его защитами</h2>
                     </p>
                 </div>
             </div>
             <div className="row">
                 <div className="col-md">
                     <p>
-                        Выбранная локация:{" "}
+                        Выбранное место проведения работ:{" "}
                         {selectedItem ? selectedItem.name : ""}
                     </p>
                     <p>Выбранные защиты:</p>
@@ -110,10 +110,10 @@ export default function LocationProtection() {
             </div>
             <div className="row">
                 <div className="col-md ">
-                    <h2 className="text-center">Локации</h2>
+                    <h2 className="text-center">Места проведения работ</h2>
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Поиск..."
                         value={searchTextLocation}
                         onChange={handleSearchTextLocationChange}
                         className="form-control search-location"
@@ -135,7 +135,7 @@ export default function LocationProtection() {
                     <h2 className="text-center">Защиты</h2>
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Поиск..."
                         value={searchTextProtection}
                         onChange={handleSearchTextProtectionChange}
                         className="form-control search-location"

@@ -28,16 +28,13 @@ export default function MnObjectList({
     };
 
     if (mnObjectList.length === 0) {
-        return <h2>Нет локаций! Попробуйте позже.</h2>;
+        return <h2>Нет мест проведения работ! Попробуйте позже.</h2>;
     }
     return (
         <div className="row">
             <div className="col-md">
                 <form onSubmit={handleSubmit}>
-                    <button type="submit" className="btn btn-primary">
-                        Выбрать места проведения работ
-                    </button>
-                    <ul className="d-flex justify-content-center ">
+                    <ul className="justify-content-center ">
                         {mnObjectList.map((item) => (
                             <div className="itemOfQuestions">
                                 <input
@@ -56,6 +53,9 @@ export default function MnObjectList({
                             </div>
                         ))}
                     </ul>
+                    <button type="submit" className="btn btn-primary btn-full">
+                        Применить
+                    </button>
                 </form>
             </div>
         </div>

@@ -44,10 +44,10 @@ function FilterLocations(props) {
                     />
                 </div>
                 <div className="col-md-4">
-                    <label>Отделы</label>
+                    <label>Типы мест проведения работ</label>
                     <Select
                         options={optionTypeLocations}
-                        placeholder="Выберите типы локаций"
+                        placeholder="Выберите типы мест проведения работ"
                         value={selectedTypeLocations}
                         onChange={handleSelect}
                         isMulti

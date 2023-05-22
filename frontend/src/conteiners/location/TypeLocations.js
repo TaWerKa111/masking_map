@@ -82,7 +82,7 @@ export default function TypeLocations() {
                 <div className="col-md d-flex header-list">
                     <AddElementButton
                         type_form="simple"
-                        name={"Добавить тип локации"}
+                        name={"Добавить тип места проведения работ"}
                         onSubmit={addClick}
                     ></AddElementButton>
                 </div>
@@ -90,7 +90,7 @@ export default function TypeLocations() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Типы локаций</h2>
+                        <h2>Типы мест проведения работ</h2>
                     </p>
                 </div>
             </div>
@@ -98,7 +98,7 @@ export default function TypeLocations() {
                 <div className="col-md">
                     {typeLocations == null ? (
                         <p>
-                            <h2>Нет типов локаций!</h2>
+                            <h2>Нет типов мест проведения работ!</h2>
                         </p>
                     ) : (
                         <table>

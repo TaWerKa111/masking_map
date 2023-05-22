@@ -175,11 +175,13 @@ export default function MaskingMap() {
                     <tr>
                         <td>
                             <div className="d-flex h3 justify-content-center align-items-center">
-                                <label>Локации:</label>
+                                <label>Места проведения работ:</label>
                             </div>
                         </td>
                         <td>
-                            <label className="h6">Локации:</label>
+                            <label className="h6">
+                                Места проведения работ:
+                            </label>
                             <button
                                 className="btn btn-secondary float-end"
                                 onClick={() => setModalLocation(true)}

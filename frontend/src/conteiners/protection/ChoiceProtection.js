@@ -109,7 +109,7 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
                                 <li key={index}>{item.name}</li>
                             ))}
                         </ul>
-                        <button onClick="submit">Выбрать защиты</button>
+                        {/* <button onClick="submit">Выбрать защиты</button> */}
                     </form>
                 </div>
             </div>
@@ -162,6 +162,13 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
                     </div>
                 </div>
             </div>
+            <button
+                onClick={handleSubmit}
+                type="submit"
+                className="btn btn-primary btn-full"
+            >
+                Применить
+            </button>
         </div>
     );
 }

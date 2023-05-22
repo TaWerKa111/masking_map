@@ -34,13 +34,16 @@ export default function AnswerConditionList({
     return (
         <div className="container">
             <form onSubmit={handleSubmit}>
-                <div className="row">
+                {/* <div className="row">
                     <div className="col-md">
-                        <button type="submit" className="btn btn-primary">
-                            Принять ответы
+                        <button
+                            type="submit"
+                            className="btn btn-primary .btn-full"
+                        >
+                            Применить
                         </button>
                     </div>
-                </div>
+                </div> */}
                 <div className="row">
                     <div className="col-md">
                         {conditions.length === 0 ? (
@@ -80,6 +83,16 @@ export default function AnswerConditionList({
                                 </div>
                             ))
                         )}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-md">
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-full"
+                        >
+                            Применить
+                        </button>
                     </div>
                 </div>
             </form>

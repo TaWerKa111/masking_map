@@ -33,33 +33,34 @@ export default function TypeWorkList({
         <div className="row">
             <div className="col-md">
                 <form onSubmit={handleSubmit}>
-                    <button type="submit" className="btn btn-primary">
-                        Выбрать вид работ
-                    </button>
-                </form>
-                <ul className="d-flex justify-content-center ">
-                    {typeWorkList.map((item) => (
-                        <div
-                            className="itemOfQuestions "
-                            onClick={(event) =>
-                                handleCheckboxChange(event, item)
-                            }
-                        >
-                            <input
-                                type="checkbox"
-                                checked={
-                                    selectedItems.filter((i) => i.id == item.id)
-                                        .length > 0
-                                }
-                                onChange={(event) =>
+                    <ul className="">
+                        {typeWorkList.map((item) => (
+                            <div
+                                className="itemOfQuestions "
+                                onClick={(event) =>
                                     handleCheckboxChange(event, item)
                                 }
-                                className="form-check-input check-item"
-                            />
-                            {item.name}
-                        </div>
-                    ))}
-                </ul>
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        selectedItems.filter(
+                                            (i) => i.id == item.id
+                                        ).length > 0
+                                    }
+                                    onChange={(event) =>
+                                        handleCheckboxChange(event, item)
+                                    }
+                                    className="form-check-input check-item"
+                                />
+                                {item.name}
+                            </div>
+                        ))}
+                    </ul>
+                    <button type="submit" className="btn btn-primary btn-full">
+                        Применить
+                    </button>
+                </form>
             </div>
         </div>
     );

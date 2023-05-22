@@ -284,7 +284,7 @@ export default function RuleInfo(props) {
             case "location":
                 return (
                     <div>
-                        <p>Локации:</p>
+                        <p>Места проведения работ:</p>
                         <ul>
                             {criteria.locations.map((location) => (
                                 <p key={location.id}>{location.name}</p>
@@ -349,132 +349,155 @@ export default function RuleInfo(props) {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <table>
-                        <tr>
-                            {/* <th>Тип критерия</th> */}
-                            <th>Тип критерия</th>
-                            <th>Выбранные значения</th>
-                            <th>Действия</th>
-                        </tr>
-                        {criteriaList.map((criteria) => (
-                            <tr key={criteria.id}>
-                                <td className="rule-td-name">
-                                    <Select
-                                        options={TYPES_CRITERIA_OPTIONS}
-                                        placeholder="Выберите тип критерия"
-                                        value={criteria.type_criteria}
-                                        onChange={(d) =>
-                                            handleSelectCriteriaType(
-                                                d,
-                                                criteria.id
-                                            )
-                                        }
-                                    ></Select>
-                                </td>
-                                <td>{listSelectedValue(criteria)}</td>
-                                <td className="td-action-rule">
-                                    <button
-                                        onClick={() =>
-                                            handleOpenModal(criteria)
-                                        }
-                                        className="btn btn-primary btn-action-rule"
-                                    >
-                                        Изменить
-                                    </button>
-                                    <ModalChangeValue
-                                        isModal={isModal}
-                                        criteria={criteria}
-                                        isModalLocation={isModalLocation}
-                                        isModalCondition={isModalCondition}
-                                        handleModalTypeWork={() =>
-                                            setModal(false)
-                                        }
-                                        handleModalLocation={() =>
-                                            setModalLocation(false)
-                                        }
-                                        handleModalQuestion={() =>
-                                            setModalCondition(false)
-                                        }
-                                        handleLocations={handleLocations}
-                                        handleTypeWorks={handleTypeWorks}
-                                        handleConditions={handleConditions}
-                                    ></ModalChangeValue>
-                                    <button
-                                        onClick={() =>
-                                            handleDelete(criteria.id)
-                                        }
-                                        className="btn btn-danger btn-action-rule"
-                                    >
-                                        Удалить
-                                    </button>
-                                </td>
+                    {criteriaList.length > 0 ? (
+                        <table>
+                            <tr>
+                                {/* <th>Тип критерия</th> */}
+                                <th>Тип критерия</th>
+                                <th>Выбранные значения</th>
+                                <th>Действия</th>
                             </tr>
-                        ))}
-                    </table>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-md-11">
-                    <h2 className="text-center">Защиты</h2>
-                </div>
-                <div className="col-md-1">
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => setModalProtection(true)}
-                    >
-                        Изменить
-                    </button>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-md">
-                    <ModalChoiceProtections
-                        isModal={isModalProtection}
-                        onClose={() => setModalProtection(false)}
-                        handleClickAdd={handleProtections}
-                        protections={protections}
-                    ></ModalChoiceProtections>
-                    {protections.length === 0 ? (
-                        <div>
-                            <h3 className="text-center">Выберите защиты</h3>
-                        </div>
-                    ) : (
-                        <div className="list-conteiner">
-                            <table>
-                                <tr>
-                                    <th>Название защиты</th>
-                                    <th>Нужно ли маскирование</th>
-                                    <th>Нужно ли демаскирование</th>
+                            {criteriaList.map((criteria) => (
+                                <tr key={criteria.id}>
+                                    <td className="rule-td-name">
+                                        <Select
+                                            options={TYPES_CRITERIA_OPTIONS}
+                                            placeholder="Выберите тип критерия"
+                                            value={criteria.type_criteria}
+                                            onChange={(d) =>
+                                                handleSelectCriteriaType(
+                                                    d,
+                                                    criteria.id
+                                                )
+                                            }
+                                        ></Select>
+                                    </td>
+                                    <td>{listSelectedValue(criteria)}</td>
+                                    <td className="td-action-rule">
+                                        <button
+                                            onClick={() =>
+                                                handleOpenModal(criteria)
+                                            }
+                                            className="btn btn-primary btn-action-rule"
+                                        >
+                                            Изменить
+                                        </button>
+                                        <ModalChangeValue
+                                            isModal={isModal}
+                                            criteria={criteria}
+                                            isModalLocation={isModalLocation}
+                                            isModalCondition={isModalCondition}
+                                            handleModalTypeWork={() =>
+                                                setModal(false)
+                                            }
+                                            handleModalLocation={() =>
+                                                setModalLocation(false)
+                                            }
+                                            handleModalQuestion={() =>
+                                                setModalCondition(false)
+                                            }
+                                            handleLocations={handleLocations}
+                                            handleTypeWorks={handleTypeWorks}
+                                            handleConditions={handleConditions}
+                                        ></ModalChangeValue>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(criteria.id)
+                                            }
+                                            className="btn btn-danger btn-action-rule"
+                                        >
+                                            Удалить
+                                        </button>
+                                    </td>
                                 </tr>
-                                {protections.map((protection) => (
-                                    <CheckboxProtection
-                                        id={protection.id}
-                                        name={protection.name}
-                                        isMasking={protection.is_masking}
-                                        isDemasking={protection.is_demasking}
-                                        onMaskingChange={(isChecked) =>
-                                            handleCheckboxChange(
-                                                protection.id,
-                                                "is_masking",
-                                                isChecked
-                                            )
-                                        }
-                                        onDemaskingChange={(isChecked) =>
-                                            handleCheckboxChange(
-                                                protection.id,
-                                                "is_demasking",
-                                                isChecked
-                                            )
-                                        }
-                                    >
-                                        {protection.name}
-                                    </CheckboxProtection>
-                                ))}
-                            </table>
-                        </div>
+                            ))}
+                        </table>
+                    ) : (
+                        <></>
                     )}
                 </div>
             </div>
+            {criteriaList.length > 0 ? (
+                <div>
+                    <div className="row">
+                        <div className="col-md-11">
+                            <h2 className="text-center">Защиты</h2>
+                        </div>
+                        <div className="col-md-1">
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => setModalProtection(true)}
+                            >
+                                Изменить
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md">
+                            <ModalChoiceProtections
+                                isModal={isModalProtection}
+                                onClose={() => setModalProtection(false)}
+                                handleClickAdd={handleProtections}
+                                protections={protections}
+                            ></ModalChoiceProtections>
+
+                            {protections.length === 0 ? (
+                                <div>
+                                    <h3 className="text-center">
+                                        Выберите защиты
+                                    </h3>
+                                    <label className="text-center">
+                                        Для выбора нажмите на кнопку изменить
+                                    </label>
+                                </div>
+                            ) : (
+                                <div className="list-conteiner">
+                                    <table>
+                                        <tr>
+                                            <th>Название защиты</th>
+                                            <th>Нужно ли маскирование</th>
+                                            <th>Нужно ли демаскирование</th>
+                                        </tr>
+                                        {protections.map((protection) => (
+                                            <CheckboxProtection
+                                                id={protection.id}
+                                                name={protection.name}
+                                                isMasking={
+                                                    protection.is_masking
+                                                }
+                                                isDemasking={
+                                                    protection.is_demasking
+                                                }
+                                                onMaskingChange={(isChecked) =>
+                                                    handleCheckboxChange(
+                                                        protection.id,
+                                                        "is_masking",
+                                                        isChecked
+                                                    )
+                                                }
+                                                onDemaskingChange={(
+                                                    isChecked
+                                                ) =>
+                                                    handleCheckboxChange(
+                                                        protection.id,
+                                                        "is_demasking",
+                                                        isChecked
+                                                    )
+                                                }
+                                            >
+                                                {protection.name}
+                                            </CheckboxProtection>
+                                        ))}
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <></>
+            )}
             <div className="row">
                 <div className="col-md">
                     <label>Сопровождающие мероприятия: </label>

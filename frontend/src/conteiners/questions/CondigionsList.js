@@ -78,9 +78,6 @@ export default function CondigionsList({ handleClickAdd, selectedConditions }) {
             <div className="row">
                 <div className="col-md">
                     <form onSubmit={handleSubmit}>
-                        <button type="submit" className="btn btn-primary">
-                            Выбрать вопросы
-                        </button>
                         {questions == null ? (
                             <p>
                                 <h2>Нет правил!</h2>
@@ -135,6 +132,12 @@ export default function CondigionsList({ handleClickAdd, selectedConditions }) {
                                 ))}
                             </div>
                         )}
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-full"
+                        >
+                            Применить
+                        </button>
                     </form>
                 </div>
             </div>
