@@ -263,3 +263,16 @@ max-width: 80%;
 .modal-content {
 border-radius: 0;
 }
+
+
+.td-ind {
+    width: 20px;
+}
+
+.table-rule {
+    width: 100%;
+}
+
+.td-info {
+    width: 25%;
+}

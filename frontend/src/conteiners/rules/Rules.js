@@ -65,7 +65,7 @@ export default function Rules() {
     console.log("rules", rules);
 
     return (
-        <div className="container">
+        <div className="container-fluid">
             <div className="row">
                 <div className="col-md d-flex header-list">
                     <button onClick={editClick} className="btn btn-primary">
@@ -87,28 +87,27 @@ export default function Rules() {
             ></FilterButton>
             <div className="row">
                 <div className="col-md">
-                    <ul className=" justify-content-center">
                         {!rules ? (
                             <p>
                                 <h2>Нет правил!</h2>
                             </p>
                         ) : (
-                            <table>
+                            <table className="table-rule">
                                 <tr>
                                     {/* <th>Название Правила</th> */}
-                                    <th>Номер правила</th>
+                                    <th className="td-ind">Номер правила</th>
                                     <th>Виды работ</th>
-                                    <th>Места проведения работ</th>
-                                    <th>Типы мест проведения работ</th>
-                                    <th>Условия</th>
+                                    <th>Критерии</th>
+                                    {/* <th>Типы мест проведения работ</th>
+                                    <th>Условия</th> */}
                                     <th>Защиты</th>
-                                    <th>Компенсирующие мероприятия</th>
-                                    <th>Изменить</th>
-                                    <th>Удалить</th>
+                                    <th>Сопровождающие мероприятия</th>
+                                    {/* <th>Изменить</th> */}
+                                    <th>Действия</th>
                                 </tr>
                                 {rules.map((rule) => (
                                     <tr>
-                                        <td>{rule.id}</td>
+                                        <td className="td-ind text-center">{rule.id}</td>
                                         <td>
                                             {rule.criteria
                                                 .find(
@@ -119,6 +118,44 @@ export default function Rules() {
                                                 .works.map((item) => item.name)}
                                         </td>
                                         <td>
+                                            <label>Места проведения работ</label>
+                                            <ul>
+                                                {rule.criteria
+                                                    .find(
+                                                        (item) =>
+                                                            item.type_criteria ===
+                                                            "location"
+                                                )
+                                                    .locations.map(
+                                                        (item) => <li>{item.name}</li>
+                                                )}
+                                            </ul>
+                                            <label>Типы локаций</label>
+                                            <ul>
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "type_location"
+                                                )
+                                                .locations_type.map(
+                                                    (item) => <li>{item.name}</li>
+                                                )}
+                                            </ul>
+                                            <label>Условия</label>
+                                            <ul>
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "question"
+                                                )
+                                                .questions.map(
+                                                    (item) => <li>{item.name}</li>
+                                                )}
+                                            </ul>
+                                        </td>
+                                        {/* <td>
                                             {rule.criteria
                                                 .find(
                                                     (item) =>
@@ -150,14 +187,14 @@ export default function Rules() {
                                                 .questions.map(
                                                     (item) => item.name
                                                 )}
-                                        </td>
-                                        <td>
+                                        </td> */}
+                                        <td className="td-info">
                                             {rule.protections.map(
                                                 (item) => item.name
                                             )}
                                         </td>
-                                        <td>{rule.compensatory_measures}</td>
-                                        <td>
+                                        <td className="td-info">{rule.compensatory_measures}</td>
+                                        {/* <td>
                                             <button
                                                 className="btn btn-primary"
                                                 onClick={(el) =>
@@ -166,10 +203,18 @@ export default function Rules() {
                                             >
                                                 Изменить
                                             </button>
-                                        </td>
-                                        <td>
+                                        </td> */}
+                                        <td className="td-action-rule">
+                                        <button
+                                                className="btn btn-primary btn-action-rule"
+                                                onClick={(el) =>
+                                                    editClick(el, rule.id)
+                                                }
+                                            >
+                                                Изменить
+                                            </button>
                                             <button
-                                                className="btn btn-danger"
+                                                className="btn btn-danger btn-action-rule"
                                                 onClick={(el) =>
                                                     deleteClick(el, rule.id)
                                                 }
@@ -181,7 +226,6 @@ export default function Rules() {
                                 ))}
                             </table>
                         )}
-                    </ul>
                 </div>
             </div>
         </div>

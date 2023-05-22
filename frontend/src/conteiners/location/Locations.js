@@ -81,6 +81,7 @@ export default function Locations() {
         let newLocation = {
             name: value.name,
             id_type_location: value.type,
+            ind_location: value.ind,
         };
         console.log(newLocation);
         apiInst

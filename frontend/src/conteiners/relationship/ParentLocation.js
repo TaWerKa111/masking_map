@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import send_notify from "../../utils/toast";
 
 export default function ParentLocation() {
     const [locations, setLocations] = useState([{ name: "loc1", id: 1 }]);
@@ -69,7 +70,15 @@ export default function ParentLocation() {
         };
         apiInst
             .post("/masking/relationship/location-location/", rel_location)
-            .catch((e) => console.log(e));
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     console.log("locations", locations);

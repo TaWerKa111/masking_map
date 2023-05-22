@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
+import send_notify from "../../utils/toast";
 
 export default function LocationProtection() {
     const [locations, setLocations] = useState([{ name: "asd", id: 1 }]);
@@ -79,7 +80,15 @@ export default function LocationProtection() {
         console.log("rel_prot", rel_protection);
         apiInst
             .post("/masking/relationship/location-protection/", rel_protection)
-            .catch((e) => console.log(e));
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     return (

@@ -861,6 +861,7 @@ def get_mn_location_list_view() -> tuple[dict, int]:
     )
     data["type_location_ids[]"] = request.args.getlist("type_location_ids[]")
     data["name"] = request.args.get("name")
+    data["parent_id"] = request.args.get("parent_id")
     current_app.logger.debug(f"mn objects data - {data}")
 
     try:

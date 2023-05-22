@@ -7,7 +7,6 @@ from common.postgres.models import (
     TypeWork,
     Protection,
     TypeProtection,
-    TypeWorkProtection,
     Location,
     TypeLocation,
     StatusProtection,
@@ -322,6 +321,7 @@ def get_location_list(
     name=None,
     type_protection_ids=None,
     type_location_ids=None,
+    parent_id=None,
     page: int = 1,
     limit: int = 10,
 ):
@@ -345,6 +345,12 @@ def get_location_list(
 
     if type_location_ids:
         query = query.filter(Location.id_type.in_(type_location_ids))
+    current_app.logger.debug(f"parent_id - {parent_id}")
+    if parent_id:
+        if parent_id == "null":
+            parent_id = None
+        query = query.filter(Location.id_parent == parent_id)
+        current_app.logger.debug(f"parent_id - {parent_id}")
 
     current_app.logger.debug(f"query - {query}")
     result = query.paginate(page=page, per_page=limit, error_out=False)

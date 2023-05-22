@@ -251,6 +251,7 @@ class FilterParamLocationSchema(PaginationSchema):
         allow_none=True,
     )
     name = fields.String(example="example", allow_none=True)
+    parent_id = fields.String(example="1", allow_none=True)
 
     @post_load
     def get_mn_object_list(self, data, **kwargs):
@@ -259,6 +260,7 @@ class FilterParamLocationSchema(PaginationSchema):
             name=data.get("name"),
             type_location_ids=data.get("type_location_ids"),
             type_protection_ids=data.get("type_protection_ids"),
+            parent_id=data.get("parent_id")
         )
 
 

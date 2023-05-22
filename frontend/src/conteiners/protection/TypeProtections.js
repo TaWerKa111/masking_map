@@ -90,7 +90,7 @@ export default function TypeProtections() {
                 <div className="col-md d-flex header-list">
                     <AddElementButton
                         type_form="simple"
-                        name={"Добавить тип защиты"}
+                        name={"Добавить систему защиты"}
                         onSubmit={addClick}
                     ></AddElementButton>
                 </div>

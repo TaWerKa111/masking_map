@@ -73,7 +73,7 @@ export default function Departments() {
             <div className="row">
                 <div className="col-md d-flex header-list">
                     <AddElementButton
-                        name={"Добавить тип отдел"}
+                        name={"Добавить отдел"}
                         type_form="simple"
                         onSubmit={addClick}
                     ></AddElementButton>
