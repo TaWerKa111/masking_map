@@ -38,11 +38,11 @@ export default function Protections() {
 
     const deleteClick = (event, key) => {
         let params = {
-            rule_id: key,
+            protection_id: key,
         };
         console.log(params);
         apiInst
-            .delete("/protection/", (params = params))
+            .delete("/masking/protection/", { params })
             .then((resp) => {
                 if (resp.data.result) {
                     send_notify(resp.data.message, "success");

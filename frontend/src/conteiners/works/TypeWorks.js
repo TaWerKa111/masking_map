@@ -49,13 +49,21 @@ export default function TypeWorksList() {
     const deleteClick = (event, key) => {
         console.log("delete el", key);
         let params = {
-            rule_id: key,
+            type_work_id: key,
         };
         console.log(params);
         apiInst
-            .delete("/masking/type-work/", (params = params))
-            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
-            .catch((e) => console.log(e));
+            .delete("/masking/type-work/", { params })
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeWorks();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     const editClick = (value) => {

@@ -34,13 +34,21 @@ export default function TypeProtections() {
     const deleteClick = (event, key) => {
         console.log("delete el", key);
         let params = {
-            rule_id: key,
+            type_protection_id: key,
         };
         console.log(params);
         apiInst
-            .delete("/locations/", (params = params))
-            .then((resp) => alert(resp.data.result ? "Удалено" : "Не удалено"))
-            .catch((e) => console.log(e));
+            .delete("/masking/type-protection/", { params })
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchTypeProtections();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     const editClick = (value) => {

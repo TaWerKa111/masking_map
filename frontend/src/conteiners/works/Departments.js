@@ -30,6 +30,22 @@ export default function Departments() {
 
     const deleteClick = (event, key) => {
         console.log("delete el", key);
+        let params = {
+            dep_id: key,
+        };
+        console.log(params);
+        apiInst
+            .delete("/masking/departament-type-work/", { params })
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchDepartamentsData();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     const editClick = (value) => {

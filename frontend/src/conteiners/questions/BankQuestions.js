@@ -23,6 +23,22 @@ export default function BankQuestions() {
 
     const deleteClick = (event, key) => {
         console.log("delete el", key);
+        let params = {
+            question_id: key,
+        };
+        console.log(params);
+        apiInst
+            .delete("/rule/question/", { params })
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                    fetchQuestions();
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     const editClick = (value) => {

@@ -51,13 +51,20 @@ export default function Locations() {
     const deleteClick = (event, key) => {
         console.log("delete el", key);
         let params = {
-            rule_id: key,
+            location_id: key,
         };
         console.log(params);
         apiInst
-            .delete("/location/", (params = params))
-            .then((resp) => alert(resp.result ? "Удалено" : "Не удалено"))
-            .catch((e) => console.log(e));
+            .delete("/masking/location/", { params })
+            .then((resp) => {
+                if (resp.data.result) {
+                    send_notify(resp.data.message, "success");
+                } else send_notify(resp.data.message, "error");
+            })
+            .catch((e) => {
+                send_notify(e.response.data.message, "error");
+                console.log(e.response.data.message);
+            });
     };
 
     const editClick = (value) => {

@@ -7,28 +7,42 @@ import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 import MyPagination from "../../components/Pagination";
 import send_notify from "../../utils/toast";
+import TableRow from "../../components/tables/TableRow";
 
 export default function MaskingMaps() {
-    const [maskingMaps, setMaskingMaps] = useState([]);
+    const [maskingMaps, setMaskingMaps] = useState([
+        {
+            filename: "filename1",
+            is_valid: true,
+            description: "description1",
+            id: 1,
+        },
+        {
+            filename: "filename2",
+            is_valid: false,
+            description: "description2",
+            id: 2,
+        },
+    ]);
     const [pagination, setPagination] = useState({});
     const [page, setPage] = useState(1);
 
     useEffect(() => {
         let params = {};
-        apiInst
-            .get("/masking/type-work/", { params })
-            .then((resp) => {
-                setMaskingMaps(resp.data.type_works);
-                setPagination(resp.data.pagination);
-                setPage(pagination.page);
-            })
-            .catch((e) => console.log(e));
-        apiInst
-            .get("/files/get-files/", { params })
-            .then((resp) => {
-                setMaskingMaps(resp.data.files);
-            })
-            .catch((e) => console.log(e));
+        // apiInst
+        //     .get("/masking/type-work/", { params })
+        //     .then((resp) => {
+        //         setMaskingMaps(resp.data.type_works);
+        //         setPagination(resp.data.pagination);
+        //         setPage(pagination.page);
+        //     })
+        //     .catch((e) => console.log(e));
+        // apiInst
+        //     .get("/files/get-files/", { params })
+        //     .then((resp) => {
+        //         setMaskingMaps(resp.data.files);
+        //     })
+        //     .catch((e) => console.log(e));
     }, []);
 
     const onClick = (el, mapUuid) => {
@@ -80,23 +94,19 @@ export default function MaskingMaps() {
                         ) : (
                             <table>
                                 <tr>
-                                    <th>ID</th>
-                                    <th className="text-center">Скачать</th>
+                                    <th className="td-ind">ID</th>
+                                    <th className="">Название</th>
+                                    <th className="">Описание</th>
+                                    <th className="text-center td-btn">
+                                        Скачать
+                                    </th>
                                 </tr>
                                 {maskingMaps.map((maskingMap) => (
-                                    <tr>
-                                        <td>{maskingMap.id}</td>
-                                        <td className="td-btn">
-                                            <button
-                                                className="btn btn-primary float-end"
-                                                onClick={(el) =>
-                                                    onClick(el, maskingMap.id)
-                                                }
-                                            >
-                                                Скачать
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    <TableRow
+                                        data={maskingMap}
+                                        handleClick={onClick}
+                                        condition={maskingMap.is_valid}
+                                    ></TableRow>
                                 ))}
                             </table>
                         )}
