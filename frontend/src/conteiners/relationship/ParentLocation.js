@@ -18,6 +18,14 @@ export default function ParentLocation() {
     const [searchTextOneLocation, setsearchTextOneLocation] = useState("");
     const [searchTextSecLocation, setsearchTextSecLocation] = useState("");
 
+    const fetchLocations = (params=null) => {
+        apiInst
+          .get("/masking/location-list/", { params: params })
+          .then((resp) => {
+            setSelectedItems(resp.data.locations);
+            });
+    };
+
     // Обработчик изменения поля поиска первого списка
     const handleSearchTextOneLocationChange = (event) => {
         setsearchTextOneLocation(event.target.value);
@@ -36,7 +44,10 @@ export default function ParentLocation() {
     // Функция для фильтрации второго списка
     const filteredListSecLocation = locations.filter((item) =>
         item.name.toLowerCase().includes(searchTextSecLocation.toLowerCase())
-    );
+        )
+        // .sort(
+        //     (a, b) => selectedItems.find(i => i.id === a.id) - selectedItems.find(i => i.id === b.id))
+        ;
 
     useEffect(() => {
         let params = {
@@ -52,18 +63,25 @@ export default function ParentLocation() {
     const handleListItemClick = (item) => {
         console.log("check item", item);
         setSelectedItem(item);
+        let params = {
+            limit: 100,
+            "parent_ids[]": [item.id],
+        };
+        fetchLocations(params);
         console.log("selectedItem", selectedItem);
     };
 
     const handleCheckboxChange = (event, item) => {
+        console.log("check item", item);
         if (event.target.checked) {
             setSelectedItems([...selectedItems, item]);
         } else {
-            setSelectedItems(selectedItems.filter((i) => i !== item));
+            setSelectedItems(selectedItems.filter((i) => i.id !== item.id));
         }
     };
 
     const addClick = () => {
+        console.log("add click", selectedItems);
         let rel_location = {
             location_id: selectedItem.id,
             location_ids: selectedItems.map((item) => item.id),
@@ -148,7 +166,7 @@ export default function ParentLocation() {
                                 <div className="check-item">
                                     <input
                                         type="checkbox"
-                                        checked={selectedItems.includes(item)}
+                                        checked={selectedItems.find(sel_item => sel_item.id === item.id)}
                                         onChange={(event) =>
                                             handleCheckboxChange(event, item)
                                         }

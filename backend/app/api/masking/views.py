@@ -535,6 +535,7 @@ def get_protection_view() -> tuple[dict, int]:
     data = dict()
     data["name"] = request.args.get("name")
     data["type_protections_ids[]"] = request.args.getlist("type_protections_ids[]")
+    data["limit"] = request.args.get("limit", 100)
 
     try:
         data = FileterParamProtectionSchema().load(data)
@@ -554,7 +555,7 @@ def get_protection_view() -> tuple[dict, int]:
         name=data.get("name"),
         type_protection_ids=data.get("type_protections_ids"),
         page=data.get("page"),
-        limit=data.get("limit"),
+        limit=data.get("limit", 100),
     )
 
     protections, pagination = serialize_paginate_object(protection_list)
@@ -1043,8 +1044,10 @@ def get_mn_location_list_view() -> tuple[dict, int]:
     )
     data["type_location_ids[]"] = request.args.getlist("type_location_ids[]")
     data["name"] = request.args.get("name")
-    data["parent_ids[]"] = request.args.getlist("parent_ids[]")
+    data["parent_ids[]"] = request.args.getlist("parent_ids[]", None)
+    data["limit"] = request.args.get("limit", 1000)
     current_app.logger.debug(f"mn objects data - {data}")
+
 
     try:
         locations = FilterParamLocationSchema().load(data)
@@ -1497,7 +1500,7 @@ def update_relationship_location_parent():
     )
 
     return BinaryResponseSchema().dump(
-        {"message": "Тип локации успешно добавлен!", "result": True}
+        {"message": "Связь локаций успешно добавлена!", "result": True}
     )
 
 
@@ -1554,5 +1557,5 @@ def update_relationship_location_protection():
     )
 
     return BinaryResponseSchema().dump(
-        {"message": "Тип локации успешно добавлен!", "result": True}
+        {"message": "Связь успешно добавлена!", "result": True}
     )

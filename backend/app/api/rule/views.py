@@ -248,9 +248,9 @@ def get_rules_view() -> tuple[dict, int]:
 
     rules_ser, pagination = serialize_paginate_object(rules)
     result = {"rules": rules_ser, "pagination": pagination}
-    current_app.logger.debug(
-        f"cr - {rules_ser[0].criteria[3].questions[0].answers[0].__dict__}"
-    )
+    # current_app.logger.debug(
+    #     f"cr - {rules_ser[0].criteria[3].questions[0].answers[0].__dict__}"
+    # )
     return RuleListSchema().dump(result), http.HTTPStatus.OK
 
 

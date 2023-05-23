@@ -347,15 +347,15 @@ def get_location_list(
         query = query.filter(Location.id_type.in_(type_location_ids))
     current_app.logger.debug(f"parent_id - {parent_ids}")
 
-    if parent_ids is not None:
-        if not parent_ids:
+    if parent_ids:
+        if parent_ids[-1] == "null":
             query = query.filter(Location.id_parent.is_(None))
         else:
             query = query.filter(Location.id_parent.in_(parent_ids))
         current_app.logger.debug(f"parent_id - {parent_ids}")
 
     current_app.logger.debug(f"query - {query}")
-    result = query.paginate(page=page, per_page=limit, error_out=False)
+    result = query.order_by(Location.created_at).paginate(page=page, per_page=limit, error_out=False)
     return result
 
 
@@ -382,6 +382,7 @@ def update_location(
         location.id_parent = parent_id
 
     db.session.commit()
+    return True
 
 
 def add_type_location(name: str) -> TypeLocation:
@@ -420,11 +421,24 @@ def update_type_location(type_location_id: int, name: str) -> bool or None:
 
 def update_rel_location_location(location_id, location_ids):
     locations = (
-        db.session.query(Location).filter(Location.id.in_(location_ids)).all()
+        db.session.query(Location)
+        .filter(Location.id_parent == location_id)
+        .update({
+            "id_parent": None
+        })
+    )
+    current_app.logger.debug(f"locations - {locations}")
+
+    (
+        db.session.query(Location)
+        .filter(Location.id.in_(location_ids))
+        .update({
+            "id_parent": location_id
+        })
     )
 
-    for location in locations:
-        location.id_parent = location_id
+    # for location in locations:
+    #     location.id_parent = location_id
 
     db.session.commit()
 

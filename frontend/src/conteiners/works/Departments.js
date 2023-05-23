@@ -128,7 +128,7 @@ export default function Departments() {
                                         ></AddElementButton>
                                     </td>
                                     <td className="td-btn">
-                                        <button className="btn btn-danger">
+                                        <button onClick={e => deleteClick(e, department.id)} className="btn btn-danger">
                                             Удалить
                                         </button>
                                     </td>

@@ -42,6 +42,7 @@ export default function TypeLocations() {
             .then((resp) => {
                 if (resp.data.result) {
                     send_notify(resp.data.message, "success");
+                    fetchTypeLocations();
                 } else send_notify(resp.data.message, "error");
             })
             .catch((e) => {

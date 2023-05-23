@@ -22,7 +22,9 @@ export default function Locations() {
     const [optionTypeLocations, setOptionTypeLocations] = useState([]);
 
     const fetchLocation = () => {
-        let params = {};
+        let params = {
+            limit: 10000
+        };
         apiInst
             .get("/masking/location-list/", { params: params })
             .then((resp) => {
@@ -59,6 +61,7 @@ export default function Locations() {
             .then((resp) => {
                 if (resp.data.result) {
                     send_notify(resp.data.message, "success");
+                    fetchLocation();
                 } else send_notify(resp.data.message, "error");
             })
             .catch((e) => {
@@ -69,8 +72,14 @@ export default function Locations() {
 
     const editClick = (value) => {
         console.log("edit el", value);
+        let uodateLocation = {
+            id: value.id,
+            name: value.name,
+            id_type_location: value.type,
+            ind_location: value.ind,
+        };
         apiInst
-            .put("/masking/location/", value)
+            .put("/masking/location/", uodateLocation)
             .then((resp) => {
                 if (resp.data.result) {
                     send_notify(resp.data.message, "success");

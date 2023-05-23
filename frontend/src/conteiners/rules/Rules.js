@@ -56,6 +56,7 @@ export default function Rules() {
                 .then((resp) => {
                     if (resp.data.result) {
                         send_notify(resp.data.message, "success");
+                        fetchRules();
                     } else send_notify(resp.data.message, "error");
                 })
                 .catch((e) => {
@@ -85,7 +86,7 @@ export default function Rules() {
     return (
         <div className="container-fluid">
             <div className="row">
-                <div className="col-md d-flex header-list">
+                <div className="col-md header-list">
                     <button onClick={editClick} className="btn btn-primary">
                         Добавить правило
                     </button>

@@ -18,16 +18,21 @@ export default function TypeWorksList() {
     const [departments, setDepartments] = useState([{ name: "dep1", id: 1 }]);
     const [page, setPage] = useState(1);
     const [selectedDepartaments, setSelectedDepartaments] = useState([]);
-    const pageSize = 10;
+    const [pageSize, setPageSize] = useState(10);
+    const [totalItems, setTotalItems] = useState(0);
 
     function fetchTypeWorks() {
         let params = {
-            limit: 10,
+            limit: pageSize,
+            page: page
         };
         apiInst
             .get("/masking/type-work/", { params })
             .then((resp) => {
                 setTypeWorks(resp.data.type_works);
+                setPage(resp.data.pagination.page);
+                setPageSize(resp.data.pagination.limit);
+                setTotalItems(resp.data.pagination.total_items);
             })
             .catch((e) => console.log(e));
     }
@@ -201,7 +206,7 @@ export default function TypeWorksList() {
             </div>
             <div className="row">
                 <MyPagination
-                    totalItems={13}
+                    totalItems={totalItems}
                     currentPage={page}
                     pageSize={pageSize}
                     onPageChange={handlePageChange}

@@ -51,7 +51,7 @@ export default function MaskingMap() {
     const handleLocations = (locations) => {
         console.log("locations", locations);
         setModalLocation(false);
-        setLocations(locations);
+        setLocations(locations.map((location) => ({name: location.label, id: location.value})));
         fetchQuestions();
     };
 

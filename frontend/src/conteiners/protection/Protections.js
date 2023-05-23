@@ -17,7 +17,9 @@ export default function Protections() {
     const [typeProtections, setTypeProtections] = useState([]);
 
     const fetchProtections = () => {
-        let params = {};
+        let params = {
+            limit: 100,
+        };
         apiInst
             .get("/masking/protection/", { params })
             .then((resp) => {
@@ -157,6 +159,7 @@ export default function Protections() {
                                                       protection.id_type_protection
                                               ).name
                                             : "Отсутсвует"}
+
                                     </td>
                                     <td>{protection.status}</td>
                                     <td>

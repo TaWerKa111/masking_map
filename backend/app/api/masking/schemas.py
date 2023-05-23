@@ -201,8 +201,8 @@ class AddLocationSchema(Schema):
     name = fields.String(example="Защита агрегата №1")
     id_parent = fields.Integer(example=1)
     # id_protection = fields.Integer(example=1)
-    ind_location = fields.Integer(example=1)
-    id_type_location = fields.Integer(example=1)
+    ind_location = fields.Integer(example=1, allow_none=True)
+    id_type_location = fields.Integer(example=1, allow_none=True)
 
     class Meta:
         unknown = EXCLUDE
@@ -213,6 +213,7 @@ class UpdateLocationSchema(Schema):
     name = fields.String()
     id_parent = fields.Integer(allow_none=True)
     id_type_location = fields.Integer(allow_none=True)
+    ind_location = fields.Integer(example=1, allow_none=True)
 
 
 class GetLocationSchema(Schema):
@@ -262,7 +263,8 @@ class FilterParamLocationSchema(PaginationSchema):
             name=data.get("name"),
             type_location_ids=data.get("type_location_ids"),
             type_protection_ids=data.get("type_protection_ids"),
-            parent_ids=data.get("parent_ids")
+            parent_ids=data.get("parent_ids"),
+            limit=data.get("limit", 100000)
         )
 
 

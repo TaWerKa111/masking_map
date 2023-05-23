@@ -334,7 +334,7 @@ export default function RuleInfo(props) {
         <div className="container">
             <div className="row">
                 <div className="col-md">
-                    <h2 className="text-center">Правило</h2>
+                    <h2 className="text-center">Правило маскирования защит</h2>
                 </div>
             </div>
             <div className="row">
@@ -423,19 +423,18 @@ export default function RuleInfo(props) {
             {criteriaList.length > 0 ? (
                 <div>
                     <div className="row">
-                        <div className="col-md-11">
+                        <div className="col-md-10">
                             <h2 className="text-center">Защиты</h2>
                         </div>
-                        <div className="col-md-1">
+                        <div className="col-md-2">
                             <button
                                 className="btn btn-primary"
                                 onClick={() => setModalProtection(true)}
                             >
-                                Изменить
+                                Добавить/Изменить защиты
                             </button>
                         </div>
                     </div>
-
                     <div className="row">
                         <div className="col-md">
                             <ModalChoiceProtections
@@ -447,12 +446,12 @@ export default function RuleInfo(props) {
 
                             {protections.length === 0 ? (
                                 <div>
-                                    <h3 className="text-center">
+                                    {/* <h3 className="text-center">
                                         Выберите защиты
                                     </h3>
                                     <label className="text-center">
                                         Для выбора нажмите на кнопку изменить
-                                    </label>
+                                    </label> */}
                                 </div>
                             ) : (
                                 <div className="list-conteiner">
