@@ -19,7 +19,11 @@ class GetListFilesMaskingSchema(PaginationSchema):
 
 class FileMaskingSchema(Schema):
     id = fields.Integer()
-    name = fields.Integer()
+    filename = fields.String()
+    description = fields.String()
+    user_id = fields.Integer()
+    is_test = fields.Boolean()
+    is_valid = fields.Boolean()
 
 
 class ListFileMaskingSchema(Schema):

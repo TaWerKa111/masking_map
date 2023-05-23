@@ -321,7 +321,7 @@ def get_location_list(
     name=None,
     type_protection_ids=None,
     type_location_ids=None,
-    parent_id=None,
+    parent_ids=None,
     page: int = 1,
     limit: int = 10,
 ):
@@ -345,12 +345,14 @@ def get_location_list(
 
     if type_location_ids:
         query = query.filter(Location.id_type.in_(type_location_ids))
-    current_app.logger.debug(f"parent_id - {parent_id}")
-    if parent_id:
-        if parent_id == "null":
-            parent_id = None
-        query = query.filter(Location.id_parent == parent_id)
-        current_app.logger.debug(f"parent_id - {parent_id}")
+    current_app.logger.debug(f"parent_id - {parent_ids}")
+
+    if parent_ids is not None:
+        if not parent_ids:
+            query = query.filter(Location.id_parent.is_(None))
+        else:
+            query = query.filter(Location.id_parent.in_(parent_ids))
+        current_app.logger.debug(f"parent_id - {parent_ids}")
 
     current_app.logger.debug(f"query - {query}")
     result = query.paginate(page=page, per_page=limit, error_out=False)
@@ -439,3 +441,84 @@ def update_rel_location_protection(location_id, protection_ids):
     )
 
     db.session.commit()
+
+
+def delete_dep(dep_id):
+    try:
+        rule = db.session.query(DepartamentOfWork).filter(
+            DepartamentOfWork.id == dep_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(
+            f"Error del DepartamentOfWork - {err}", exc_info=True)
+        return False
+
+
+def delete_type_work(type_work_id):
+    try:
+        rule = db.session.query(TypeWork).filter(
+            TypeWork.id == type_work_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(f"Error del TypeWork - {err}", exc_info=True)
+        return False
+
+
+def delete_protection(protection_id):
+    try:
+        rule = db.session.query(Protection).filter(
+            Protection.id == protection_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(f"Error del Protection - {err}", exc_info=True)
+        return False
+
+
+def delete_type_protection(type_protection_id):
+    try:
+        rule = db.session.query(TypeProtection).filter(
+            TypeProtection.id == type_protection_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(
+            f"Error del TypeProtection - {err}", exc_info=True)
+        return False
+
+
+def delete_location(location_id):
+    try:
+        rule = db.session.query(Location).filter(
+            Location.id == location_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(f"Error del Location - {err}", exc_info=True)
+        return False
+
+
+def delete_type_location(type_location_id):
+    try:
+        rule = db.session.query(TypeLocation).filter(
+            TypeLocation.id == type_location_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(
+            f"Error del TypeLocation - {err}", exc_info=True)
+        return False

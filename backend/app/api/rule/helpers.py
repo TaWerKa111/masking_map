@@ -395,3 +395,16 @@ def update_question(question_id: int, text: str, answers: list[dict]):
     ).delete()
     db.session.commit()
     return question
+
+
+def delete_rule(rule_id):
+    try:
+        rule = db.session.query(Rule).filter(
+            Rule.id == rule_id
+        ).first()
+        db.session.delete(rule)
+        db.session.commit()
+        return True
+    except Exception as err:
+        current_app.logger.info(f"Error del rule - {err}", exc_info=True)
+        return False

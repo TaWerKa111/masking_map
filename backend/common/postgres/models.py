@@ -51,7 +51,7 @@ class TypeWork(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), index=True)
     departament_id = Column(
-        Integer, ForeignKey("departament_of_work.id"), nullable=True)
+        Integer, ForeignKey("departament_of_work.id", ondelete='SET NULL'), nullable=True)
 
     # relationship
     departament = relationship(
@@ -88,13 +88,13 @@ class Protection(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), index=True)
     id_type_protection = Column(
-        Integer, ForeignKey("type_protection.id"), nullable=True, index=True)
+        Integer, ForeignKey("type_protection.id", ondelete='SET NULL'), nullable=True, index=True)
     is_end = Column(Boolean)
     id_status = Column(
-        Integer, ForeignKey("protection_status.id"), nullable=True
+        Integer, ForeignKey("protection_status.id", ondelete='SET NULL'), nullable=True
     )
     id_location = Column(
-        Integer, ForeignKey("location.id"), nullable=True)
+        Integer, ForeignKey("location.id", ondelete='SET NULL'), nullable=True)
 
     # relationship
     type_protection = relationship(
@@ -138,9 +138,9 @@ class Location(Base, TimestampsMixin):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     id_parent = Column(
-        Integer, ForeignKey("location.id"), nullable=True, index=True)
+        Integer, ForeignKey("location.id", ondelete='SET NULL'), nullable=True, index=True)
     id_type = Column(
-        Integer, ForeignKey("location_type.id"), nullable=True
+        Integer, ForeignKey("location_type.id", ondelete='SET NULL'), nullable=True
     )
     ind_location = Column(
         Integer, nullable=True
@@ -220,7 +220,7 @@ class MaskingMapFile(Base):
         MutableDict.as_mutable(postgresql.JSONB)
     )
     user_id = Column(
-        Integer, ForeignKey("users.id"), nullable=True
+        Integer, ForeignKey("users.id", ondelete='SET NULL'), nullable=True
     )
     is_test = Column(Boolean)
     params_masking = Column(
@@ -242,7 +242,7 @@ class Criteria(Base):
     name = Column(String(255))
     type_criteria = Column(
         Enum(TypeCriteria, values_callable=lambda obj: [x.value for x in obj]))
-    rule_id = Column(Integer, ForeignKey("rule.id"))
+    rule_id = Column(Integer, ForeignKey("rule.id", ondelete='SET NULL'))
 
     # relationships
     locations = relationship(
@@ -285,24 +285,24 @@ class CriteriaLocation(Base):
     __tablename__ = "criteria_location"
 
     id = Column(Integer, primary_key=True)
-    id_criteria = Column(Integer, ForeignKey("criteria.id"))
-    id_location = Column(Integer, ForeignKey("location.id"))
+    id_criteria = Column(Integer, ForeignKey("criteria.id", ondelete='SET NULL'))
+    id_location = Column(Integer, ForeignKey("location.id", ondelete='SET NULL'))
 
 
 class CriteriaTypeLocation(Base):
     __tablename__ = "criteria_location_type"
 
     id = Column(Integer, primary_key=True)
-    id_criteria = Column(Integer, ForeignKey("criteria.id"))
-    id_type_location = Column(Integer, ForeignKey("location_type.id"))
+    id_criteria = Column(Integer, ForeignKey("criteria.id", ondelete='SET NULL'))
+    id_type_location = Column(Integer, ForeignKey("location_type.id", ondelete='SET NULL'))
 
 
 class CriteriaTypeWork(Base):
     __tablename__ = "criteria_work_type"
 
     id = Column(Integer, primary_key=True)
-    id_criteria = Column(Integer, ForeignKey("criteria.id"))
-    id_type_work = Column(Integer, ForeignKey("type_work.id"))
+    id_criteria = Column(Integer, ForeignKey("criteria.id", ondelete='SET NULL'))
+    id_type_work = Column(Integer, ForeignKey("type_work.id", ondelete='SET NULL'))
 
 
 class Rule(Base):
@@ -314,7 +314,7 @@ class Rule(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete='SET NULL'))
     compensatory_measures = Column(Text)
 
     # relationship
@@ -323,7 +323,8 @@ class Rule(Base):
         lazy="select",
         uselist=True,
         back_populates="rules",
-        secondary="rule_protection"
+        secondary="rule_protection",
+        # cascade="all, delete"
     )
     user = relationship(
         "User",
@@ -340,8 +341,8 @@ class RuleProtection(Base):
     __tablename__ = "rule_protection"
 
     id = Column(Integer, primary_key=True)
-    id_rule = Column(Integer, ForeignKey("rule.id"))
-    id_protection = Column(Integer, ForeignKey("protection.id"))
+    id_rule = Column(Integer, ForeignKey("rule.id", ondelete='SET NULL'))
+    id_protection = Column(Integer, ForeignKey("protection.id", ondelete='SET NULL'))
     is_need_masking = Column(Boolean)
     is_need_demasking = Column(Boolean)
 
@@ -367,13 +368,13 @@ class QuestionAnswer(Base):
 
     id = Column(Integer, primary_key=True)
     text = Column(String(255))
-    id_question = Column(Integer, ForeignKey("question.id"))
+    id_question = Column(Integer, ForeignKey("question.id", ondelete="CASCADE"))
 
     # relationship
     questions = relationship(
         "Question",
         lazy="select",
-        backref=backref("answers", uselist=True)
+        backref=backref("answers", uselist=True, cascade='all,delete')
     )
 
 
@@ -384,4 +385,3 @@ class CriteriaQuestion(Base):
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
     id_question = Column(Integer, ForeignKey("question.id"))
     id_right_answer = Column(Integer)
-

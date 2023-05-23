@@ -18,7 +18,7 @@ from app.api.rule.helpers import (
     add_question,
     add_question_answer,
     update_question,
-    get_locations_work_types_location_types,
+    get_locations_work_types_location_types, delete_rule,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -328,6 +328,50 @@ def update_rule_view():
     )
 
 
+@bp.route("/rule/", methods=["DELETE"])
+def delete_rule_view():
+    """
+
+    :return:
+    ---
+    delete:
+        summary: Удалить правило
+        description: Удаление правила
+        parameters:
+            -   in: query
+                name: rule_id
+                type: integer
+        responses:
+            '200':
+                description:
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+            '400':
+                description:
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - rule
+    """
+
+    rule_id = request.args.get("rule_id")
+    result = delete_rule(rule_id)
+    if result:
+        return BinaryResponseSchema().dump(
+            {
+                "message": "Правило успешно удалено!",
+                "result": True
+            }
+        )
+
+    return BinaryResponseSchema().dump({
+        "message": "Не удалось удалить правило!",
+        "result": False
+    }), http.HTTPStatus.BAD_REQUEST
+
+
 @bp.route("/questions/", methods=["GET"])
 def get_questions_view() -> tuple[dict, int]:
     """
@@ -556,91 +600,3 @@ def update_question_view() -> tuple[dict, int]:
         ),
         http.HTTPStatus.OK,
     )
-
-
-# @bp.route("/criteria/", methods=["POST"])
-# def add_criteria_views() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     post:
-#         summary: Добавить критерий для уточнения правила
-#         description: Добавить критерий для уточнения правила
-#         requestBody:
-#             content:
-#                 app/json:
-#                     schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
-#
-#
-# @bp.route("/criteria/", methods=["GET"])
-# def get_criteria_views() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     ---
-#     get:
-#         summary: Получить критерий формирования карт
-#         description: Получить критерий формирования карт
-#         parameters:
-#             -   in: query
-#                 schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description: Ошибка при выполнении запроса
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
-#
-#
-# @bp.route("/criteria-list/", methods=["GET"])
-# def get_criteria_list_views() -> tuple[dict, int]:
-#     """
-#
-#     :return:
-#     ---
-#     get:
-#         summary: Получить список критериев формирования карт
-#         description: Получить список критериев формирования карт
-#         parameters:
-#             -   in: query
-#                 schema:
-#         responses:
-#             '200':
-#                 description:
-#                 content:
-#                     application/json:
-#                         schema:
-#             '400':
-#                 description: Ошибка при выполнении запроса
-#                 content:
-#                     application/json:
-#                         schema:
-#         tags:
-#             - rule
-#     """
-#
-#
-#
-#

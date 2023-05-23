@@ -59,9 +59,7 @@ function AddWorkElementForm(props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <label>
-                Название:
-            </label>
+            <label>Название:</label>
             <input
                 type="text"
                 name="name"
@@ -69,11 +67,14 @@ function AddWorkElementForm(props) {
                 onChange={(e) => handleChange(e)}
                 className="form-control"
             />
-            
-            <label>
-                Тип:
-            </label>
-            <select className="form-select" name="type" value={value.type} onChange={handleChange}>
+
+            <label>Тип:</label>
+            <select
+                className="form-select"
+                name="type"
+                value={value.type}
+                onChange={handleChange}
+            >
                 <option value="">Выберите тип</option>
                 {dep.map((typeEl) => (
                     <option key={typeEl.id} value={typeEl.id}>
@@ -81,8 +82,10 @@ function AddWorkElementForm(props) {
                     </option>
                 ))}
             </select>
-            
-            <button className="btn btn-primary btn-full" type="submit">{props.btnName}</button>
+
+            <button className="btn btn-primary btn-full" type="submit">
+                {props.btnName}
+            </button>
         </form>
     );
 }
@@ -108,37 +111,44 @@ function AddLocElementForm(props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <label>
-                Название:
-                </label>
-                <input
-                    type="text"
-                    name="name"
-                    value={value.name}
-                    onChange={(e) => handleChange(e)}
-                    className="form-control"
-                />
-            <label>
-                Тип:
-                </label>
-                <select className="form-select" name="type" value={value.type} onChange={handleChange}>
-                    <option value="">Выберите тип</option>
-                    {types.map((typeEl) => (
-                        <option key={typeEl.id} value={typeEl.id}>
-                            {typeEl.name}
-                        </option>
-                    ))}
-                </select>
-            <label>
-                Номер объекта
-            </label>
-            <input onChange={handleChange} value={value.ind} name="ind" type="number" min="0" className="form-control" placeholder="Номер объекта">
-            </input>
-            <button className="btn btn-primary btn-full" type="submit">{props.btnName}</button>
+            <label>Название:</label>
+            <input
+                type="text"
+                name="name"
+                value={value.name}
+                onChange={(e) => handleChange(e)}
+                className="form-control"
+            />
+            <label>Тип:</label>
+            <select
+                className="form-select"
+                name="type"
+                value={value.type}
+                onChange={handleChange}
+            >
+                <option value="">Выберите тип</option>
+                {types.map((typeEl) => (
+                    <option key={typeEl.id} value={typeEl.id}>
+                        {typeEl.name}
+                    </option>
+                ))}
+            </select>
+            <label>Номер объекта</label>
+            <input
+                onChange={handleChange}
+                value={value.ind}
+                name="ind"
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder="Номер объекта"
+            ></input>
+            <button className="btn btn-primary btn-full" type="submit">
+                {props.btnName}
+            </button>
         </form>
     );
 }
-
 
 function AddProtectionElementForm(props) {
     const [value, setValue] = useState(
@@ -163,20 +173,23 @@ function AddProtectionElementForm(props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <label>
-                Название:
-                </label>
-                <input
-                    type="text"
-                    name="name"
-                    value={value.name}
-                    onChange={(e) => handleChange(e)}
-                    className="form-control"
-                />
-            
+            <label>Название:</label>
+            <input
+                type="text"
+                name="name"
+                value={value.name}
+                onChange={(e) => handleChange(e)}
+                className="form-control"
+            />
+
             <label>
                 Тип:
-                <select className="form-select" name="type" value={value.type} onChange={handleChange}>
+                <select
+                    className="form-select"
+                    name="type"
+                    value={value.type}
+                    onChange={handleChange}
+                >
                     <option value="">Выберите тип</option>
                     {types.map((typeEl) => (
                         <option key={typeEl.id} value={typeEl.id}>
@@ -196,7 +209,9 @@ function AddProtectionElementForm(props) {
                     className="form-check-input"
                 />
             </label>
-            <button className="btn btn-primary btn-full" type="submit">{props.btnName}</button>
+            <button className="btn btn-primary btn-full" type="submit">
+                {props.btnName}
+            </button>
         </form>
     );
 }
@@ -318,7 +333,9 @@ function AddConditionElementForm(props) {
                     ))
                 )}
             </div>
-            <button className="btn btn-primary btn-full" type="submit">{props.btnName}</button>
+            <button className="btn btn-primary btn-full" type="submit">
+                {props.btnName}
+            </button>
         </form>
     );
 }
@@ -347,23 +364,22 @@ function AddElementButton(props) {
                 )}
             </div>
         );
-                } else if (props.type_form == "loc") {
-
-                return (
-                    <div>
-                        <button onClick={handleClick} className="btn btn-primary">
-                            {name}
-                        </button>
-                        {showForm && (
-                            <AddLocElementForm
-                                btnName={name}
-                                onSubmit={props.onSubmit}
-                                value={props.value}
-                                types={props.types}
-                            />
-                        )}
-                    </div>
-                );
+    } else if (props.type_form == "loc") {
+        return (
+            <div>
+                <button onClick={handleClick} className="btn btn-primary">
+                    {name}
+                </button>
+                {showForm && (
+                    <AddLocElementForm
+                        btnName={name}
+                        onSubmit={props.onSubmit}
+                        value={props.value}
+                        types={props.types}
+                    />
+                )}
+            </div>
+        );
     } else if (["work"].includes(props.type_form)) {
         return (
             <div>
@@ -383,10 +399,7 @@ function AddElementButton(props) {
     } else if (props.type_form == "protection") {
         return (
             <div>
-                <button
-                    onClick={handleClick}
-                    className="btn btn-primary"
-                >
+                <button onClick={handleClick} className="btn btn-primary">
                     {name}
                 </button>
                 {showForm && (

@@ -76,15 +76,18 @@ export default function RuleInfo(props) {
     };
 
     const handleLocations = (locations) => {
-        console.log("locations", locations);
+        console.log("locations add", locations);
         setModalLocation(false);
-        // let temp = Object.assign({}, rule);
-        // temp["locations"] = locations;
-        // setRule(temp);
         setCriteriaList(
             criteriaList.map((cr) => {
                 if (cr.id === selectedCriteriaEditindId) {
-                    return { ...cr, locations: locations };
+                    return {
+                        ...cr,
+                        locations: locations.map((item) => ({
+                            id: item.value,
+                            name: item.label,
+                        })),
+                    };
                 } else return cr;
             })
         );
