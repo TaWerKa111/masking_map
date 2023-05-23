@@ -52,7 +52,7 @@ export default function MnObjectQuestions({
 
     useEffect(() => {
         fetchLocations({
-            parent_id: "null",
+            parent_ids: ["null"],
         });
     }, []);
 
