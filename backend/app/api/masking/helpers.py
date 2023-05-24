@@ -56,7 +56,7 @@ def get_type_work_list(
     type_location_ids=None,
     departament_ids=None,
     page: int = 1,
-    limit: int = 10,
+    limit: int = 1000,
 ):
     """
 

@@ -535,7 +535,7 @@ def get_protection_view() -> tuple[dict, int]:
     data = dict()
     data["name"] = request.args.get("name")
     data["type_protections_ids[]"] = request.args.getlist("type_protections_ids[]")
-    data["limit"] = request.args.get("limit", 100)
+    data["limit"] = request.args.get("limit", 1000)
 
     try:
         data = FileterParamProtectionSchema().load(data)
@@ -555,7 +555,7 @@ def get_protection_view() -> tuple[dict, int]:
         name=data.get("name"),
         type_protection_ids=data.get("type_protections_ids"),
         page=data.get("page"),
-        limit=data.get("limit", 100),
+        limit=data.get("limit", 1000),
     )
 
     protections, pagination = serialize_paginate_object(protection_list)

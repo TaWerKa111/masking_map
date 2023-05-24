@@ -212,7 +212,7 @@ def get_rule(rule_id: int) -> Rule:
 
 
 def filter_list_rule(
-    rules_ids: list[int], name: str, page: int = 1, limit: int = 10
+    rules_ids: list[int], name: str, page: int = 1, limit: int = 1000
 ) -> Pagination:
     """
     Получить список правил с пагинацией
@@ -323,7 +323,7 @@ def update_rule(
 
 
 def filter_list_question(
-    questions_ids: list[int], text: str, page: int = 1, limit: int = 10
+    questions_ids: list[int], text: str, page: int = 1, limit: int = 1000
 ):
     """
 
