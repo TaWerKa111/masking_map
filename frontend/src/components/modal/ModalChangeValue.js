@@ -5,11 +5,11 @@ import ModalQuestions from "./ModalQuestions";
 import ModalTypeWork from "./ModalTypeWork";
 
 const ModalChangeValue = (props) => {
-    if (!props.criteria.type_criteria) {
+    if (!props.criteria.selected_type_criteria) {
         return <></>;
     }
 
-    switch (props.criteria.type_criteria.value) {
+    switch (props.criteria.selected_type_criteria.value) {
         case "type_work": {
             return (
                 <ModalTypeWork

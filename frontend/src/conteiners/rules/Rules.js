@@ -76,10 +76,11 @@ export default function Rules() {
             navigate({
                 pathname: `/expert/add-rule/`,
                 search: `?${createSearchParams(params)}`,
-                state: { rule_id: key },
+                // state: { rule_id: key },
             });
         }
-        navigate("/expert/add-rule/");
+        else
+            navigate("/expert/add-rule/");
     };
     console.log("rules", rules);
 
@@ -147,9 +148,18 @@ export default function Rules() {
                                                         item.type_criteria ===
                                                         "location"
                                                 )
-                                                .locations.map((item) => (
-                                                    <li>{item.name}</li>
-                                                ))}
+                                                .locations.length > 0
+                                                ? rule.criteria
+                                                    .find(
+                                                        (item) =>
+                                                            item.type_criteria ===
+                                                            "location"
+                                                    )
+                                                    .locations.map((item) => (
+                                                        <li>{item.name}</li>
+                                                    ))
+                                                : "Не задано"
+                                            }
                                         </ul>
                                         <label>Типы локаций</label>
                                         <ul>
@@ -159,9 +169,18 @@ export default function Rules() {
                                                         item.type_criteria ===
                                                         "type_location"
                                                 )
+                                                .locations_type.length > 0
+                                                ?rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "type_location"
+                                                )
                                                 .locations_type.map((item) => (
                                                     <li>{item.name}</li>
-                                                ))}
+                                                ))
+                                                : "Не задано"
+                                                }
                                         </ul>
                                         <label>Условия</label>
                                         <ul>
@@ -171,9 +190,17 @@ export default function Rules() {
                                                         item.type_criteria ===
                                                         "question"
                                                 )
+                                                .questions.length > 0
+                                                ?rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "question"
+                                                )
                                                 .questions.map((item) => (
-                                                    <li>{item.name}</li>
-                                                ))}
+                                                    <li>{item.text}</li>
+                                                ))
+                                                : "Не задано" }
                                         </ul>
                                     </td>
                                     {/* <td>
@@ -210,9 +237,11 @@ export default function Rules() {
                                                 )}
                                         </td> */}
                                     <td className="td-info">
+                                        <ul>
                                         {rule.protections.map(
-                                            (item) => item.name
+                                            (item) => <li>{item.name}</li>
                                         )}
+                                        </ul>
                                     </td>
                                     <td className="td-info">
                                         {rule.compensatory_measures}

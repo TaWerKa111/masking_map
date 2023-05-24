@@ -95,7 +95,7 @@ export default function TypeProtections() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex header-list">
+                <div className="col-md header-list">
                     <AddElementButton
                         type_form="simple"
                         name={"Добавить систему защиты"}

@@ -31,11 +31,12 @@ export default function AddRule() {
                     conditions: res.data.criteria.find(
                         (item) => item.type_criteria === "question"
                     ).questions,
-                    protections: [],
+                    protections: res.data.protections,
                     type_locations: res.data.criteria.find(
                         (item) => item.type_criteria === "type_location"
                     ).locations_type,
                     compensatory_measures: res.data.compensatory_measures,
+                    criteria: res.data.criteria.map(item => ({...item, selected_type_criteria:{ value: item.type_criteria, label: item.name}})),
                 });
                 console.log(res.data);
                 console.log(searchParams.get("id"));

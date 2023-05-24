@@ -21,8 +21,8 @@ const NavAuthBar = (props) => {
                 </h1>
             </div>
             <div className="row navbar navbar-noauth">
-                <div className="col ">
-                    <a href="/expert/" style={aStyle}>
+                <div className="col">
+                    <a href="/expert/" style={aStyle} className="">
                         <h2 className="navButton">Инструкция</h2>
                     </a>
                 </div>
@@ -50,9 +50,10 @@ const NavAuthBar = (props) => {
                     <Dropdown>
                         <Dropdown.Toggle
                             id="dropdown-basic"
-                            className="btn btn-secondary btn-nav"
+                            className="btn btn-nav"
                         >
-                            Справочники
+                            <h2 style={{display: "inline"}}>Справочники</h2>
+                            
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>

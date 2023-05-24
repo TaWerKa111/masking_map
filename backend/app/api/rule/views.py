@@ -70,8 +70,8 @@ def add_rule_view() -> tuple[dict, int]:
         criteria = [
             cr.get(key)
             for cr in rule.get("criteria")
-            if cr.get("type_criteria")
-            and cr.get("type_criteria").get("value") == type_cr
+            if cr.get("selected_type_criteria")
+            and cr.get("selected_type_criteria").get("value") == type_cr
         ]
         result = []
 

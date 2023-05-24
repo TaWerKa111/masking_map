@@ -134,7 +134,7 @@ export default function TypeWorksList() {
     return (
         <div className="container">
             <div className="row">
-                <div className="col-md d-flex header-list">
+                <div className="col-md  header-list">
                     <AddElementButton
                         name={"Добавить вид работы"}
                         type_form="work"

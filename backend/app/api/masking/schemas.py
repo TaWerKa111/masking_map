@@ -1,5 +1,5 @@
 from flask import current_app
-from marshmallow import Schema, fields, post_load, EXCLUDE
+from marshmallow import Schema, fields, post_load, EXCLUDE, post_dump
 
 from app.api.helpers.schemas import (
     BinaryResponseSchema,
@@ -143,6 +143,8 @@ class ProtectionSchema(Schema):
     id_type_protection = fields.Integer()
     # type_protection = fields.List(fields.Dict())
     is_end = fields.Boolean(example=True)
+    is_masking = fields.Boolean(example=True)
+    is_demasking = fields.Boolean(example=True)
 
 
 class ProtectionListSchema(Schema):
@@ -231,7 +233,13 @@ class LocationSchema(Schema):
     # id_protection = fields.Integer()
     id_type = fields.Integer(allow_none=True)
     type_location = fields.Nested(TypeLocationSchema())
+    ind_location = fields.Integer(example=1, allow_none=True)
 
+    @post_dump
+    def post_process(self, data, **kwargs):
+        if data.get("ind_location") is not None:
+            data["name"] = f"{data['name']} № {data['ind_location']}"
+        return data
 
 class LocationListSchema(Schema):
     locations = fields.List(fields.Nested(LocationSchema()))

@@ -15,9 +15,10 @@ export default function Rule() {
         };
         console.log("params", params);
         apiInst
-            .get("/rule/", { params })
+            .get("/rule/rule/", { params })
             .then((resp) => {
                 setRule(resp.data);
+                console.log("get rule", resp.data);
             })
             .catch((e) => console.log(e));
     }, []);
