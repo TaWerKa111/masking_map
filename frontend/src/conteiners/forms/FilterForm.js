@@ -192,36 +192,78 @@ function FilterProtection(props) {
 }
 
 function FilterRules(props) {
-    const [searchName, setSearchName] = useState(null);
-    const [optionList, setOptionList] = useState([]);
-    const [optionTypeProtections, setOptionTypeProtections] = useState([]);
-    const [selectedTypeProtections, setSelectedTypeProtections] = useState([]);
+    const [optionProtections, setOptionProtections] = useState(
+        props.protections.map((item) => ({ label: item.name, value: item.id }))
+    );
+    const [selectedProtections, setSelectedProtections] = useState([]);
+    const [optionTypeWorks, setOptionTypeWorks] = useState(
+        props.typeWorks.map((item) => ({ label: item.name, value: item.id }))
+    );
+    const [selectedTypeWorks, setSelectedTypeWorks] = useState([]);
+    const [optionTypeLocations, setOptionTypeLocations] = useState(
+        props.typeLocations.map((item) => ({
+            label: item.name,
+            value: item.id,
+        }))
+    );
+    const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
         let params = {
-            name: searchName,
-            "type_protections_ids[]": selectedTypeProtections.map(
+            "protection_ids[]": selectedProtections.map((item) => item.value),
+            "type_work_ids[]": selectedTypeWorks.map((item) => item.value),
+            "type_location_ids[]": selectedTypeLocations.map(
                 (item) => item.value
             ),
         };
         props.onClickFiltered(params);
     };
 
-    const handleSelect = (data) => {
-        setSelectedTypeProtections(data);
+    const handleSelectProtection = (data) => {
+        setSelectedProtections(data);
+    };
+
+    const handleSelectTypeWork = (data) => {
+        setSelectedTypeWorks(data);
+    };
+
+    const handleSelectTypeLocation = (data) => {
+        setSelectedTypeLocations(data);
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <div className="row">
                 <div className="col-md-4">
-                    <label>Система АСУТП</label>
+                    <label>Защиты</label>
                     <Select
-                        options={[]}
-                        placeholder="Выберите систему АСУТП"
-                        value={[]}
-                        onChange={handleSelect}
+                        options={optionProtections}
+                        placeholder="Выберите защиты"
+                        value={selectedProtections}
+                        onChange={handleSelectProtection}
+                        isMulti
+                        className=""
+                    ></Select>
+                </div>
+                <div className="col-md-4">
+                    <label>Виды работ</label>
+                    <Select
+                        options={optionTypeWorks}
+                        placeholder="Выберите виды работ"
+                        value={selectedTypeWorks}
+                        onChange={handleSelectTypeWork}
+                        isMulti
+                        className=""
+                    ></Select>
+                </div>
+                <div className="col-md-4">
+                    <label>Типы мест проведения работ</label>
+                    <Select
+                        options={optionTypeLocations}
+                        placeholder="Выберите типы мест проведения работ"
+                        value={selectedTypeLocations}
+                        onChange={handleSelectTypeLocation}
                         isMulti
                         className=""
                     ></Select>
@@ -271,8 +313,10 @@ function FilterButton(props) {
     } else if (props.name === "rules") {
         filterForm = (
             <FilterRules
-                typeProtections={props.typeProtections}
                 onClickFiltered={props.onClickFiltered}
+                protections={props.protections}
+                typeWorks={props.typeWorks}
+                typeLocations={props.typeLocations}
             ></FilterRules>
         );
     } else {

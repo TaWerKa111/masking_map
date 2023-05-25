@@ -4,6 +4,10 @@ import os
 import sys
 from typing import Type
 
+import yaml
+
+from common.helpers.settings import SettingField, BaseSetting
+
 CURRENT_FILE_PATH = os.path.abspath(__file__)
 BASE_DIR = os.path.dirname(CURRENT_FILE_PATH)
 LOGGING_CONF = BASE_DIR + "/logging.yaml"
@@ -50,6 +54,11 @@ class PostgresConfig(BaseSetting):
         "POSTGRES_TARGET_SESSION_ATTRS", default=""
     )
 
+
+class UrlData(BaseSetting):
+    VALIDATE_FILE = "http://app:5000/"
+
+
 class AppConfig(BaseSetting):
     # Postgres settings
     SECRET_KEY = "123"
@@ -61,3 +70,4 @@ class AppConfig(BaseSetting):
     SQLALCHEMY_DATABASE_URI = SqlAlchemyBuilder(PostgresConfig)
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     # SQLALCHEMY_ECHO = True
+    URLS = UrlData

@@ -50,8 +50,12 @@ from app.api.masking.helpers import (
     update_location,
     update_type_location,
     update_rel_location_location,
-    update_rel_location_protection, delete_dep, delete_type_work,
-    delete_protection, delete_type_protection, delete_location,
+    update_rel_location_protection,
+    delete_dep,
+    delete_type_work,
+    delete_protection,
+    delete_type_protection,
+    delete_location,
     delete_type_location,
 )
 
@@ -276,16 +280,15 @@ def delete_type_work_view():
     result = delete_type_work(type_work_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Удаление прошло успешно!",
-                "result": True
-            }
+            {"message": "Удаление прошло успешно!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/departament-type-work/", methods=["GET"])
@@ -494,16 +497,15 @@ def delete_departament_type_work_view():
     result = delete_dep(dep_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Удаление прошло успешно!",
-                "result": True
-            }
+            {"message": "Удаление прошло успешно!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/protection/", methods=["GET"])
@@ -534,7 +536,9 @@ def get_protection_view() -> tuple[dict, int]:
     """
     data = dict()
     data["name"] = request.args.get("name")
-    data["type_protections_ids[]"] = request.args.getlist("type_protections_ids[]")
+    data["type_protections_ids[]"] = request.args.getlist(
+        "type_protections_ids[]"
+    )
     data["limit"] = request.args.get("limit", 1000)
 
     try:
@@ -738,16 +742,15 @@ def delete_protection_view():
     result = delete_protection(protection_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Удаление прошло успешно!",
-                "result": True
-            }
+            {"message": "Удаление прошло успешно!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/type-protection/", methods=["GET"])
@@ -952,16 +955,15 @@ def delete_type_protection_view():
     result = delete_type_protection(type_protection_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Удаление прошло успешно!",
-                "result": True
-            }
+            {"message": "Удаление прошло успешно!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/location/", methods=["GET"])
@@ -1047,7 +1049,6 @@ def get_mn_location_list_view() -> tuple[dict, int]:
     data["parent_ids[]"] = request.args.getlist("parent_ids[]", None)
     data["limit"] = request.args.get("limit", 1000)
     current_app.logger.debug(f"mn objects data - {data}")
-
 
     try:
         locations = FilterParamLocationSchema().load(data)
@@ -1242,16 +1243,15 @@ def delete_location_view():
     result = delete_location(location_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Удаление прошло успешно!",
-                "result": True
-            }
+            {"message": "Удаление прошло успешно!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/type-location/", methods=["GET"])
@@ -1435,16 +1435,15 @@ def delete_type_location_view():
     result = delete_type_location(type_location_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Удаление прошло успешно!",
-                "result": True
-            }
+            {"message": "Удаление прошло успешно!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/relationship/location-location/", methods=["POST"])

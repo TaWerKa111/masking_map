@@ -17,6 +17,9 @@ export default function send_notify(message, type) {
             toast.success(message, settings);
             break;
         case "error":
+            if (!message) {
+                message = "Не удалось выполнить операцию. Попробуйте позже.";
+            }
             toast.error(message, settings);
             break;
 

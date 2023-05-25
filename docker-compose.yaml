@@ -12,7 +12,7 @@ services:
       - "5001:5000"
     volumes:
       - ./backend/app/:/transneft/application/
-      - ./backend/common/:/common/
+      - ./common/:/common/
       - masking_maps:/transneft/masking_maps/
     env_file:
       - ./.env.example

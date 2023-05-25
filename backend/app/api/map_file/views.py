@@ -216,7 +216,7 @@ def generate_masking_view():
 
     current_app.logger.debug(f"mask data - {data_for_masking}")
 
-    masking_uuid = check_generate_masking_plan(
+    masking_uuid, description = check_generate_masking_plan(
         locations=data_for_masking.get("locations"),
         type_works=data_for_masking.get("type_works"),
         questions=data_for_masking.get("questions"),
@@ -228,19 +228,20 @@ def generate_masking_view():
             MaskingResponseFileSchema().dump(
                 {
                     "message": "Возможно сделать карту маскирования!",
-                    "masking_uuid": masking_uuid.masking_uuid,
+                    "masking_uuid": masking_uuid,
                     "result": True,
-                    "description": masking_uuid.description,
+                    "description": description,
                 }
             ),
             http.HTTPStatus.OK,
         )
 
     return (
-        BinaryResponseSchema().dump(
+        MaskingResponseFileSchema().dump(
             {
                 "message": "Нет. Невозможно сделать карту маскирования!",
                 "result": False,
+                "description": description,
             }
         ),
         http.HTTPStatus.BAD_REQUEST,

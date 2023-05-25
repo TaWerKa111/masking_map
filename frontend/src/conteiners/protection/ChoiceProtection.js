@@ -99,49 +99,31 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
             <div className="row">
                 <div className="col-md">
                     <form onSubmit={handleSubmit}>
-                        {/* <p>
-                            Выбранная локация:{" "}
-                            {selectedItem ? selectedItem.name : ""}
-                        </p> */}
                         <p>Выбранные защиты:</p>
-                        <ul>
+                        <ul className="list-group">
                             {selectedProtections.map((item, index) => (
-                                <li key={index}>{item.name}</li>
+                                <li className="list-group-item" key={index}>
+                                    {item.name}
+                                </li>
                             ))}
                         </ul>
-                        {/* <button onClick="submit">Выбрать защиты</button> */}
                     </form>
                 </div>
             </div>
             <div className="row">
-                {/* <div className="col-md ">
-                    <h2>Локации</h2>
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchTextLocation}
-                        onChange={handleSearchTextLocationChange}
-                    />
-                    <div className="list-scroll-container">
-                        <ul className="list">
-                            {filteredListLocation.map((item, index) => (
-                                <div onClick={() => handleListItemClick(item)}>
-                                    {item.name}
-                                </div>
-                            ))}
-                        </ul>
-                    </div>
-                </div> */}
                 <div className="col-md ">
-                    <h2>Защиты</h2>
+                    <label htmlFor="exampleFormControlSelect1">
+                        Введите название защиты
+                    </label>
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Название защиты"
                         value={searchTextProtection}
                         onChange={handleSearchTextProtectionChange}
+                        className="form-control"
                     />
                     <div className="list-scroll-container">
-                        <ul className="list">
+                        <ul className="list-protection">
                             {filteredListProtection.map((item) => (
                                 <div>
                                     <input
@@ -154,8 +136,16 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
                                         onChange={(event) =>
                                             handleCheckboxChange(event, item)
                                         }
-                                    />
-                                    {item.name}
+                                        class="form-check-input"
+                                        value=""
+                                        id="flexCheckDefault"
+                                    ></input>
+                                    <label
+                                        class="form-check-label protection-label"
+                                        for="flexCheckDefault"
+                                    >
+                                        {item.name}
+                                    </label>
                                 </div>
                             ))}
                         </ul>

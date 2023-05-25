@@ -30,7 +30,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import uuid
 
-from config import AppConfig
 
 Base = declarative_base()
 
@@ -64,7 +63,7 @@ class TypeWork(Base):
         "Criteria",
         lazy="select",
         uselist=True,
-        back_populates="works",
+        back_populates="type_works",
         secondary="criteria_work_type"
     )
 
@@ -259,7 +258,7 @@ class Criteria(Base):
         back_populates="criteria",
         secondary="criteria_location_type"
     )
-    works = relationship(
+    type_works = relationship(
         "TypeWork",
         lazy="select",
         uselist=True,
@@ -385,3 +384,19 @@ class CriteriaQuestion(Base):
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
     id_question = Column(Integer, ForeignKey("question.id"))
     id_right_answer = Column(Integer)
+
+
+class TaskCheckMapFile(Base, TimestampsMixin):
+    __tablename__ = "task_check_map_file"
+
+    class StatusTask(enum.Enum):
+        pending = 10
+        in_process = 11
+        failed = 19
+        success = 20
+
+    id = Column(Integer, primary_key=True)
+    type_task = Column(String(255))
+    date_start = Column(DateTime)
+    status = Column(Integer, index=True)
+    attempts = Column(Integer, default=0)

@@ -24,7 +24,7 @@ export default function TypeWorksList() {
     function fetchTypeWorks() {
         let params = {
             limit: pageSize,
-            page: page
+            page: page,
         };
         apiInst
             .get("/masking/type-work/", { params })

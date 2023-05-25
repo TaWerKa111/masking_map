@@ -98,8 +98,6 @@ def check_generate_masking_plan(
     :return:
     """
 
-    # location = db.session().query(Location).get(location_id)
-
     criteria = (
         db.session.query(Criteria)
         .filter(
@@ -132,27 +130,24 @@ def check_generate_masking_plan(
     rules = (
         db.session.query(Rule)
         # .filter(Criteria.id.in_(cr_id_right))
-        .filter(Criteria.id.in_(criteria_ids)).all()
+        .filter(Criteria.id.in_(criteria_ids))
     )
-
+    rule_ids = [rule.id for rule in rules.all()]
     current_app.logger.debug(f"rules - {rules}")
     current_app.logger.debug(f"rules - {[rule.id for rule in rules]}")
 
     protections = (
         db.session.query(RuleProtection)
         .filter(
-            RuleProtection.id_rule.in_([rule.id for rule in rules]),
-            # Rule.is_test == is_test,
+            RuleProtection.id_rule.in_(rule_ids),
         )
         .all()
     )
 
     prot = (
-        db.session.query(Protection, RuleProtection)
-        .join(RuleProtection)
+        db.session.query(Protection)
         .filter(
             Protection.id.in_([p.id for p in protections]),
-            # Rule.is_test == is_test,
         )
         .all()
     )
@@ -160,12 +155,9 @@ def check_generate_masking_plan(
     current_app.logger.debug(
         f"protections relationship - {[p.id for p in protections]}"
     )
-    # current_app.logger.debug(f"prot - {[p.__dict__ for p in prot]}")
     current_app.logger.debug(f"prot - {prot}")
-    for protection, rel in prot:
-        current_app.logger.debug(
-            f"pr - {protection.id}, rel - {rel.is_need_masking}"
-        )
+
+    for protection in prot:
 
         masking_uuid = uuid.uuid4()
         masking_data = {
@@ -176,19 +168,26 @@ def check_generate_masking_plan(
             "protection_cspa": [
                 {
                     "name": protection.name,
-                    "is_no_demask": rel.is_need_demasking,
+                    # "is_no_demask": rel.is_need_demasking,
                 }
             ],
         }
-
+        description = "Маскирование нужно."
         masking_map = MaskingMapFile(
             description="",
             filename="",
             data_masking=masking_data,
             masking_uuid=masking_uuid,
+            is_test=is_test
         )
         db.session.add(masking_map)
         db.session.commit()
-        return masking_map
+        return masking_map, description
+    else:
+        description = (
+            f"Нет необходимости. "
+        )
 
-    return None
+    description = f"{description} Используемые правила: {' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
+
+    return None, description

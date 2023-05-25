@@ -11,6 +11,7 @@ export default function TypeWorkList({
     selectedWorks,
 }) {
     const [selectedItems, setSelectedItems] = useState(selectedWorks);
+    const [searchTextTypeWork, setSearchTextTypeWork] = useState("");
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -26,6 +27,13 @@ export default function TypeWorkList({
         }
     };
 
+    const filteredTypeWorks = typeWorkList.filter((item) =>
+        item.name.toLowerCase().includes(searchTextTypeWork.toLowerCase())
+    );
+    const handleSearchTextTypeWork = (event) => {
+        setSearchTextTypeWork(event.target.value);
+    };
+
     if (typeWorkList.length === 0) {
         return <h2>Нет видов работ! Попробуйте позже.</h2>;
     }
@@ -33,8 +41,17 @@ export default function TypeWorkList({
         <div className="row">
             <div className="col-md">
                 <form onSubmit={handleSubmit}>
+                    <div>
+                        <label>Введите тип работы:</label>
+                        <input
+                            onChange={handleSearchTextTypeWork}
+                            type="text"
+                            className="form-control"
+                            placeholder="Название типа работы"
+                        ></input>
+                    </div>
                     <ul className="">
-                        {typeWorkList.map((item) => (
+                        {filteredTypeWorks.map((item) => (
                             <div
                                 className="itemOfQuestions "
                                 onClick={(event) =>

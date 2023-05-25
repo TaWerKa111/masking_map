@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
 // import Modal from "../modal/ModalTypeWork";
@@ -35,10 +35,13 @@ export default function RuleInfo(props) {
     const [isModalCondition, setModalCondition] = useState(false);
     const [protections, setProtections] = useState(rule.protections);
     const [selectedTypeCriteria, setSelectedTypeCriteria] = useState({});
-    const [criteriaList, setCriteriaList] = useState(props.rule.criteria ? props.rule.criteria : []);
+    const [criteriaList, setCriteriaList] = useState(
+        props.rule.criteria ? props.rule.criteria : []
+    );
     const [selectedCriteriaEditindId, setSelectedCriteriaEditindId] =
         useState(null);
     const [isConfirmationOpen, setConfirmationOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         apiInst
@@ -215,15 +218,8 @@ export default function RuleInfo(props) {
         }));
 
         let newRule = {
-            // name: rule.name,
             compensatory_measures: rule.compensatory_measures,
-            // type_locations: selectedTypeLocations.map((type) => ({
-            //     id: type.value,
-            //     text: type.label,
-            // })),
             protections: rule.protections,
-            // type_works: rule.works,
-            // locations: rule.locations,
             criteria: criteria.map((criteria) => {
                 if (criteria.selected_type_criteria.value === "type_location") {
                     return {
@@ -232,13 +228,13 @@ export default function RuleInfo(props) {
                     };
                 } else return criteria;
             }),
-            // questions: rule.conditions,
         };
         console.log("newRule", newRule);
         apiInst
             .post("/rule/rule/", newRule)
             .then((resp) => {
                 if (resp.data.result) {
+                    navigate("/expert/rules/");
                     send_notify(resp.data.message, "success");
                 } else send_notify(resp.data.message, "error");
             })
@@ -252,7 +248,6 @@ export default function RuleInfo(props) {
         setSelectedCriteriaEditindId(criteria.id);
         console.log("criteria", criteria);
         if (!criteria.selected_type_criteria) return;
-        // console.log("Exist cri", criteria);
         switch (criteria.selected_type_criteria.value) {
             case "type_work":
                 console.log("type work exist");
@@ -262,7 +257,6 @@ export default function RuleInfo(props) {
                 setModalLocation(true);
                 break;
             case "type_location":
-                // setIsModalTypeLocation(true);
                 break;
             case "question":
                 setModalCondition(true);
@@ -310,7 +304,7 @@ export default function RuleInfo(props) {
                     ></Select>
                 );
             case "question":
-                console.log("que", criteria.questions)
+                console.log("que", criteria.questions);
                 return (
                     <div>
                         <p>Условия:</p>
@@ -318,15 +312,14 @@ export default function RuleInfo(props) {
                             {criteria.questions.map((condition) => (
                                 <p key={condition.id}>
                                     {condition.text}{" "}
-                                    {
-                                        condition.answers.find(
-                                            (answer) => answer.is_right === true
-                                        )
+                                    {condition.answers.find(
+                                        (answer) => answer.is_right === true
+                                    )
                                         ? condition.answers.find(
-                                            (answer) => answer.is_right === true
-                                        ).text
-                                        : ""
-                                    }
+                                              (answer) =>
+                                                  answer.is_right === true
+                                          ).text
+                                        : ""}
                                 </p>
                             ))}
                         </ul>
@@ -375,7 +368,9 @@ export default function RuleInfo(props) {
                                         <Select
                                             options={TYPES_CRITERIA_OPTIONS}
                                             placeholder="Выберите тип критерия"
-                                            value={criteria.selected_type_criteria}
+                                            value={
+                                                criteria.selected_type_criteria
+                                            }
                                             onChange={(d) =>
                                                 handleSelectCriteriaType(
                                                     d,

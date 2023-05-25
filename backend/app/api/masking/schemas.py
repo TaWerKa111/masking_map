@@ -95,9 +95,7 @@ class FilterParamTypeWorkSchema(Schema):
     name = fields.String(example="Work 1", allow_none=True)
     group_by = fields.String(example="dep", allow_none=True)
     departament_ids = fields.List(
-        fields.String(),
-        data_key="departament_ids[]",
-        allow_none=True
+        fields.String(), data_key="departament_ids[]", allow_none=True
     )
 
     @post_load
@@ -106,7 +104,7 @@ class FilterParamTypeWorkSchema(Schema):
             name=data.get("name"),
             type_location_ids=data.get("type_location_ids"),
             type_protection_ids=data.get("type_protection_ids"),
-            departament_ids=data.get("departament_ids")
+            departament_ids=data.get("departament_ids"),
         )
 
 
@@ -241,6 +239,7 @@ class LocationSchema(Schema):
             data["name"] = f"{data['name']} № {data['ind_location']}"
         return data
 
+
 class LocationListSchema(Schema):
     locations = fields.List(fields.Nested(LocationSchema()))
     pagination = fields.Nested(PaginationResponseSchema())
@@ -261,8 +260,11 @@ class FilterParamLocationSchema(PaginationSchema):
     )
     name = fields.String(example="example", allow_none=True)
     parent_ids = fields.List(
-        fields.String(allow_none=True), example=["1"],
-        allow_none=True, data_key="parent_ids[]")
+        fields.String(allow_none=True),
+        example=["1"],
+        allow_none=True,
+        data_key="parent_ids[]",
+    )
 
     @post_load
     def get_mn_object_list(self, data, **kwargs):
@@ -272,7 +274,7 @@ class FilterParamLocationSchema(PaginationSchema):
             type_location_ids=data.get("type_location_ids"),
             type_protection_ids=data.get("type_protection_ids"),
             parent_ids=data.get("parent_ids"),
-            limit=data.get("limit", 100000)
+            limit=data.get("limit", 100000),
         )
 
 

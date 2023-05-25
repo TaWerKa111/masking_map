@@ -278,3 +278,12 @@ border-radius: 0;
 .td-info {
     width: 25%;
 }
+
+.list-protection {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.protection-label {
+    margin-left: 10px;
+}

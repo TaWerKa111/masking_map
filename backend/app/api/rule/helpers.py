@@ -1,5 +1,6 @@
 from flask import current_app
 from flask_sqlalchemy import Pagination
+from sqlalchemy import or_
 
 from app import db
 from common.postgres.models import (
@@ -118,22 +119,9 @@ def add_new_rule(
         "Критерий типа локации", Criteria.TypeCriteria.type_location
     )
 
-    criteria_work.works.extend(type_works)
+    criteria_work.type_works.extend(type_works)
     criteria_location.locations.extend(locations)
     criteria_type_location.locations_type.extend(type_locations)
-
-    questions_list = []
-    right_answers = dict()
-
-    # for question_data in questions:
-    #     question = add_question(question_data.get("text"))
-    #     for answer_data in question_data.get("answers"):
-    #         answer = add_question_answer(
-    #             answer_data.get("text"), id_question=question.id
-    #         )
-    #         if answer_data.get("is_right_answer"):
-    #             right_answers[question.id] = answer.id
-    #     questions_list.append(question)
 
     rule.criteria.extend(
         [criteria_work, criteria_location, criteria_type_location]
@@ -147,7 +135,6 @@ def add_new_rule(
         qu_ans = CriteriaQuestion(
             id_question=question.get("id"),
             id_criteria=criteria_question.id,
-            # id_right_answer=right_answers[question.id]
             id_right_answer=question.get("right_answer_id"),
         )
         db.session.add(qu_ans)
@@ -212,7 +199,13 @@ def get_rule(rule_id: int) -> Rule:
 
 
 def filter_list_rule(
-    rules_ids: list[int], name: str, page: int = 1, limit: int = 1000
+    rules_ids: list[int],
+    name: str,
+    page: int = 1,
+    limit: int = 1000,
+    protection_ids: list[int] = None,
+    type_work_ids: list[int] = None,
+    type_location_ids: list[int] = None,
 ) -> Pagination:
     """
     Получить список правил с пагинацией
@@ -233,6 +226,24 @@ def filter_list_rule(
     if name:
         filter_name = f"%{name}%"
         query = query.filter(Rule.name.ilike(filter_name))
+
+    if type_location_ids:
+        query = query.join(
+            Criteria,
+        ).join(
+            CriteriaTypeLocation,
+            CriteriaTypeLocation.id_criteria == Criteria.id,
+        )
+        query = query.filter(
+            CriteriaTypeLocation.id_type_location.in_(type_location_ids)
+        )
+    if type_work_ids:
+        query = query.join(
+            Criteria,
+        ).join(CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id)
+        query = query.filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
+    if protection_ids:
+        query = query.filter(RuleProtection.id_protection.in_(protection_ids))
 
     result = query.paginate(page=page, per_page=limit, error_out=False)
     return result
@@ -274,14 +285,12 @@ def update_rule(
     if name_rule:
         rule.name = name_rule
 
-    criteria_work = add_criteria(
-        "Критерий работы", Criteria.TypeCriteria.type_work
-    )
+    criteria_work = add_criteria("Виды работ", Criteria.TypeCriteria.type_work)
     criteria_location = add_criteria(
-        "Критерий локации", Criteria.TypeCriteria.location
+        "Места проведения работ", Criteria.TypeCriteria.location
     )
     criteria_type_location = add_criteria(
-        "Критерий типа локации", Criteria.TypeCriteria.type_location
+        "Типы мест проведения работ", Criteria.TypeCriteria.type_location
     )
 
     criteria_work.works.append(type_work)
@@ -301,9 +310,7 @@ def update_rule(
     rule.criteria.extend(
         [criteria_work, criteria_location, criteria_type_location]
     )
-    criteria_question = add_criteria(
-        "Критерий вопросов", Criteria.TypeCriteria.question
-    )
+    criteria_question = add_criteria("Вопросы", Criteria.TypeCriteria.question)
 
     rule.criteria.append(criteria_question)
 
@@ -323,7 +330,12 @@ def update_rule(
 
 
 def filter_list_question(
-    questions_ids: list[int], text: str, page: int = 1, limit: int = 1000
+    questions_ids: list[int],
+    text: str,
+    page: int = 1,
+    limit: int = 1000,
+    type_work_ids=None,
+    location_ids=None,
 ):
     """
 
@@ -333,6 +345,7 @@ def filter_list_question(
     :param limit:
     :return:
     """
+    rule_ids = []
     query = db.session.query(Question)
 
     if questions_ids:
@@ -341,6 +354,37 @@ def filter_list_question(
         filter_text = f"%{text}%"
         query = query.filter(Question.text.ilike(filter_text))
 
+    if type_work_ids:
+        rules = (
+            db.session.query(Rule)
+            .join(Criteria)
+            .join(
+                CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id
+            )
+            .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
+        )
+
+        rule_ids.extend([rule.id for rule in rules.all()])
+
+    if location_ids:
+        rules = (
+            db.session.query(Rule)
+            .join(Criteria)
+            .join(
+                CriteriaLocation, CriteriaLocation.id_criteria == Criteria.id
+            )
+            .filter(CriteriaLocation.id_location.in_(location_ids))
+        )
+        rule_ids.extend([rule.id for rule in rules.all()])
+
+    if rule_ids:
+        rule_ids = list(set(rule_ids))
+        query = query.join(
+            CriteriaQuestion, CriteriaQuestion.id_question == Question.id
+        ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
+        query = query.filter(Criteria.rule_id.in_(rule_ids))
+
+    current_app.logger.info(f"qu - {query}")
     result = query.paginate(page=page, per_page=limit, error_out=False)
     return result
 
@@ -399,9 +443,7 @@ def update_question(question_id: int, text: str, answers: list[dict]):
 
 def delete_rule(rule_id):
     try:
-        rule = db.session.query(Rule).filter(
-            Rule.id == rule_id
-        ).first()
+        rule = db.session.query(Rule).filter(Rule.id == rule_id).first()
         db.session.delete(rule)
         db.session.commit()
         return True

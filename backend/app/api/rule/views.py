@@ -18,7 +18,8 @@ from app.api.rule.helpers import (
     add_question,
     add_question_answer,
     update_question,
-    get_locations_work_types_location_types, delete_rule,
+    get_locations_work_types_location_types,
+    delete_rule,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -124,9 +125,6 @@ def add_rule_view() -> tuple[dict, int]:
         type_work,
         type_location,
     ) = get_locations_work_types_location_types(
-        # location_ids=[loc["id"] for loc in rule.get("locations")],
-        # type_work_ids=[tw["id"] for tw in rule.get("type_works")],
-        # type_location_ids=[tl["id"] for tl in rule.get("type_locations")],
         location_ids=[loc["id"] for loc in locations],
         type_work_ids=[tw["id"] for tw in type_works],
         type_location_ids=[tl["id"] for tl in type_locations],
@@ -137,7 +135,6 @@ def add_rule_view() -> tuple[dict, int]:
         type_works=type_work,
         locations=location,
         type_locations=type_location,
-        # questions=rule.get("questions"),
         questions=questions,
         protections=rule.get("protections"),
         compensatory_measures=rule.get("compensatory_measures"),
@@ -225,6 +222,9 @@ def get_rules_view() -> tuple[dict, int]:
     data = dict()
     data["rule_ids[]"] = request.args.getlist("rule_ids[]")
     data["name"] = request.args.get("name")
+    data["type_location_ids[]"] = request.args.getlist("type_location_ids[]")
+    data["type_work_ids[]"] = request.args.getlist("type_work_ids[]")
+    data["protection_ids[]"] = request.args.getlist("protection_ids[]")
 
     try:
         valid_data = FilterRulesSchema().load(data)
@@ -239,11 +239,15 @@ def get_rules_view() -> tuple[dict, int]:
             http.HTTPStatus.BAD_REQUEST,
         )
 
+    current_app.logger.debug(f"data rules - {valid_data}")
     rules = filter_list_rule(
         rules_ids=valid_data.get("rule_ids"),
         name=valid_data.get("name"),
         page=valid_data.get("page"),
         limit=valid_data.get("limit"),
+        type_work_ids=valid_data.get("type_work_ids"),
+        protection_ids=valid_data.get("protection_ids"),
+        type_location_ids=valid_data.get("type_location_ids"),
     )
 
     rules_ser, pagination = serialize_paginate_object(rules)
@@ -360,16 +364,15 @@ def delete_rule_view():
     result = delete_rule(rule_id)
     if result:
         return BinaryResponseSchema().dump(
-            {
-                "message": "Правило успешно удалено!",
-                "result": True
-            }
+            {"message": "Правило успешно удалено!", "result": True}
         )
 
-    return BinaryResponseSchema().dump({
-        "message": "Не удалось удалить правило!",
-        "result": False
-    }), http.HTTPStatus.BAD_REQUEST
+    return (
+        BinaryResponseSchema().dump(
+            {"message": "Не удалось удалить правило!", "result": False}
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
 
 
 @bp.route("/questions/", methods=["GET"])
@@ -398,7 +401,11 @@ def get_questions_view() -> tuple[dict, int]:
         tags:
             - rule
     """
-    data = request.args.to_dict()
+    data = dict()
+    data["question_ids[]"] = request.args.getlist("question_ids[]")
+    data["text"] = request.args.get("text")
+    data["type_work_ids[]"] = request.args.getlist("type_work_ids[]")
+    data["location_ids[]"] = request.args.getlist("location_ids[]")
 
     try:
         valid_data = FilterQuestionsSchema().load(data)
@@ -412,16 +419,20 @@ def get_questions_view() -> tuple[dict, int]:
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
+    current_app.logger.debug(f"que params - {valid_data}")
 
     questions = filter_list_question(
         questions_ids=valid_data.get("questions_ids"),
         text=valid_data.get("text"),
         page=valid_data.get("page"),
         limit=valid_data.get("limit"),
+        type_work_ids=valid_data.get("type_work_ids"),
+        location_ids=valid_data.get("location_ids"),
     )
 
     questions_ser, pagination = serialize_paginate_object(questions)
     result = {"questions": questions_ser, "pagination": pagination}
+    current_app.logger.debug(f"qus - {result}")
     return QuestionListSchema().dump(result), http.HTTPStatus.OK
 
 

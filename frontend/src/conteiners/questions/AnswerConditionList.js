@@ -8,22 +8,18 @@ export default function AnswerConditionList({
     const [conditions, setConditions] = useState(selectedConditions);
 
     const handleChangeChekedAnswer = (event, answer_id, condition_id) => {
-        let temp = Object.assign([], conditions);
         setConditions(
-            temp.map((item) => {
+            conditions.map((item) => {
                 if (item.id === condition_id && item.answer_id !== answer_id) {
                     return {
                         ...item,
                         answer_id: answer_id,
                     };
                 }
-                return {
-                    ...item,
-                    answer_id: null,
-                };
+                return item;
             })
         );
-        console.log("temp", temp, answer_id);
+        console.log("conditions", conditions, answer_id);
     };
 
     const handleSubmit = (event) => {
@@ -34,16 +30,6 @@ export default function AnswerConditionList({
     return (
         <div className="container">
             <form onSubmit={handleSubmit}>
-                {/* <div className="row">
-                    <div className="col-md">
-                        <button
-                            type="submit"
-                            className="btn btn-primary .btn-full"
-                        >
-                            Применить
-                        </button>
-                    </div>
-                </div> */}
                 <div className="row">
                     <div className="col-md">
                         {conditions.length === 0 ? (
@@ -56,7 +42,7 @@ export default function AnswerConditionList({
                                     key={condition.id}
                                     className="form-check question"
                                 >
-                                    <p className="h4">{condition.text}?</p>
+                                    <p className="h4">{condition.text}</p>
                                     {condition.answers.map((answer) => (
                                         <div key={answer.id} className="answer">
                                             <label className="form-check-label">

@@ -8,6 +8,7 @@ import { apiInst } from "../../utils/axios";
 import MyPagination from "../../components/Pagination";
 import send_notify from "../../utils/toast";
 import TableRow from "../../components/tables/TableRow";
+import FilterButton from "../forms/FilterForm";
 
 export default function MaskingMaps() {
     const [maskingMaps, setMaskingMaps] = useState([
@@ -26,23 +27,36 @@ export default function MaskingMaps() {
     ]);
     const [pagination, setPagination] = useState({});
     const [page, setPage] = useState(1);
+    const [typeWorks, setTypeWorks] = useState([]);
+    const [typeLocations, setTypeLocations] = useState([]);
+    const [protections, setProtections] = useState([]);
 
     useEffect(() => {
         let params = {};
-        // apiInst
-        //     .get("/masking/type-work/", { params })
-        //     .then((resp) => {
-        //         setMaskingMaps(resp.data.type_works);
-        //         setPagination(resp.data.pagination);
-        //         setPage(pagination.page);
-        //     })
-        //     .catch((e) => console.log(e));
-        // apiInst
-        //     .get("/files/get-files/", { params })
-        //     .then((resp) => {
-        //         setMaskingMaps(resp.data.files);
-        //     })
-        //     .catch((e) => console.log(e));
+        apiInst
+            .get("/files/get-files/", { params })
+            .then((resp) => {
+                setMaskingMaps(resp.data.files);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/type-work/")
+            .then((resp) => {
+                setTypeWorks(resp.data.type_works);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/protection/")
+            .then((resp) => {
+                setProtections(resp.data.protections);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/type-location/")
+            .then((resp) => {
+                setTypeLocations(resp.data);
+            })
+            .catch((e) => console.log(e));
     }, []);
 
     const onClick = (el, mapUuid) => {
@@ -73,6 +87,23 @@ export default function MaskingMaps() {
         setPage(page);
     };
 
+    const handleFiltered = (params) => {
+        console.log("fitering masking-maps...", params);
+        apiInst
+            .get("/files/get-files/", { params })
+            .then((resp) => {
+                setMaskingMaps(resp.data.files);
+                send_notify(
+                    "Список отфильтрован." +
+                        `\nНайдено карт: ${resp.data.pagination.total_items}`,
+                    "success"
+                );
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    };
+
     return (
         <div className="container">
             <div className="row">
@@ -82,6 +113,13 @@ export default function MaskingMaps() {
                     </p>
                 </div>
             </div>
+            <FilterButton
+                onClickFiltered={handleFiltered}
+                name="rules"
+                typeLocations={typeLocations}
+                protections={protections}
+                typeWorks={typeWorks}
+            ></FilterButton>
             <div className="row">
                 <div className="col-md">
                     <ul className="d-flex justify-content-end list-group">

@@ -77,7 +77,7 @@ export default function QuestionInfo({
                 <div className="col-md-12">
                     <form onSubmit={handleSubmit}>
                         <button type="submit" className="btn btn-primary">
-                            Добавить
+                            Применить
                         </button>
                         <div className="form-group">
                             <label htmlFor="name">Название</label>
@@ -125,6 +125,7 @@ export default function QuestionInfo({
                                                 }
                                             ></input>
                                             <button
+                                                type="button"
                                                 className="btn btn-danger"
                                                 onClick={() =>
                                                     OnDeleteAnswer(answer)

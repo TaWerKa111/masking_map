@@ -24,11 +24,25 @@ export default function MaskingMap() {
     const [styleBtn, setStyleBtn] = useState({
         display: "block",
     });
+    const [isTest, setIsTest] = useState(false);
 
     // const [selectedConditions, setSelectedConditions] = useState([]);
-    const fetchQuestions = () => {
+    const fetchQuestions = (type_works = null, location_list = null) => {
+        let tw = null;
+        let loc = null;
+        if (type_works) {
+            tw = type_works.map((typeWork) => typeWork.id);
+        }
+        if (location_list) {
+            loc = location_list.map((location) => location.id);
+        }
+        let params = {
+            "type_work_ids[]": tw,
+            "location_ids[]": loc,
+        };
+        console.log("questions params", params);
         apiInst
-            .get("/rule/questions/")
+            .get("/rule/questions/", { params })
             .then((resp) => {
                 setConditions(resp.data.questions);
             })
@@ -38,21 +52,31 @@ export default function MaskingMap() {
     };
 
     useEffect(() => {
-        fetchQuestions();
+        // fetchQuestions();
     }, []);
 
     const handleTypeWorks = (selectedTypeWorks) => {
         console.log("type_works", typeWorks);
         setModalTypeWork(false);
         setTypeWorks(selectedTypeWorks);
-        fetchQuestions();
+        fetchQuestions(selectedTypeWorks);
     };
 
     const handleLocations = (locations) => {
         console.log("locations", locations);
         setModalLocation(false);
-        setLocations(locations.map((location) => ({name: location.label, id: location.value})));
-        fetchQuestions();
+        setLocations(
+            locations.map((location) => ({
+                name: location.label,
+                id: location.value,
+            }))
+        );
+        fetchQuestions(
+            locations.map((location) => ({
+                name: location.label,
+                id: location.value,
+            }))
+        );
     };
 
     const handleConditions = (selectedConditions) => {
@@ -102,11 +126,12 @@ export default function MaskingMap() {
     };
 
     const handleGenerateMap = () => {
-        setResultGenerating({});
+        // setResultGenerating({});
         let generateMapData = {
             locations: locations,
             type_works: typeWorks,
             questions: conditions,
+            is_test: isTest,
         };
         console.log("generateMapData", generateMapData);
         apiInst
@@ -123,12 +148,11 @@ export default function MaskingMap() {
             .catch((err) => {
                 console.log(err);
                 send_toast("Не удалось сформировать карту!", "error");
+                setResultGenerating(err.response.data);
             });
-        setStyleBtn({
-            display: "none",
-        });
     };
 
+    console.log("result", resultGenerating);
     return (
         <div className="container">
             <div className="row">
@@ -246,13 +270,36 @@ export default function MaskingMap() {
                     </tr>
                 </table>
             </div>
+            <div className="row">
+                <div className="col-md">
+                    <div class="form-check form-switch">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="flexSwitchCheckDefault"
+                            checked={isTest}
+                            onChange={(e) => setIsTest(e.target.checked)}
+                        />
+                        <label
+                            class="form-check-label"
+                            for="flexSwitchCheckDefault"
+                        >
+                            Тестовый запрос
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {resultGenerating.description ? (
+                <div className="row">
+                    <div className="col-md">
+                        <div>{resultGenerating.description}</div>
+                    </div>
+                </div>
+            ) : (
+                <> </>
+            )}
             {resultGenerating.result ? (
                 <div>
-                    <div className="row">
-                        <div className="col-md">
-                            <div>{resultGenerating.description}</div>
-                        </div>
-                    </div>
                     <div className="row">
                         <div className="col-md">
                             <iframe

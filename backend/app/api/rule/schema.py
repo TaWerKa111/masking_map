@@ -56,7 +56,7 @@ class CriteriaSchema(Schema):
     name = fields.String()
     type_criteria = fields.Method("get_criteria_type")
     locations = fields.List(fields.Nested(LocationSchema()))
-    works = fields.List(fields.Nested(WorkSchema()))
+    type_works = fields.List(fields.Nested(WorkSchema()))
     locations_type = fields.List(fields.Nested(LocationTypeSchema()))
     questions = fields.List(fields.Nested(QuestionSchema()))
 
@@ -64,10 +64,10 @@ class CriteriaSchema(Schema):
         return obj.type_criteria.value
 
 
-class QuestionSchema(Schema):
-    id = fields.Integer()
-    text = fields.String()
-    answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+# class QuestionSchema(Schema):
+#     id = fields.Integer()
+#     text = fields.String()
+#     answers = fields.List(fields.Nested(QuestionAnswerSchema()))
 
 
 class QuestionListSchema(Schema):
@@ -80,8 +80,16 @@ class GetQuestionSchema(Schema):
 
 
 class FilterQuestionsSchema(PaginationSchema):
-    question_ids = fields.List(fields.Integer(), data_key="question_ids[]")
-    text = fields.String()
+    question_ids = fields.List(
+        fields.Integer(), data_key="question_ids[]", allow_none=True
+    )
+    text = fields.String(allow_none=True)
+    type_work_ids = fields.List(
+        fields.Integer, data_key="type_work_ids[]", allow_none=True
+    )
+    location_ids = fields.List(
+        fields.Integer, data_key="location_ids[]", allow_none=True
+    )
 
 
 class AddQuestionSchema(Schema):
@@ -163,3 +171,8 @@ class GetRuleSchema(Schema):
 class FilterRulesSchema(PaginationSchema):
     rule_ids = fields.List(fields.Integer(), data_key="rule_ids[]")
     name = fields.String(allow_none=True)
+    protection_ids = fields.List(fields.Integer(), data_key="protection_ids[]")
+    type_work_ids = fields.List(fields.Integer(), data_key="type_work_ids[]")
+    type_location_ids = fields.List(
+        fields.Integer(), data_key="type_location_ids[]"
+    )

@@ -14,6 +14,9 @@ const URL = "http:localhost:5001/api/masking/get-file/";
 export default function Rules() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [rules, setRules] = useState(null);
+    const [typeWorks, setTypeWorks] = useState([]);
+    const [typeLocations, setTypeLocations] = useState([]);
+    const [protections, setProtections] = useState([]);
     const navigate = useNavigate();
 
     const fetchRules = () => {
@@ -28,6 +31,24 @@ export default function Rules() {
 
     useEffect(() => {
         fetchRules();
+        apiInst
+            .get("/masking/type-work/")
+            .then((resp) => {
+                setTypeWorks(resp.data.type_works);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/protection/")
+            .then((resp) => {
+                setProtections(resp.data.protections);
+            })
+            .catch((e) => console.log(e));
+        apiInst
+            .get("/masking/type-location/")
+            .then((resp) => {
+                setTypeLocations(resp.data);
+            })
+            .catch((e) => console.log(e));
     }, []);
 
     const onClick = (event, key) => {
@@ -78,11 +99,26 @@ export default function Rules() {
                 search: `?${createSearchParams(params)}`,
                 // state: { rule_id: key },
             });
-        }
-        else
-            navigate("/expert/add-rule/");
+        } else navigate("/expert/add-rule/");
     };
     console.log("rules", rules);
+
+    const handleFiltered = (params) => {
+        console.log("fitering type-works...", params);
+        apiInst
+            .get("/rule/rules/", { params })
+            .then((resp) => {
+                setRules(resp.data.rules);
+                send_notify(
+                    "Список отфильтрован." +
+                        `\nНайдено правил: ${resp.data.pagination.total_items}`,
+                    "success"
+                );
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    };
 
     return (
         <div className="container-fluid">
@@ -101,9 +137,11 @@ export default function Rules() {
                 </div>
             </div>
             <FilterButton
-                // onClickFiltered={handleFiltered}
+                onClickFiltered={handleFiltered}
                 name="rules"
-                // departaments={departments}
+                typeLocations={typeLocations}
+                protections={protections}
+                typeWorks={typeWorks}
             ></FilterButton>
             <div className="row">
                 <div className="col-md">
@@ -137,70 +175,68 @@ export default function Rules() {
                                                     item.type_criteria ===
                                                     "type_work"
                                             )
-                                            .works.map((item) => item.name)}
+                                            .type_works.map(
+                                                (item) => item.name
+                                            )}
                                     </td>
                                     <td>
                                         <label>Места проведения работ</label>
                                         <ul>
-                                            {rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "location"
-                                                )
-                                                .locations.length > 0
+                                            {rule.criteria.find(
+                                                (item) =>
+                                                    item.type_criteria ===
+                                                    "location"
+                                            ).locations.length > 0
                                                 ? rule.criteria
-                                                    .find(
-                                                        (item) =>
-                                                            item.type_criteria ===
-                                                            "location"
-                                                    )
-                                                    .locations.map((item) => (
-                                                        <li>{item.name}</li>
-                                                    ))
-                                                : "Не задано"
-                                            }
+                                                      .find(
+                                                          (item) =>
+                                                              item.type_criteria ===
+                                                              "location"
+                                                      )
+                                                      .locations.map((item) => (
+                                                          <li>{item.name}</li>
+                                                      ))
+                                                : "Не задано"}
                                         </ul>
                                         <label>Типы локаций</label>
                                         <ul>
-                                            {rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "type_location"
-                                                )
-                                                .locations_type.length > 0
-                                                ?rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "type_location"
-                                                )
-                                                .locations_type.map((item) => (
-                                                    <li>{item.name}</li>
-                                                ))
-                                                : "Не задано"
-                                                }
+                                            {rule.criteria.find(
+                                                (item) =>
+                                                    item.type_criteria ===
+                                                    "type_location"
+                                            ).locations_type.length > 0
+                                                ? rule.criteria
+                                                      .find(
+                                                          (item) =>
+                                                              item.type_criteria ===
+                                                              "type_location"
+                                                      )
+                                                      .locations_type.map(
+                                                          (item) => (
+                                                              <li>
+                                                                  {item.name}
+                                                              </li>
+                                                          )
+                                                      )
+                                                : "Не задано"}
                                         </ul>
                                         <label>Условия</label>
                                         <ul>
-                                            {rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "question"
-                                                )
-                                                .questions.length > 0
-                                                ?rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "question"
-                                                )
-                                                .questions.map((item) => (
-                                                    <li>{item.text}</li>
-                                                ))
-                                                : "Не задано" }
+                                            {rule.criteria.find(
+                                                (item) =>
+                                                    item.type_criteria ===
+                                                    "question"
+                                            ).questions.length > 0
+                                                ? rule.criteria
+                                                      .find(
+                                                          (item) =>
+                                                              item.type_criteria ===
+                                                              "question"
+                                                      )
+                                                      .questions.map((item) => (
+                                                          <li>{item.text}</li>
+                                                      ))
+                                                : "Не задано"}
                                         </ul>
                                     </td>
                                     {/* <td>
@@ -238,9 +274,9 @@ export default function Rules() {
                                         </td> */}
                                     <td className="td-info">
                                         <ul>
-                                        {rule.protections.map(
-                                            (item) => <li>{item.name}</li>
-                                        )}
+                                            {rule.protections.map((item) => (
+                                                <li>{item.name}</li>
+                                            ))}
                                         </ul>
                                     </td>
                                     <td className="td-info">
