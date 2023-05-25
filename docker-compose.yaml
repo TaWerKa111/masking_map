@@ -11,7 +11,7 @@ services:
     ports:
       - "5001:5000"
     volumes:
-      - ./backend/app/:/transneft/application/
+      - ./backend/app/:/transneft/app/
       - ./common/:/common/
       - masking_maps:/transneft/masking_maps/
     env_file:
@@ -19,16 +19,16 @@ services:
     depends_on:
       - db
 
-#  client:
-#    build:
-#      context: ./frontend
-#      dockerfile: Dockerfile
-#    ports:
-#      - '3000:80'
-##    links:
-##      - api
-#    depends_on:
-#      - app
+  # client:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3000:80'
+  #   links:
+  #     - app
+  #   depends_on:
+  #     - app
 
   # The DataBase
   db:
@@ -40,9 +40,9 @@ services:
     restart: unless-stopped
     ports:
       - "5432:5432"
-    # volumes:
-    #   - app_postgres:/var/lib/postgresql/data
+    volumes:
+      - app_postgres:/var/lib/postgresql/data
 
 volumes:
-  # app_postgres:
+  app_postgres:
   masking_maps:

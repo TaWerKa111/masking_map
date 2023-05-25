@@ -119,9 +119,18 @@ def add_new_rule(
         "Критерий типа локации", Criteria.TypeCriteria.type_location
     )
 
-    criteria_work.type_works.extend(type_works)
-    criteria_location.locations.extend(locations)
-    criteria_type_location.locations_type.extend(type_locations)
+    if type_works:
+        criteria_work.type_works.extend(type_works)
+    else:
+        criteria_work.is_any = True
+    if type_works:
+        criteria_location.locations.extend(locations)
+    else:
+        criteria_location.is_any = True
+    if type_works:
+        criteria_type_location.locations_type.extend(type_locations)
+    else:
+        criteria_type_location.is_any = True
 
     rule.criteria.extend(
         [criteria_work, criteria_location, criteria_type_location]
@@ -384,9 +393,68 @@ def filter_list_question(
         ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
         query = query.filter(Criteria.rule_id.in_(rule_ids))
 
+
     current_app.logger.info(f"qu - {query}")
     result = query.paginate(page=page, per_page=limit, error_out=False)
     return result
+
+
+def get_filter_questions_for_gen_map(
+    type_work_ids=None,
+    location_ids=None,
+):
+    """
+    Получение отфильтрованного списка вопросов по правилам, 
+    в которые входят работы и локации.
+    На выходе выдается список вопросов, отфильтрованных по важности,
+    т.е. те которые чаще всего встречаются.
+
+    """
+    
+    rule_ids = []
+    query = db.session.query(Question, CriteriaQuestion)
+
+    if type_work_ids:
+        rules = (
+            db.session.query(Rule)
+            .join(Criteria)
+            .join(
+                CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id
+            )
+            .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
+        )
+
+        rule_ids.extend([rule.id for rule in rules.all()])
+
+    if location_ids:
+        rules = (
+            db.session.query(Rule)
+            .join(Criteria)
+            .join(
+                CriteriaLocation, CriteriaLocation.id_criteria == Criteria.id
+            )
+            .filter(CriteriaLocation.id_location.in_(location_ids))
+        )
+        rule_ids.extend([rule.id for rule in rules.all()])
+
+    if rule_ids:
+        rule_ids = list(set(rule_ids))
+        query = query.join(
+            CriteriaQuestion, CriteriaQuestion.id_question == Question.id
+        ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria).group_by(Criteria.rule_id)
+        query = query.filter(Criteria.rule_id.in_(rule_ids))
+
+    # questions = query.all()
+    questions = list()
+    for question, cr_que in query.all():
+        questions.append({
+            "id": question.id,
+            "text": question.text,
+            "answers": question.answers,
+            "id_right_answer": cr_que.id_right_answer
+        })
+
+    return questions
 
 
 def get_question(question_id: int) -> Question:

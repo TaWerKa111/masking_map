@@ -242,6 +242,7 @@ class Criteria(Base):
     type_criteria = Column(
         Enum(TypeCriteria, values_callable=lambda obj: [x.value for x in obj]))
     rule_id = Column(Integer, ForeignKey("rule.id", ondelete='SET NULL'))
+    is_any = Column(Boolean, default=True)
 
     # relationships
     locations = relationship(

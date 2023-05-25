@@ -141,9 +141,9 @@ export default function MaskingMap() {
                 setMapUuid(resp.data.masking_uuid);
                 fetchPdfDocument(resp.data.masking_uuid);
                 send_toast("Карта сформирована!", "success");
-                setStyleBtn({
-                    display: "none",
-                });
+                // setStyleBtn({
+                //     display: "none",
+                // });
             })
             .catch((err) => {
                 console.log(err);

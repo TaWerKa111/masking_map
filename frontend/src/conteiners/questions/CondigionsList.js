@@ -46,10 +46,11 @@ export default function CondigionsList({ handleClickAdd, selectedConditions }) {
     };
 
     const handleChangeChekedAnswer = (event, que_id, id) => {
+        console.log("question", que_id, "ans", id);
         setSelectedQuestions(
             selectedQuestion.map((question) => {
-                if (question.id === que_id) {
-                    console.log(question);
+                if (question.value === que_id) {
+                    console.log("question", question);
                     question.answers = question.answers
                         .map((ans) =>
                             ans.id === id
@@ -118,7 +119,7 @@ export default function CondigionsList({ handleClickAdd, selectedConditions }) {
                                                                 onChange={(e) =>
                                                                     handleChangeChekedAnswer(
                                                                         e,
-                                                                        question.id,
+                                                                        question.value,
                                                                         answer.id
                                                                     )
                                                                 }

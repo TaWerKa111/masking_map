@@ -4,7 +4,7 @@ import uuid
 
 from flask import render_template, current_app
 from flask_sqlalchemy import Pagination
-from sqlalchemy import desc
+from sqlalchemy import and_, desc, or_
 
 from app import db
 from common.postgres.models import (
@@ -100,18 +100,59 @@ def check_generate_masking_plan(
 
     criteria = (
         db.session.query(Criteria)
+        .outerjoin(CriteriaTypeWork, Criteria.id == CriteriaTypeWork.id_criteria)
         .filter(
-            CriteriaTypeWork.id_type_work.in_(
-                [type_work["id"] for type_work in type_works]
-            ),
-            # CriteriaTypeLocation.id_type_location.in_([type_location["id_type"] for type_location in locations]),
-            CriteriaLocation.id_location.in_(
-                [location["id"] for location in locations]
-            ),
-            # CriteriaQuestion.id_question.in_([question["id"] for question in questions]),
+            or_(
+                CriteriaTypeWork.id_type_work.in_(
+                    [type_work["id"] for type_work in type_works]
+                ),
+                and_(
+                    Criteria.type_criteria == Criteria.TypeCriteria.type_work,
+                    Criteria.is_any.is_(True),
+                )
+            )
         )
         .all()
     )
+
+    rules_tw = (
+        db.session.query(Rule)
+        .join(Criteria, Criteria.rule_id == Rule.id)
+        .filter(
+            Criteria.id.in_([cr.id for cr in criteria]),
+        )
+        .all()
+    )
+
+    current_app.logger.debug(f"rule type work - {rules_tw}")
+    criteria_location = (
+        db.session.query(Criteria)
+        .outerjoin(CriteriaLocation, Criteria.id == CriteriaLocation.id_criteria)
+        .filter(
+            or_(
+                CriteriaLocation.id_location.in_(
+                    [loc["id"] for loc in locations]
+                ),
+                Criteria.is_any == True
+            ),
+        )
+        .all()
+    )
+
+    rules = (
+        db.session.query(Rule)
+        .join(Criteria, Criteria.rule_id == Rule.id)
+        .filter(
+            Criteria.id.in_([cr.id for cr in criteria_location]),
+        )
+        .filter(
+            Rule.id.in_([rl.id for rl in rules_tw]),
+        )
+        .all()
+    )
+
+    current_app.logger.debug(f"cr location - {criteria_location}")
+    current_app.logger.debug(f"rule type work and loc - {[r.id for r in rules]}")
 
     criteria_question: list[CriteriaQuestion] = db.session.query(
         CriteriaQuestion
@@ -132,6 +173,7 @@ def check_generate_masking_plan(
         # .filter(Criteria.id.in_(cr_id_right))
         .filter(Criteria.id.in_(criteria_ids))
     )
+
     rule_ids = [rule.id for rule in rules.all()]
     current_app.logger.debug(f"rules - {rules}")
     current_app.logger.debug(f"rules - {[rule.id for rule in rules]}")
@@ -168,7 +210,6 @@ def check_generate_masking_plan(
             "protection_cspa": [
                 {
                     "name": protection.name,
-                    # "is_no_demask": rel.is_need_demasking,
                 }
             ],
         }

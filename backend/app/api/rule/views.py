@@ -10,6 +10,7 @@ from app.api.helpers.schemas import BinaryResponseSchema
 from app.api.helpers.utils import serialize_paginate_object
 from app.api.rule.helpers import (
     add_new_rule,
+    get_filter_questions_for_gen_map,
     get_rule,
     filter_list_rule,
     update_rule,
@@ -434,6 +435,58 @@ def get_questions_view() -> tuple[dict, int]:
     result = {"questions": questions_ser, "pagination": pagination}
     current_app.logger.debug(f"qus - {result}")
     return QuestionListSchema().dump(result), http.HTTPStatus.OK
+
+
+@bp.route("/filter-question-rule/", methods=["GET"])
+def get_filter_question_rule_view() -> tuple[dict, int]:
+    """
+    
+    :return:
+    ---
+    get:
+        summary: Получить список вопросов для уточнения маскирования защит
+        description: Получить список вопросов для уточнения маскирования защит
+        parameters:
+            -   in: query
+                schema: FilterQuestionsSchema
+        responses:
+            '200':
+                description:
+                content:
+                    application/json:
+                        schema: QuestionListSchema
+            '400':
+                description: Ошибка при выполнении запроса
+                content:
+                    application/json:
+                        schema: BinaryResponseSchema
+        tags:
+            - rule
+    """
+    data = dict()
+    data["type_work_ids[]"] = request.args.getlist("type_work_ids[]")
+    data["location_ids[]"] = request.args.getlist("location_ids[]")
+
+    try:
+        valid_data = FilterQuestionsSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(
+            f"Ошибка при валидации данных для схемы. {err}"
+        )
+        return (
+            BinaryResponseSchema().dump(
+                {"message": f"Ошибка валидации. {err}", "result": False}
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+    current_app.logger.debug(f"que params - {valid_data}")
+
+    questions = get_filter_questions_for_gen_map(
+        type_work_ids=valid_data.get("type_work_ids"),
+        location_ids=valid_data.get("location_ids"),
+    )
+    current_app.logger.debug(f"qus - {questions}")
+    return QuestionListSchema().dump(questions), http.HTTPStatus.OK
 
 
 @bp.route("/question/", methods=["GET"])
