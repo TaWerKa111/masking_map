@@ -49,6 +49,7 @@ class QuestionSchema(Schema):
     id = fields.Integer()
     text = fields.String()
     answers = fields.List(fields.Nested(QuestionAnswerSchema()))
+    id_right_answer = fields.Integer(allow_none=True)
 
 
 class CriteriaSchema(Schema):

@@ -121,14 +121,17 @@ def add_new_rule(
 
     if type_works:
         criteria_work.type_works.extend(type_works)
+        criteria_work.is_any = False
     else:
         criteria_work.is_any = True
-    if type_works:
+    if locations:
         criteria_location.locations.extend(locations)
+        criteria_location.is_any = False
     else:
         criteria_location.is_any = True
-    if type_works:
+    if type_locations:
         criteria_type_location.locations_type.extend(type_locations)
+        criteria_type_location.is_any = False
     else:
         criteria_type_location.is_any = True
 
@@ -410,8 +413,11 @@ def get_filter_questions_for_gen_map(
     т.е. те которые чаще всего встречаются.
 
     """
-    
+    def append_to_tree():
+        pass
+
     rule_ids = []
+    rules_questions = dict()
     query = db.session.query(Question, CriteriaQuestion)
 
     if type_work_ids:
@@ -439,20 +445,30 @@ def get_filter_questions_for_gen_map(
 
     if rule_ids:
         rule_ids = list(set(rule_ids))
-        query = query.join(
-            CriteriaQuestion, CriteriaQuestion.id_question == Question.id
-        ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria).group_by(Criteria.rule_id)
-        query = query.filter(Criteria.rule_id.in_(rule_ids))
+        for rule_id in rule_ids:
+            temp_query = query.join(
+                CriteriaQuestion, CriteriaQuestion.id_question == Question.id
+            ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
+            data_question = temp_query.filter(Criteria.rule_id == rule_id).all()
+            rules_questions.setdefault(rule_id, data_question)
+        # query = query.join(
+        #     CriteriaQuestion, CriteriaQuestion.id_question == Question.id
+        # ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
+        # query = query.filter(Criteria.rule_id.in_(rule_ids))
 
     # questions = query.all()
     questions = list()
-    for question, cr_que in query.all():
-        questions.append({
-            "id": question.id,
-            "text": question.text,
-            "answers": question.answers,
-            "id_right_answer": cr_que.id_right_answer
-        })
+
+    for rule_id in rules_questions:
+        # for question, cr_que in query.all():
+        for question, cr_que in rules_questions.get(rule_id):
+            questions.append({
+                "id": question.id,
+                "text": question.text,
+                "answers": question.answers,
+                "id_right_answer": cr_que.id_right_answer,
+                "rule_id": rule_id
+            })
 
     return questions
 

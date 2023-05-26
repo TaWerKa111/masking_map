@@ -108,7 +108,7 @@ def get_html_view() -> Response or tuple[dict, int]:
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
-
+    current_app.logger.debug(f"masking_uuid - {masking_uuid}")
     map_html_data = render_masking_map(masking_uuid)
 
     return Response(

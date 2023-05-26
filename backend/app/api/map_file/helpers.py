@@ -1,6 +1,8 @@
 import datetime
 import os
 import uuid
+from itertools import groupby
+from operator import attrgetter
 
 from flask import render_template, current_app
 from flask_sqlalchemy import Pagination
@@ -91,14 +93,11 @@ def check_generate_masking_plan(
 ) -> uuid.UUID or None:
     """
     Проверка возможности сгенерировать карту для заданных критериев
-    :param location_id: int,
-        идентификатор локации
-    :param type_work_id: int,
-        идентификатор типа работы
+
     :return:
     """
 
-    criteria = (
+    tw_criteria = (
         db.session.query(Criteria)
         .outerjoin(CriteriaTypeWork, Criteria.id == CriteriaTypeWork.id_criteria)
         .filter(
@@ -112,14 +111,15 @@ def check_generate_masking_plan(
                 )
             )
         )
-        .all()
-    )
 
+    )
+    current_app.logger.debug(f"tw cr query - {tw_criteria}")
+    tw_criteria = tw_criteria.all()
     rules_tw = (
         db.session.query(Rule)
         .join(Criteria, Criteria.rule_id == Rule.id)
         .filter(
-            Criteria.id.in_([cr.id for cr in criteria]),
+            Criteria.id.in_([cr.id for cr in tw_criteria]),
         )
         .all()
     )
@@ -133,7 +133,10 @@ def check_generate_masking_plan(
                 CriteriaLocation.id_location.in_(
                     [loc["id"] for loc in locations]
                 ),
-                Criteria.is_any == True
+                and_(
+                    Criteria.type_criteria == Criteria.TypeCriteria.location,
+                    Criteria.is_any.is_(True),
+                )
             ),
         )
         .all()
@@ -153,43 +156,40 @@ def check_generate_masking_plan(
 
     current_app.logger.debug(f"cr location - {criteria_location}")
     current_app.logger.debug(f"rule type work and loc - {[r.id for r in rules]}")
+    rule_ids = [rule.id for rule in rules]
 
-    criteria_question: list[CriteriaQuestion] = db.session.query(
-        CriteriaQuestion
-    ).filter(CriteriaQuestion.id_criteria.in_([cr.id for cr in criteria]))
+    rule_questions = dict()
+    for rule_id in rule_ids:
+        criteria_question: list[CriteriaQuestion] = (
+            db.session.query(CriteriaQuestion)
+            .join(Criteria)
+            .filter(Criteria.rule_id == rule_id)
+            .all()
+        )
+        rule_questions.setdefault(rule_id, criteria_question)
 
-    answers_d = {int(q.get("id")): q.get("answer_id") for q in questions}
-    # cr_id_right = []
-    # for cr_qu in criteria_question:
-    #     if answers_d.get(cr_qu.id) and answers_d[cr_qu.id] == cr_qu.id_right_answer:
-    #         cr_id_right.append(cr_qu.id_criteria)
+    current_app.logger.debug(f"rule questions - {rule_questions}")
 
-    criteria_ids = [cr.id for cr in criteria]
-    current_app.logger.debug(f"criteria_ids - {criteria_ids}")
-    current_app.logger.debug(f"criteria - {criteria}")
-
-    rules = (
-        db.session.query(Rule)
-        # .filter(Criteria.id.in_(cr_id_right))
-        .filter(Criteria.id.in_(criteria_ids))
-    )
-
-    rule_ids = [rule.id for rule in rules.all()]
-    current_app.logger.debug(f"rules - {rules}")
-    current_app.logger.debug(f"rules - {[rule.id for rule in rules]}")
-
+    rule_right_ids = []
+    if rule_questions:
+        answers_d = {int(q.get("id")): q.get("answer_id") for q in questions}
+        current_app.logger.debug(f"answers_d - {answers_d}")
+        for rule_id in rule_questions:
+            for cr_qu in rule_questions.get(rule_id, []):
+                if (
+                    answers_d[cr_qu.id_question] != cr_qu.id_right_answer
+                ):
+                    break
+            else:
+                rule_right_ids.append(rule_id)
+    current_app.logger.debug(f"rule right ids = {rule_right_ids}")
+    rule_ids = rule_right_ids or rule_ids
+    current_app.logger.debug(f"rule right ids = {rule_ids}")
     protections = (
-        db.session.query(RuleProtection)
+        db.session.query(Protection)
+        .join(RuleProtection)
         .filter(
             RuleProtection.id_rule.in_(rule_ids),
-        )
-        .all()
-    )
-
-    prot = (
-        db.session.query(Protection)
-        .filter(
-            Protection.id.in_([p.id for p in protections]),
         )
         .all()
     )
@@ -197,9 +197,8 @@ def check_generate_masking_plan(
     current_app.logger.debug(
         f"protections relationship - {[p.id for p in protections]}"
     )
-    current_app.logger.debug(f"prot - {prot}")
 
-    for protection in prot:
+    for protection in protections:
 
         masking_uuid = uuid.uuid4()
         masking_data = {
@@ -213,22 +212,34 @@ def check_generate_masking_plan(
                 }
             ],
         }
-        description = "Маскирование нужно."
+
+        description = (
+            f"Маскирование нужно. Используемые правила: "
+            f"{' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
+        )
         masking_map = MaskingMapFile(
-            description="",
-            filename="",
+            description=description,
+            filename=(
+                f"Карта Маскирования от "
+                f"{datetime.date.today().strftime('%d_%m_%Y')}"
+            ),
             data_masking=masking_data,
             masking_uuid=masking_uuid,
-            is_test=is_test
+            is_test=is_test,
+            is_valid=True
         )
         db.session.add(masking_map)
         db.session.commit()
-        return masking_map, description
+
+        return masking_map.masking_uuid, description
     else:
         description = (
             f"Нет необходимости. "
         )
 
-    description = f"{description} Используемые правила: {' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
+    description = (
+        f"{description} Используемые правила: "
+        f"{' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
+    )
 
     return None, description

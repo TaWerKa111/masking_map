@@ -1,7 +1,6 @@
 import http
-from itertools import chain
 
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request, current_app, jsonify
 from marshmallow import ValidationError
 
 from app.api.helpers.exceptions import SqlAlchemyException
@@ -486,7 +485,7 @@ def get_filter_question_rule_view() -> tuple[dict, int]:
         location_ids=valid_data.get("location_ids"),
     )
     current_app.logger.debug(f"qus - {questions}")
-    return QuestionListSchema().dump(questions), http.HTTPStatus.OK
+    return jsonify(QuestionSchema(many=True).dump(questions)), http.HTTPStatus.OK
 
 
 @bp.route("/question/", methods=["GET"])

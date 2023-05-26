@@ -68,4 +68,3 @@ class MaskingResponseFileSchema(BinaryResponseSchema):
     description = fields.String()
     is_end = fields.Boolean()
     rule_ids = fields.List(fields.Integer())
-    
