@@ -10,6 +10,7 @@ export default function AddRule() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [rule, setRule] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const [ruleId, setRuleId] = useState(null);
 
     useEffect(() => {
         let rule_id = searchParams.get("rule_id");
@@ -41,6 +42,7 @@ export default function AddRule() {
                 console.log(res.data);
                 console.log(searchParams.get("id"));
             });
+            setRuleId(rule_id);
         } else {
             setRule({
                 name: "",
@@ -59,6 +61,6 @@ export default function AddRule() {
     return isLoading ? (
         <LoadingSpinner></LoadingSpinner>
     ) : (
-        <RuleInfo rule={rule}></RuleInfo>
+        <RuleInfo rule={rule} ruleId={ruleId}></RuleInfo>
     );
 }

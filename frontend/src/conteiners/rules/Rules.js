@@ -169,6 +169,7 @@ export default function Rules() {
                                         {rule.id}
                                     </td>
                                     <td>
+                                        <ul>
                                         {rule.criteria
                                             .find(
                                                 (item) =>
@@ -176,8 +177,9 @@ export default function Rules() {
                                                     "type_work"
                                             )
                                             .type_works.map(
-                                                (item) => item.name
+                                                (item) => <li>{item.name}</li>
                                             )}
+                                            </ul>
                                     </td>
                                     <td>
                                         <label>Места проведения работ</label>

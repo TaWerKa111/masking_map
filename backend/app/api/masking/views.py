@@ -564,9 +564,6 @@ def get_protection_view() -> tuple[dict, int]:
 
     protections, pagination = serialize_paginate_object(protection_list)
     result = {"protections": protections, "pagination": pagination}
-    current_app.logger.debug(
-        f"protection list - {protections[0].type_protection}"
-    )
 
     return (
         ProtectionListSchema().dump(result),

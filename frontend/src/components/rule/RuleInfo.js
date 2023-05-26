@@ -230,8 +230,14 @@ export default function RuleInfo(props) {
             }),
         };
         console.log("newRule", newRule);
-        apiInst
-            .post("/rule/rule/", newRule)
+
+        let req = apiInst.post;
+        console.log("ruleId", props.ruleId);
+        if (props.ruleId)
+            req = apiInst.put;
+            newRule.id = props.ruleId;
+
+        req("/rule/rule/", newRule)
             .then((resp) => {
                 if (resp.data.result) {
                     navigate("/expert/rules/");
@@ -243,6 +249,7 @@ export default function RuleInfo(props) {
                 console.log(e.response.data.message);
             });
     };
+    console.log("ruleId", props.ruleId);
 
     const handleOpenModal = (criteria) => {
         setSelectedCriteriaEditindId(criteria.id);

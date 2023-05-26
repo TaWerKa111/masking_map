@@ -1,6 +1,6 @@
 from flask import current_app
 from flask_sqlalchemy import Pagination
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 
 from app import db
 from common.postgres.models import (
@@ -17,6 +17,21 @@ from common.postgres.models import (
     CriteriaTypeLocation,
     CriteriaQuestion,
 )
+
+
+def get_list_value(rule, key, type_cr):
+    criteria = [
+        cr.get(key)
+        for cr in rule.get("criteria")
+        if cr.get("selected_type_criteria")
+        and cr.get("selected_type_criteria").get("value") == type_cr
+    ]
+    result = []
+
+    for tw in criteria:
+        if tw:
+            result.extend(tw)
+    return result
 
 
 def add_rule(name: str, compensatory_measures: str = None) -> Rule:
@@ -263,12 +278,13 @@ def filter_list_rule(
 
 def update_rule(
     rule_id: int,
-    name_rule: str,
-    type_work: TypeWork,
-    location: Location,
-    type_location: TypeLocation,
+    name_rule,
+    type_works: list[TypeWork],
+    locations: list[Location],
+    type_locations: list[TypeLocation],
     questions: list[dict],
     protections: list[dict],
+    compensatory_measures: str,
 ) -> Rule or None:
     """
     Изменение правила, его критериев и списка защит
@@ -296,37 +312,36 @@ def update_rule(
         return None
     if name_rule:
         rule.name = name_rule
+    if compensatory_measures:
+        rule.compensatory_measures = compensatory_measures
 
-    criteria_work = add_criteria("Виды работ", Criteria.TypeCriteria.type_work)
-    criteria_location = add_criteria(
-        "Места проведения работ", Criteria.TypeCriteria.location
-    )
-    criteria_type_location = add_criteria(
-        "Типы мест проведения работ", Criteria.TypeCriteria.type_location
-    )
-
-    criteria_work.works.append(type_work)
-    criteria_location.locations.append(location)
-    criteria_type_location.locations_type.append(type_location)
-
-    questions_list = []
-    if questions:
-        for question_data in questions:
-            question = add_question(question_data.get("text"))
-            for answer_data in question_data.get("answers"):
-                add_question_answer(
-                    answer_data.get("text"), id_question=question.id
+    for criteria in rule.criteria:
+        if criteria.type_criteria == Criteria.TypeCriteria.type_work:
+            criteria.type_works = type_works
+        if criteria.type_criteria == Criteria.TypeCriteria.location:
+            criteria.locations = locations
+        if criteria.type_criteria == Criteria.TypeCriteria.type_location:
+            criteria.locations_type = type_locations
+        if criteria.type_criteria == Criteria.TypeCriteria.question:
+            criteria.questions = []
+            db.session.commit()
+            for question in questions:
+                qu_ans = CriteriaQuestion(
+                    id_question=question.get("id"),
+                    id_criteria=criteria.id,
+                    id_right_answer=question.get("right_answer_id"),
                 )
-            questions_list.append(question)
-
-    rule.criteria.extend(
-        [criteria_work, criteria_location, criteria_type_location]
-    )
-    criteria_question = add_criteria("Вопросы", Criteria.TypeCriteria.question)
-
-    rule.criteria.append(criteria_question)
+                db.session.add(qu_ans)
+                db.session.commit()
 
     if protections:
+        (
+            db.session.query(RuleProtection).filter(
+                RuleProtection.id_rule == rule.id
+            ).delete()
+        )
+        db.session.commit()
+
         for protection in protections:
             rule_protection = RuleProtection(
                 id_rule=rule.id,
@@ -419,6 +434,7 @@ def get_filter_questions_for_gen_map(
     rule_ids = []
     rules_questions = dict()
     query = db.session.query(Question, CriteriaQuestion)
+    descriptions = []
 
     if type_work_ids:
         rules = (
@@ -427,21 +443,51 @@ def get_filter_questions_for_gen_map(
             .join(
                 CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id
             )
-            .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
+            .filter(
+                or_(
+                    CriteriaTypeWork.id_type_work.in_(
+                        type_work_ids
+                    ),
+                    and_(
+                        Criteria.type_criteria == Criteria.TypeCriteria.type_work,
+                        Criteria.is_any.is_(True),
+                    )
+                )
+            )
         )
 
         rule_ids.extend([rule.id for rule in rules.all()])
+        descriptions.append(
+            f"Правила подходящие под вид работы: {rule_ids}"
+        )
 
     if location_ids:
-        rules = (
+        query_loc_rule = (
             db.session.query(Rule)
             .join(Criteria)
             .join(
                 CriteriaLocation, CriteriaLocation.id_criteria == Criteria.id
             )
-            .filter(CriteriaLocation.id_location.in_(location_ids))
+            .filter(
+                or_(
+                    CriteriaLocation.id_location.in_(
+                        location_ids
+                    ),
+                    and_(
+                        Criteria.type_criteria == Criteria.TypeCriteria.location,
+                        Criteria.is_any.is_(True),
+                    )
+                ),
+            )
         )
+        if rule_ids:
+            rules = query_loc_rule.filter(
+                Rule.id.in_(rule_ids)
+            )
         rule_ids.extend([rule.id for rule in rules.all()])
+        descriptions.append(
+            f"Правила подходящие под вид работы и места их проведения: {rule_ids}"
+        )
 
     if rule_ids:
         rule_ids = list(set(rule_ids))
@@ -451,16 +497,10 @@ def get_filter_questions_for_gen_map(
             ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
             data_question = temp_query.filter(Criteria.rule_id == rule_id).all()
             rules_questions.setdefault(rule_id, data_question)
-        # query = query.join(
-        #     CriteriaQuestion, CriteriaQuestion.id_question == Question.id
-        # ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
-        # query = query.filter(Criteria.rule_id.in_(rule_ids))
 
-    # questions = query.all()
     questions = list()
 
     for rule_id in rules_questions:
-        # for question, cr_que in query.all():
         for question, cr_que in rules_questions.get(rule_id):
             questions.append({
                 "id": question.id,
@@ -470,7 +510,14 @@ def get_filter_questions_for_gen_map(
                 "rule_id": rule_id
             })
 
-    return questions
+    if not questions:
+        descriptions.append("Нет вопросов")
+    else:
+        descriptions.append(
+            f"Вопросы подходящие под вид работы и места их проведения: {questions}"
+        )
+
+    return questions, descriptions
 
 
 def get_question(question_id: int) -> Question:

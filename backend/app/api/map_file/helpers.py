@@ -97,6 +97,7 @@ def check_generate_masking_plan(
     :return:
     """
 
+    descriptions = []
     tw_criteria = (
         db.session.query(Criteria)
         .outerjoin(CriteriaTypeWork, Criteria.id == CriteriaTypeWork.id_criteria)
@@ -123,7 +124,10 @@ def check_generate_masking_plan(
         )
         .all()
     )
-
+    
+    descriptions.append(
+        f"Правила выбранные по работам: {[rule.id for rule in rules_tw] or 'отсутствуют'}")
+    
     current_app.logger.debug(f"rule type work - {rules_tw}")
     criteria_location = (
         db.session.query(Criteria)
@@ -154,6 +158,9 @@ def check_generate_masking_plan(
         .all()
     )
 
+    descriptions.append(
+        f"Правила выбранные по работам и местам их проведения: {[rule.id for rule in rules] or 'отсутствуют'}")
+
     current_app.logger.debug(f"cr location - {criteria_location}")
     current_app.logger.debug(f"rule type work and loc - {[r.id for r in rules]}")
     rule_ids = [rule.id for rule in rules]
@@ -174,17 +181,23 @@ def check_generate_masking_plan(
     if rule_questions:
         answers_d = {int(q.get("id")): q.get("answer_id") for q in questions}
         current_app.logger.debug(f"answers_d - {answers_d}")
+        descriptions.append(f"Список вопросов для правил: {rule_ids or 'отсутствует'}")
         for rule_id in rule_questions:
             for cr_qu in rule_questions.get(rule_id, []):
                 if (
                     answers_d[cr_qu.id_question] != cr_qu.id_right_answer
                 ):
+                    descriptions.append(f"правило №{rule_id} не подходит, ответ неверный на вопрос ''")
                     break
             else:
                 rule_right_ids.append(rule_id)
+
     current_app.logger.debug(f"rule right ids = {rule_right_ids}")
     rule_ids = rule_right_ids or rule_ids
     current_app.logger.debug(f"rule right ids = {rule_ids}")
+
+    descriptions.append(f"Итоговый список правил: {rule_ids}")
+
     protections = (
         db.session.query(Protection)
         .join(RuleProtection)
@@ -213,12 +226,11 @@ def check_generate_masking_plan(
             ],
         }
 
-        description = (
-            f"Маскирование нужно. Используемые правила: "
+        descriptions.append(f" Маскирование нужно. Используемые правила: "
             f"{' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
         )
         masking_map = MaskingMapFile(
-            description=description,
+            description='\n'.join(descriptions),
             filename=(
                 f"Карта Маскирования от "
                 f"{datetime.date.today().strftime('%d_%m_%Y')}"
@@ -231,15 +243,8 @@ def check_generate_masking_plan(
         db.session.add(masking_map)
         db.session.commit()
 
-        return masking_map.masking_uuid, description
+        return masking_map.masking_uuid, descriptions
     else:
-        description = (
-            f"Нет необходимости. "
-        )
+        descriptions.append(" Нет необходимости маскирования. ")
 
-    description = (
-        f"{description} Используемые правила: "
-        f"{' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
-    )
-
-    return None, description
+    return None, descriptions

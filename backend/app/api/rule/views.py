@@ -10,6 +10,7 @@ from app.api.helpers.utils import serialize_paginate_object
 from app.api.rule.helpers import (
     add_new_rule,
     get_filter_questions_for_gen_map,
+    get_list_value,
     get_rule,
     filter_list_rule,
     update_rule,
@@ -23,6 +24,7 @@ from app.api.rule.helpers import (
 )
 from app.api.rule.schema import (
     AddRuleSchema,
+    FilteredQuestionListSchema,
     GetRuleSchema,
     RuleSchema,
     FilterRulesSchema,
@@ -67,19 +69,19 @@ def add_rule_view() -> tuple[dict, int]:
             - rule
     """
 
-    def get_list_value(key, type_cr):
-        criteria = [
-            cr.get(key)
-            for cr in rule.get("criteria")
-            if cr.get("selected_type_criteria")
-            and cr.get("selected_type_criteria").get("value") == type_cr
-        ]
-        result = []
+    # def get_list_value(key, type_cr):
+    #     criteria = [
+    #         cr.get(key)
+    #         for cr in rule.get("criteria")
+    #         if cr.get("selected_type_criteria")
+    #         and cr.get("selected_type_criteria").get("value") == type_cr
+    #     ]
+    #     result = []
 
-        for tw in criteria:
-            if tw:
-                result.extend(tw)
-        return result
+    #     for tw in criteria:
+    #         if tw:
+    #             result.extend(tw)
+    #     return result
 
     if not request.json:
         return (
@@ -109,10 +111,10 @@ def add_rule_view() -> tuple[dict, int]:
 
     current_app.logger.debug(f"rule_data prot - {rule.get('protections')}")
 
-    type_works = get_list_value("type_works", "type_work")
-    questions = get_list_value("questions", "question")
-    type_locations = get_list_value("type_locations", "type_location")
-    locations = get_list_value("locations", "location")
+    type_works = get_list_value(rule, "type_works", "type_work")
+    questions = get_list_value(rule, "questions", "question")
+    type_locations = get_list_value(rule, "type_locations", "type_location")
+    locations = get_list_value(rule, "locations", "location")
     current_app.logger.debug(
         f"type_works - {type_works}, "
         f"question - {questions}\n"
@@ -311,21 +313,38 @@ def update_rule_view():
             BinaryResponseSchema().dump({"message": err, "result": False}),
             http.HTTPStatus.BAD_REQUEST,
         )
+    
+    type_works = get_list_value(rule, "type_works", "type_work")
+    questions = get_list_value(rule, "questions", "question")
+    type_locations = get_list_value(rule, "type_locations", "type_location")
+    locations = get_list_value(rule, "locations", "location")
+    current_app.logger.debug(
+        f"type_works - {type_works}, "
+        f"question - {questions}\n"
+        f"loca - {locations}\n"
+        f"tl - {type_locations}\n"
+    )
 
-    # location, type_work, type_location = get_locations_work_types_location_types(
-    #     location_id=rule.get("location_id"),
-    #     type_work_id=rule.get("type_work_id"),
-    #     type_location_id=rule.get("type_location_id"),
-    # )
-    #
-    # update_rule(
-    #     name_rule=rule.get("name"),
-    #     type_work=type_work,
-    #     location=location,
-    #     type_location=type_location,
-    #     questions=rule.get("questions"),
-    #     protections=rule.get("protections"),
-    # )
+    (
+        location,
+        type_work,
+        type_location,
+    ) = get_locations_work_types_location_types(
+        location_ids=[loc["id"] for loc in locations],
+        type_work_ids=[tw["id"] for tw in type_works],
+        type_location_ids=[tl["id"] for tl in type_locations if tl],
+    )
+    
+    update_rule(
+        rule_id=rule.get("id"),
+        name_rule=rule.get("name"),
+        type_works=type_work,
+        locations=location,
+        type_locations=type_location,
+        questions=questions,
+        protections=rule.get("protections"),
+        compensatory_measures=rule.get("compensatory_measures"),
+    )
 
     return BinaryResponseSchema().dump(
         {"message": "Правило успешно изменено!", "result": True}
@@ -480,12 +499,17 @@ def get_filter_question_rule_view() -> tuple[dict, int]:
         )
     current_app.logger.debug(f"que params - {valid_data}")
 
-    questions = get_filter_questions_for_gen_map(
+    questions, descriptions = get_filter_questions_for_gen_map(
         type_work_ids=valid_data.get("type_work_ids"),
         location_ids=valid_data.get("location_ids"),
     )
     current_app.logger.debug(f"qus - {questions}")
-    return jsonify(QuestionSchema(many=True).dump(questions)), http.HTTPStatus.OK
+
+    result = {
+        "questions": questions,
+        "descriptions": descriptions,
+    }
+    return FilteredQuestionListSchema().dump(result), http.HTTPStatus.OK
 
 
 @bp.route("/question/", methods=["GET"])

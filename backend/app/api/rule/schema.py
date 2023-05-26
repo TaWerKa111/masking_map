@@ -65,15 +65,14 @@ class CriteriaSchema(Schema):
         return obj.type_criteria.value
 
 
-# class QuestionSchema(Schema):
-#     id = fields.Integer()
-#     text = fields.String()
-#     answers = fields.List(fields.Nested(QuestionAnswerSchema()))
-
-
 class QuestionListSchema(Schema):
     questions = fields.List(fields.Nested(QuestionSchema()))
     pagination = fields.Nested(PaginationResponseSchema())
+
+
+class FilteredQuestionListSchema(Schema):
+    questions = fields.List(fields.Nested(QuestionSchema()))
+    descriptions = fields.List(fields.String())
 
 
 class GetQuestionSchema(Schema):
@@ -146,6 +145,8 @@ class AddRuleSchema(Schema):
     criteria = fields.List(fields.Dict())
     protections = fields.List(fields.Nested(RuleProtectionSchema()))
     compensatory_measures = fields.String(allow_none=True)
+    class Meta:
+        unknown = EXCLUDE
 
 
 class UpdateRuleSchema(AddRuleSchema):

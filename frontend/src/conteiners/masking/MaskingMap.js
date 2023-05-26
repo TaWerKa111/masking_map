@@ -11,7 +11,7 @@ const URL = "http:localhost:5001/api/masking/get-file/";
 
 export default function MaskingMap() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [resultGenerating, setResultGenerating] = useState({});
+    const [resultGenerating, setResultGenerating] = useState({descriptions: []});
     const [mapHtml, setMapHtml] = useState("");
     const [mapUuid, setMapUuid] = useState("");
 
@@ -25,6 +25,7 @@ export default function MaskingMap() {
         display: "block",
     });
     const [isTest, setIsTest] = useState(false);
+    const [questionDescriptions, setQuestionDescriptions] = useState([]);
 
     // const [selectedConditions, setSelectedConditions] = useState([]);
     const fetchQuestions = (type_works = null, location_list = null) => {
@@ -44,7 +45,8 @@ export default function MaskingMap() {
         apiInst
             .get("/rule/filter-question-rule/", { params })
             .then((resp) => {
-                setConditions(resp.data);
+                setConditions(resp.data.questions);
+                setQuestionDescriptions(resp.data.descriptions)
             })
             .catch((err) => {
                 console.log(err);
@@ -60,7 +62,7 @@ export default function MaskingMap() {
         console.log("type_works", typeWorks);
         setModalTypeWork(false);
         setTypeWorks(selectedTypeWorks);
-        fetchQuestions(selectedTypeWorks);
+        fetchQuestions(selectedTypeWorks, locations);
     };
 
     const handleLocations = (locations) => {
@@ -73,6 +75,7 @@ export default function MaskingMap() {
             }))
         );
         fetchQuestions(
+            typeWorks,
             locations.map((location) => ({
                 name: location.label,
                 id: location.value,
@@ -156,6 +159,7 @@ export default function MaskingMap() {
     };
 
     console.log("result", resultGenerating);
+    console.log("desc qestions", questionDescriptions);
     return (
         <div className="container">
             <div className="row">
@@ -310,11 +314,40 @@ export default function MaskingMap() {
                     )}
                 </table>
             </div>
-
-            {resultGenerating.description ? (
+            {
+                questionDescriptions.length > 0? (
+                    <div className="row">
+                        <div className="col-md">
+                            <lable>
+                                Промежуточные правила при выборе условий
+                            </lable>
+                            <ul>
+                                {questionDescriptions.map((description) => (
+                                    <li>
+                                        {description}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                )
+                : (
+                    <> </>
+                )
+            }
+            {resultGenerating.descriptions.length > 0 ? (
                 <div className="row">
                     <div className="col-md">
-                        <div>{resultGenerating.description}</div>
+                        <label>Путь машины логического вывыода</label>
+                        <ul>
+                            {
+                                resultGenerating.descriptions.map((description) => (
+                                    <li>
+                                        {description}
+                                    </li>
+                                ))
+                            }
+                        </ul>
                     </div>
                 </div>
             ) : (

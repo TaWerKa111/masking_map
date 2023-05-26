@@ -65,6 +65,6 @@ class GenerateMaskingPlanSchema(Schema):
 
 class MaskingResponseFileSchema(BinaryResponseSchema):
     masking_uuid = fields.UUID()
-    description = fields.String()
+    descriptions = fields.List(fields.String())
     is_end = fields.Boolean()
     rule_ids = fields.List(fields.Integer())
