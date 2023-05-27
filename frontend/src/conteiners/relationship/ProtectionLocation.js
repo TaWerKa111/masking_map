@@ -96,7 +96,9 @@ export default function LocationProtection() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center header-list">
                     <p>
-                        <h2>Связать место проведения работ и с его защитами</h2>
+                        <h2 className="center-header header-block">
+                            Связать место проведения работ и с его защитами
+                        </h2>
                     </p>
                 </div>
             </div>
@@ -112,7 +114,10 @@ export default function LocationProtection() {
                             <li key={index}>{item.name}</li>
                         ))}
                     </ul>
-                    <button className="btn btn-primary" onClick={addClick}>
+                    <button
+                        className="btn btn-primary btn-blue"
+                        onClick={addClick}
+                    >
                         Добавить связь
                     </button>
                 </div>

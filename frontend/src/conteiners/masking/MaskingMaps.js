@@ -109,7 +109,9 @@ export default function MaskingMaps() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center header-block">
                     <p>
-                        <h2>Карты маскирования</h2>
+                        <h1 className="text-center center-header">
+                            Карты маскирования
+                        </h1>
                     </p>
                 </div>
             </div>

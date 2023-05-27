@@ -15,8 +15,8 @@ const Navbar = (props) => {
 
     return (
         <div className="container-fluid" style={divStyle}>
-            <div className="row">
-                <h1 className="text-center">
+            <div className="row row-system">
+                <h1 className="name-system text-center">
                     Экспертная система для формирования карт маскирования
                 </h1>
             </div>

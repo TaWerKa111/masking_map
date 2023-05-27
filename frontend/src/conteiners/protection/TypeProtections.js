@@ -106,7 +106,9 @@ export default function TypeProtections() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Типы защит</h2>
+                        <h1 className="center-header header-block">
+                            Системы защит
+                        </h1>
                     </p>
                 </div>
             </div>
@@ -137,7 +139,7 @@ export default function TypeProtections() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn btn-danger"
+                                            className="btn btn-danger btn-red"
                                             onClick={(el) =>
                                                 deleteClick(
                                                     el,

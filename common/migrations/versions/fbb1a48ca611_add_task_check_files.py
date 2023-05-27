@@ -24,7 +24,11 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('type_task', sa.String(length=255), nullable=True),
     sa.Column('date_start', sa.DateTime(), nullable=True),
-    sa.Column('status', sa.Integer(), nullable=True),
+    # sa.Column('status', sa.String(), nullable=True),
+    sa.Column('status',
+              sa.Enum('pending', 'in_process', 'failed',
+                      'success', name='statustask'),
+              nullable=True),
     sa.Column('attempts', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )

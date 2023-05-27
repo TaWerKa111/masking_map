@@ -76,10 +76,13 @@ export default function QuestionInfo({
             <div className="row">
                 <div className="col-md-12">
                     <form onSubmit={handleSubmit}>
-                        <button type="submit" className="btn btn-primary">
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-blue"
+                        >
                             Применить
                         </button>
-                        <div className="form-group">
+                        <div className="form-group form-row">
                             <label htmlFor="name">Название</label>
                             <input
                                 type="text"
@@ -88,19 +91,14 @@ export default function QuestionInfo({
                                 name="name"
                                 value={question.text}
                                 onChange={OnChangeName}
+                                placeholder="Введите название"
                             />
-                            <small
-                                id="nameHelp"
-                                className="form-text text-muted"
-                            >
-                                Введите название
-                            </small>
                         </div>
                         <div className="form-group">
                             <label htmlFor="answers">Ответы</label>
                             <button
                                 type="button"
-                                className="btn btn-primary"
+                                className="btn btn-primary btn-blue"
                                 onClick={OnAddAnswer}
                             >
                                 Добавить ответ
@@ -123,10 +121,11 @@ export default function QuestionInfo({
                                                         answer
                                                     )
                                                 }
+                                                placeholder="Введите текст ответа"
                                             ></input>
                                             <button
                                                 type="button"
-                                                className="btn btn-danger"
+                                                className="btn btn-danger btn-red"
                                                 onClick={() =>
                                                     OnDeleteAnswer(answer)
                                                 }
@@ -134,12 +133,6 @@ export default function QuestionInfo({
                                                 Удалить
                                             </button>
                                         </div>
-                                        <small
-                                            id="nameHelp"
-                                            className="form-text text-muted"
-                                        >
-                                            Введите текст
-                                        </small>
                                     </div>
                                 );
                             })}

@@ -3,6 +3,7 @@ import http
 from flask import Blueprint, request, current_app, jsonify
 from marshmallow import ValidationError
 
+from app.api.helpers.events.map_file import MapFileEvent
 from app.api.helpers.exceptions import SqlAlchemyException
 from app.api.helpers.messages import MESSAGES_DICT
 from app.api.helpers.schemas import BinaryResponseSchema
@@ -141,7 +142,7 @@ def add_rule_view() -> tuple[dict, int]:
         protections=rule.get("protections"),
         compensatory_measures=rule.get("compensatory_measures"),
     )
-
+    MapFileEvent.process_after_add_or_update_rule_views()
     return BinaryResponseSchema().dump(
         {"message": "Правило успешно добавлен!", "result": True}
     )
@@ -345,6 +346,7 @@ def update_rule_view():
         protections=rule.get("protections"),
         compensatory_measures=rule.get("compensatory_measures"),
     )
+    MapFileEvent.process_after_add_or_update_rule_views()
 
     return BinaryResponseSchema().dump(
         {"message": "Правило успешно изменено!", "result": True}
@@ -382,6 +384,7 @@ def delete_rule_view():
     rule_id = request.args.get("rule_id")
     result = delete_rule(rule_id)
     if result:
+        MapFileEvent.process_after_add_or_update_rule_views()
         return BinaryResponseSchema().dump(
             {"message": "Правило успешно удалено!", "result": True}
         )

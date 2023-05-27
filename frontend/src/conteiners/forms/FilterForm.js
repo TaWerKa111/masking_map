@@ -271,7 +271,10 @@ function FilterRules(props) {
             </div>
             <div className="row">
                 <div className="col-md">
-                    <button type="submit" className="btn btn-primary btn-full">
+                    <button
+                        type="submit"
+                        className="btn btn-primary btn-full btn-blue"
+                    >
                         Применить фильтр
                     </button>
                 </div>
@@ -330,7 +333,7 @@ function FilterButton(props) {
 
     return (
         <div>
-            <button onClick={handleClick} className="btn btn-primary">
+            <button onClick={handleClick} className="btn btn-blue btn-primary">
                 {name}
             </button>
             {showForm && <div>{filterForm}</div>}

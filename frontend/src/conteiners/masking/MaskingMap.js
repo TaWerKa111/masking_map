@@ -6,12 +6,15 @@ import ModalLocation from "../../components/modal/ModalLocation";
 import { type } from "@testing-library/user-event/dist/type";
 import ModalChoiceConditions from "../../components/modal/ModalChoiceConditions";
 import send_toast from "../../utils/toast";
+import ModalDescriptions from "../../components/modal/ModalDescriptions";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
 export default function MaskingMap() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [resultGenerating, setResultGenerating] = useState({descriptions: []});
+    const [resultGenerating, setResultGenerating] = useState({
+        descriptions: [],
+    });
     const [mapHtml, setMapHtml] = useState("");
     const [mapUuid, setMapUuid] = useState("");
 
@@ -26,6 +29,7 @@ export default function MaskingMap() {
     });
     const [isTest, setIsTest] = useState(false);
     const [questionDescriptions, setQuestionDescriptions] = useState([]);
+    const [isModalDesriptions, setIsModalDesriptions] = useState(false);
 
     // const [selectedConditions, setSelectedConditions] = useState([]);
     const fetchQuestions = (type_works = null, location_list = null) => {
@@ -46,7 +50,7 @@ export default function MaskingMap() {
             .get("/rule/filter-question-rule/", { params })
             .then((resp) => {
                 setConditions(resp.data.questions);
-                setQuestionDescriptions(resp.data.descriptions)
+                setQuestionDescriptions(resp.data.descriptions);
             })
             .catch((err) => {
                 console.log(err);
@@ -164,11 +168,15 @@ export default function MaskingMap() {
         <div className="container">
             <div className="row">
                 <div className="col-md header-block">
-                    <h1 className="text-center ">Заполните анкету</h1>
+                    <h1 className="text-center center-header">
+                        Заполните анкету
+                    </h1>
                     <p>
                         Для заполнения отдельных блоков необходимо нажимать
                         кнопку "Изменить" и в появившемся окне необходимо
-                        выбрать соответсвующие пункты.
+                        выбрать соответсвующие пункты. <br /> Настройка
+                        <strong> "Тестовый запрос"</strong> используется для
+                        тестирования, проверок.
                     </p>
                 </div>
             </div>
@@ -183,7 +191,7 @@ export default function MaskingMap() {
                             onChange={(e) => setIsTest(e.target.checked)}
                         />
                         <label
-                            class="form-check-label"
+                            class="form-check-label text-check-label"
                             for="flexSwitchCheckDefault"
                         >
                             Тестовый запрос
@@ -200,7 +208,7 @@ export default function MaskingMap() {
                             </div>
                         </td>
                         <td>
-                            <label className="h6">Виды работ:</label>
+                            <label className="h6">Выбраные виды работ:</label>
 
                             <ul>
                                 {typeWorks.map((work) => (
@@ -218,7 +226,7 @@ export default function MaskingMap() {
                         <td className="td-btn">
                             <div className="d-flex justify-content-center">
                                 <button
-                                    className="btn btn-secondary float-end"
+                                    className="btn btn-primary btn-edit float-end"
                                     onClick={() => setModalTypeWork(true)}
                                     style={styleBtn}
                                 >
@@ -235,7 +243,7 @@ export default function MaskingMap() {
                         </td>
                         <td>
                             <label className="h6">
-                                Места проведения работ:
+                                Выбранные места проведения работ:
                             </label>
 
                             <ul>
@@ -243,7 +251,6 @@ export default function MaskingMap() {
                                     <p key={location.id}>{location.name}</p>
                                 ))}
                             </ul>
-
                             <ModalLocation
                                 isModal={isModalLocation}
                                 onClose={() => setModalLocation(false)}
@@ -254,7 +261,7 @@ export default function MaskingMap() {
                         <td className="td-btn">
                             <div className="d-flex justify-content-center">
                                 <button
-                                    className="btn btn-secondary "
+                                    className="btn btn-primary btn-edit"
                                     onClick={() => setModalLocation(true)}
                                     style={styleBtn}
                                 >
@@ -300,7 +307,7 @@ export default function MaskingMap() {
                             <td className="td-btn">
                                 <div className="d-flex justify-content-center">
                                     <button
-                                        className="btn btn-secondary float-end"
+                                        className="btn btn-primary btn-edit float-end"
                                         onClick={() => setModalCondition(true)}
                                         style={styleBtn}
                                     >
@@ -314,40 +321,35 @@ export default function MaskingMap() {
                     )}
                 </table>
             </div>
-            {
-                questionDescriptions.length > 0? (
-                    <div className="row">
-                        <div className="col-md">
-                            <lable>
-                                Промежуточные правила при выборе условий
-                            </lable>
-                            <ul>
-                                {questionDescriptions.map((description) => (
-                                    <li>
-                                        {description}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+
+            {questionDescriptions.length > 0 ? (
+                <div className="row">
+                    <div className="col-md">
+                        <label>Промежуточные правила при выборе условий</label>
+                        <ul>
+                            {questionDescriptions.map((description) => (
+                                <li>{description}</li>
+                            ))}
+                        </ul>
                     </div>
-                )
-                : (
-                    <> </>
-                )
-            }
+                </div>
+            ) : (
+                <> </>
+            )}
             {resultGenerating.descriptions.length > 0 ? (
                 <div className="row">
                     <div className="col-md">
-                        <label>Путь машины логического вывыода</label>
-                        <ul>
-                            {
-                                resultGenerating.descriptions.map((description) => (
-                                    <li>
-                                        {description}
-                                    </li>
-                                ))
-                            }
-                        </ul>
+                        <button
+                            className="btn btn-full btn-primary btn-blue"
+                            onClick={() => setIsModalDesriptions(true)}
+                        >
+                            Показать окно с путем формирования карты
+                        </button>
+                        <ModalDescriptions
+                            onClose={() => setIsModalDesriptions(false)}
+                            descriptions={resultGenerating.descriptions}
+                            isModal={isModalDesriptions}
+                        ></ModalDescriptions>
                     </div>
                 </div>
             ) : (
@@ -367,7 +369,7 @@ export default function MaskingMap() {
                     <div className="row">
                         <div className="col-md d-flex justify-content-center">
                             <button
-                                className="downloadButton"
+                                className="downloadButton btn-blue"
                                 onClick={handleDownloadClick}
                             >
                                 Скачать файл

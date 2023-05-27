@@ -1,7 +1,7 @@
 import React from "react";
 
 const TableRow = ({ data, condition, handleClick }) => {
-    const rowStyle = condition ? {} : { backgroundColor: "lightcoral" };
+    const rowStyle = condition ? {} : { backgroundColor: "#EC3053" };
 
     return (
         <tr style={rowStyle}>
@@ -12,7 +12,7 @@ const TableRow = ({ data, condition, handleClick }) => {
             <td className="td-btn">
                 <div className="d-flex justify-content-center">
                     <button
-                        className="btn btn-primary float-end "
+                        className="btn btn-primary btn-blue float-end "
                         onClick={(el) => handleClick(el, data.id)}
                     >
                         Скачать

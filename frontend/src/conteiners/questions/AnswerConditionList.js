@@ -75,7 +75,7 @@ export default function AnswerConditionList({
                     <div className="col-md">
                         <button
                             type="submit"
-                            className="btn btn-primary btn-full"
+                            className="btn btn-primary btn-full btn-blue"
                         >
                             Применить
                         </button>

@@ -10,15 +10,20 @@ const ModalQuestion = ({
 }) => {
     return (
         <Modal isOpen={isModal} onRequestClose={onClose}>
-            <div className="text-center header-modal">
-                <label className="h2 text-center">Редактирование вопроса</label>
+            <div className="text-center header-modal center-header">
+                <h2
+                    className="text-center center-header"
+                    style={{ display: "inline" }}
+                >
+                    Редактирование вопроса
+                </h2>
                 <button
                     className="float-end btn btn-close"
                     onClick={onClose}
                 ></button>
             </div>
             <div>
-                <p className="text-center">Измените вопрос"</p>
+                <p className="text-center"></p>
             </div>
             <QuestionInfo
                 handleClickAdd={handleClickAdd}

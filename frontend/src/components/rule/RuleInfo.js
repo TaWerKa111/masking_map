@@ -233,9 +233,8 @@ export default function RuleInfo(props) {
 
         let req = apiInst.post;
         console.log("ruleId", props.ruleId);
-        if (props.ruleId)
-            req = apiInst.put;
-            newRule.id = props.ruleId;
+        if (props.ruleId) req = apiInst.put;
+        newRule.id = props.ruleId;
 
         req("/rule/rule/", newRule)
             .then((resp) => {
@@ -339,20 +338,23 @@ export default function RuleInfo(props) {
 
     console.log("criteriaList", criteriaList);
     console.log("rule", rule);
+
     return (
         <div className="container">
             <div className="row">
                 <div className="col-md">
-                    <h2 className="text-center">Правило маскирования защит</h2>
+                    <h2 className="text-center header-block center-header">
+                        Правило маскирования защит
+                    </h2>
                 </div>
             </div>
             <div className="row">
-                <div className="col-md-10 d-flex align-items-end">
+                <div className="col-md-9 d-flex align-items-end">
                     <label className="form">Критерии: </label>
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-3">
                     <button
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-blue btn-full"
                         onClick={handleAddCriteria}
                     >
                         Добавить критерий
@@ -392,7 +394,7 @@ export default function RuleInfo(props) {
                                             onClick={() =>
                                                 handleOpenModal(criteria)
                                             }
-                                            className="btn btn-primary btn-action-rule"
+                                            className="btn btn-primary btn-action-rule btn-edit"
                                         >
                                             Изменить
                                         </button>
@@ -418,7 +420,7 @@ export default function RuleInfo(props) {
                                             onClick={() =>
                                                 handleDelete(criteria.id)
                                             }
-                                            className="btn btn-danger btn-action-rule"
+                                            className="btn btn-danger btn-action-rule btn-red"
                                         >
                                             Удалить
                                         </button>
@@ -439,7 +441,7 @@ export default function RuleInfo(props) {
                         </div>
                         <div className="col-md-2">
                             <button
-                                className="btn btn-primary"
+                                className="btn btn-primary btn-blue"
                                 onClick={() => setModalProtection(true)}
                             >
                                 Добавить/Изменить защиты
@@ -456,14 +458,7 @@ export default function RuleInfo(props) {
                             ></ModalChoiceProtections>
 
                             {protections.length === 0 ? (
-                                <div>
-                                    {/* <h3 className="text-center">
-                                        Выберите защиты
-                                    </h3>
-                                    <label className="text-center">
-                                        Для выбора нажмите на кнопку изменить
-                                    </label> */}
-                                </div>
+                                <div></div>
                             ) : (
                                 <div className="list-conteiner">
                                     <table>
@@ -532,7 +527,7 @@ export default function RuleInfo(props) {
             <div className="row">
                 <div className="col-md">
                     <button
-                        className="btn btn-primary btn-save-rule"
+                        className="btn btn-primary btn-save-rule btn-blue"
                         onClick={handleAddRule}
                     >
                         Сохранить правило

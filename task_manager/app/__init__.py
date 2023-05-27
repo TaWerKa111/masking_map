@@ -12,5 +12,5 @@ app.config["DEBUG"] = True
 
 db = SQLAlchemy(app)
 
-from app.management.create.swagger import bp as cli_launch  # noqa:
+from app.management.launch import bp as cli_launch  # noqa:
 app.register_blueprint(cli_launch)

@@ -23,7 +23,7 @@ export default function Locations() {
 
     const fetchLocation = () => {
         let params = {
-            limit: 10000
+            limit: 10000,
         };
         apiInst
             .get("/masking/location-list/", { params: params })
@@ -142,7 +142,9 @@ export default function Locations() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Места проведения работ</h2>
+                        <h1 className="center-header header-block">
+                            Места проведения работ
+                        </h1>
                     </p>
                 </div>
             </div>
@@ -188,7 +190,7 @@ export default function Locations() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn btn-danger"
+                                            className="btn btn-danger btn-red"
                                             onClick={(el) =>
                                                 deleteClick(el, location.id)
                                             }

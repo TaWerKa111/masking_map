@@ -146,7 +146,9 @@ export default function TypeWorksList() {
             <div className="row">
                 <div className="col-md">
                     <p>
-                        <h2 className="text-center">Виды работ</h2>
+                        <h2 className="text-center center-header header-block">
+                            Виды работ
+                        </h2>
                     </p>
                 </div>
             </div>
@@ -190,7 +192,7 @@ export default function TypeWorksList() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn btn-danger"
+                                            className="btn btn-danger btn-red"
                                             onClick={(el) =>
                                                 deleteClick(el, typeWork.id)
                                             }

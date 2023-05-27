@@ -5,6 +5,7 @@ import time
 from sqlalchemy import or_
 
 from app import db
+from app.handlers import HANDLERS
 from app.transport.consumer.abstract import ConsumerAbc
 from common.postgres.models import TaskCheckMapFile
 
@@ -35,7 +36,17 @@ class DataBaseConsumer(ConsumerAbc):
                 time.sleep(self.SEC)
 
     def on_task(self, task):
-        return True
+        handler_cls = HANDLERS.get("task")
+        print(HANDLERS)
+
+        if not handler_cls:
+            self.logger.info("Handler not found!")
+            return False
+
+        handler = handler_cls(task)
+        self.logger.info(f"Start handler - {handler.name}")
+
+        return handler.run()
 
     def stop(self):
         self.in_process = False
@@ -63,7 +74,8 @@ class DataBaseConsumer(ConsumerAbc):
         task = (
             self.session.query(TaskCheckMapFile)
             .filter(
-                TaskCheckMapFile.status == TaskCheckMapFile.StatusTask.pending,
+                TaskCheckMapFile.status
+                == TaskCheckMapFile.StatusTask.pending,
                 or_(
                    TaskCheckMapFile.date_start.is_(None),
                    TaskCheckMapFile.date_start <= datetime.datetime.utcnow()
@@ -73,6 +85,9 @@ class DataBaseConsumer(ConsumerAbc):
             .limit(1)
             .first()
         )
+
+        self.logger.info(
+            f"query - {task}")
 
         if task:
             self._set_in_process(task)

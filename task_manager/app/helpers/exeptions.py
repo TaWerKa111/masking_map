@@ -1,0 +1,2 @@
+class DontValidateFile(BaseException):
+    pass

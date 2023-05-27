@@ -213,6 +213,9 @@ class MaskingMapFile(Base):
     id = Column(Integer, primary_key=True)
     filename = Column(String(255), nullable=True)
     description = Column(String(255), nullable=True)
+    logic_machine_answer = Column(
+        MutableDict.as_mutable(postgresql.JSONB)
+    )
     masking_uuid = Column(
         UUID(as_uuid=True), default=uuid.uuid4)
     data_masking = Column(
@@ -391,13 +394,14 @@ class TaskCheckMapFile(Base, TimestampsMixin):
     __tablename__ = "task_check_map_file"
 
     class StatusTask(enum.Enum):
-        pending = 10
-        in_process = 11
-        failed = 19
-        success = 20
+        pending = "pending"
+        in_process = "in_process"
+        failed = "failed"
+        success = "success"
 
     id = Column(Integer, primary_key=True)
     type_task = Column(String(255))
     date_start = Column(DateTime)
-    status = Column(Integer, index=True)
+    status = Column(
+        Enum(StatusTask, values_callable=lambda obj: [x.value for x in obj]))
     attempts = Column(Integer, default=0)

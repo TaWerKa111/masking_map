@@ -124,7 +124,10 @@ export default function Rules() {
         <div className="container-fluid">
             <div className="row">
                 <div className="col-md header-list">
-                    <button onClick={editClick} className="btn btn-primary">
+                    <button
+                        onClick={editClick}
+                        className="btn btn-primary btn-blue"
+                    >
                         Добавить правило
                     </button>
                 </div>
@@ -132,7 +135,7 @@ export default function Rules() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Правила</h2>
+                        <h2 className="center-header header-block">Правила</h2>
                     </p>
                 </div>
             </div>
@@ -151,16 +154,12 @@ export default function Rules() {
                         </p>
                     ) : (
                         <table className="table-rule">
-                            <tr>
-                                {/* <th>Название Правила</th> */}
+                            <tr className="text-center">
                                 <th className="td-ind">Номер правила</th>
                                 <th>Виды работ</th>
                                 <th>Критерии</th>
-                                {/* <th>Типы мест проведения работ</th>
-                                    <th>Условия</th> */}
                                 <th>Защиты</th>
                                 <th>Сопровождающие мероприятия</th>
-                                {/* <th>Изменить</th> */}
                                 <th>Действия</th>
                             </tr>
                             {rules.map((rule) => (
@@ -170,16 +169,16 @@ export default function Rules() {
                                     </td>
                                     <td>
                                         <ul>
-                                        {rule.criteria
-                                            .find(
-                                                (item) =>
-                                                    item.type_criteria ===
-                                                    "type_work"
-                                            )
-                                            .type_works.map(
-                                                (item) => <li>{item.name}</li>
-                                            )}
-                                            </ul>
+                                            {rule.criteria
+                                                .find(
+                                                    (item) =>
+                                                        item.type_criteria ===
+                                                        "type_work"
+                                                )
+                                                .type_works.map((item) => (
+                                                    <li>{item.name}</li>
+                                                ))}
+                                        </ul>
                                     </td>
                                     <td>
                                         <label>Места проведения работ</label>
@@ -241,39 +240,6 @@ export default function Rules() {
                                                 : "Не задано"}
                                         </ul>
                                     </td>
-                                    {/* <td>
-                                            {rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "location"
-                                                )
-                                                .locations.map(
-                                                    (item) => item.name
-                                                )}
-                                        </td>
-                                        <td>
-                                            {rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "type_location"
-                                                )
-                                                .locations_type.map(
-                                                    (item) => item.name
-                                                )}
-                                        </td>
-                                        <td>
-                                            {rule.criteria
-                                                .find(
-                                                    (item) =>
-                                                        item.type_criteria ===
-                                                        "question"
-                                                )
-                                                .questions.map(
-                                                    (item) => item.name
-                                                )}
-                                        </td> */}
                                     <td className="td-info">
                                         <ul>
                                             {rule.protections.map((item) => (
@@ -286,7 +252,7 @@ export default function Rules() {
                                     </td>
                                     <td className="td-action-rule">
                                         <button
-                                            className="btn btn-primary btn-action-rule"
+                                            className="btn btn-primary btn-action-rule btn-blue"
                                             onClick={(el) =>
                                                 editClick(el, rule.id)
                                             }
@@ -294,7 +260,7 @@ export default function Rules() {
                                             Изменить
                                         </button>
                                         <button
-                                            className="btn btn-danger btn-action-rule"
+                                            className="btn btn-danger btn-action-rule btn-red"
                                             onClick={(el) =>
                                                 deleteClick(el, rule.id)
                                             }

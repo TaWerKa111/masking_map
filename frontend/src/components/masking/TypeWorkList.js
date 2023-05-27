@@ -74,7 +74,10 @@ export default function TypeWorkList({
                             </div>
                         ))}
                     </ul>
-                    <button type="submit" className="btn btn-primary btn-full">
+                    <button
+                        type="submit"
+                        className="btn btn-primary btn-full btn-blue"
+                    >
                         Применить
                     </button>
                 </form>

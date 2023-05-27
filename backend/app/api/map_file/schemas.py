@@ -63,6 +63,10 @@ class GenerateMaskingPlanSchema(Schema):
     is_test = fields.Boolean()
 
 
+class CheckMaskingFileSchema(GenerateMaskingPlanSchema):
+    protections = fields.List(fields.Integer())
+
+
 class MaskingResponseFileSchema(BinaryResponseSchema):
     masking_uuid = fields.UUID()
     descriptions = fields.List(fields.String())

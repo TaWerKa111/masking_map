@@ -98,7 +98,9 @@ export default function TypeLocations() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Типы мест проведения работ</h2>
+                        <h1 className="center-header header-block">
+                            Типы мест проведения работ
+                        </h1>
                     </p>
                 </div>
             </div>
@@ -111,9 +113,7 @@ export default function TypeLocations() {
                     ) : (
                         <table>
                             <tr>
-                                <th>
-                                    <p>Название</p>
-                                </th>
+                                <th>Название</th>
                                 <th>Изменить</th>
                                 <th>Удалить</th>
                             </tr>
@@ -133,7 +133,7 @@ export default function TypeLocations() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn btn-danger"
+                                            className="btn btn-danger btn-red"
                                             onClick={(el) =>
                                                 deleteClick(el, typeLocation.id)
                                             }

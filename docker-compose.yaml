@@ -43,6 +43,19 @@ services:
     volumes:
       - app_postgres:/var/lib/postgresql/data
 
+  consumer:
+    image: consumer:1.0
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    volumes:
+      - ./common/:/consumer/common/
+    env_file:
+      - ./.env.example
+    depends_on:
+      - db
+
 volumes:
   app_postgres:
   masking_maps:

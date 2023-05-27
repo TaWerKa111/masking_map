@@ -89,7 +89,7 @@ def get_filtered_files(page: int, limit: int) -> Pagination:
 
 
 def check_generate_masking_plan(
-    locations, type_works, questions, is_test=False
+    locations, type_works, questions
 ) -> uuid.UUID or None:
     """
     Проверка возможности сгенерировать карту для заданных критериев
@@ -159,7 +159,9 @@ def check_generate_masking_plan(
     )
 
     descriptions.append(
-        f"Правила выбранные по работам и местам их проведения: {[rule.id for rule in rules] or 'отсутствуют'}")
+        f"Правила выбранные по работам и местам их проведения: "
+        f"{[rule.id for rule in rules] or 'отсутствуют'}"
+    )
 
     current_app.logger.debug(f"cr location - {criteria_location}")
     current_app.logger.debug(f"rule type work and loc - {[r.id for r in rules]}")
@@ -211,40 +213,52 @@ def check_generate_masking_plan(
         f"protections relationship - {[p.id for p in protections]}"
     )
 
-    for protection in protections:
-
-        masking_uuid = uuid.uuid4()
-        masking_data = {
-            "number_pril": "",
-            "number_project": "",
-            "date": datetime.date.today().strftime("%d.%m.%Y"),
-            "name_nps": "",
-            "protection_cspa": [
-                {
-                    "name": protection.name,
-                }
-            ],
-        }
-
-        descriptions.append(f" Маскирование нужно. Используемые правила: "
+    if protections:
+        descriptions.append(
+            f" Маскирование нужно. Используемые правила: "
             f"{' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
         )
-        masking_map = MaskingMapFile(
-            description='\n'.join(descriptions),
-            filename=(
-                f"Карта Маскирования от "
-                f"{datetime.date.today().strftime('%d_%m_%Y')}"
-            ),
-            data_masking=masking_data,
-            masking_uuid=masking_uuid,
-            is_test=is_test,
-            is_valid=True
-        )
-        db.session.add(masking_map)
-        db.session.commit()
-
-        return masking_map.masking_uuid, descriptions
+        return True, descriptions, protections
     else:
         descriptions.append(" Нет необходимости маскирования. ")
 
-    return None, descriptions
+    return None, descriptions, None
+
+
+def add_masking_file(
+        protections, descriptions, is_test=False):
+    protection_names = []
+    for protection in protections:
+        protection_names.append({
+            "name": protection.name
+        })
+    masking_uuid = uuid.uuid4()
+    masking_data = {
+        "number_pril": "",
+        "number_project": "",
+        "date": datetime.date.today().strftime("%d.%m.%Y"),
+        "name_nps": "",
+        "protection_cspa": [
+            {
+                "name": protection_names,
+            }
+        ],
+    }
+
+    masking_map = MaskingMapFile(
+        description='\n'.join(descriptions),
+        filename=(
+            f"Карта Маскирования от "
+            f"{datetime.date.today().strftime('%d_%m_%Y')}"
+        ),
+        data_masking=masking_data,
+        masking_uuid=masking_uuid,
+        logic_machine_answer={
+            "list": descriptions
+        },
+        is_test=is_test,
+        is_valid=True
+    )
+    db.session.add(masking_map)
+    db.session.commit()
+    return masking_map.masking_uuid

@@ -98,7 +98,7 @@ export default function Departments() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Отделы</h2>
+                        <h2 className="center-header header-block">Отделы</h2>
                     </p>
                 </div>
             </div>
@@ -128,7 +128,12 @@ export default function Departments() {
                                         ></AddElementButton>
                                     </td>
                                     <td className="td-btn">
-                                        <button onClick={e => deleteClick(e, department.id)} className="btn btn-danger">
+                                        <button
+                                            onClick={(e) =>
+                                                deleteClick(e, department.id)
+                                            }
+                                            className="btn btn-danger btn-red"
+                                        >
                                             Удалить
                                         </button>
                                     </td>

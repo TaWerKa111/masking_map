@@ -15,8 +15,8 @@ const NavAuthBar = (props) => {
 
     return (
         <div className="container-fluid" style={divStyle}>
-            <div className="row">
-                <h1 className="text-center">
+            <div className="row row-system">
+                <h1 className="name-system text-center">
                     Экспертная система для формирования карт маскирования
                 </h1>
             </div>
@@ -26,34 +26,23 @@ const NavAuthBar = (props) => {
                         <h2 className="navButton">Инструкция</h2>
                     </a>
                 </div>
-                {/* <div className="col">
-                    <a href="/expert/type-works/" style={aStyle}>
-                        <h2 className="navButton">Виды работ</h2>
-                    </a>
-                </div>
-                <div className="col">
-                    <a href="/expert/locations/" style={aStyle}>
-                        <h2 className="navButton">Локации</h2>
-                    </a>
-                </div>
-                <div className="col">
-                    <a href="/expert/protections/" style={aStyle}>
-                        <h2 className="navButton">Защиты</h2>
-                    </a>
-                </div> */}
                 <div className="col">
                     <a href="/expert/rules/" style={aStyle}>
                         <h2 className="navButton">Правила</h2>
                     </a>
                 </div>
-                <div className="col">
+                <div className="col navButton" style={aStyle}>
                     <Dropdown>
                         <Dropdown.Toggle
                             id="dropdown-basic"
                             className="btn btn-nav"
                         >
-                            <h2 style={{display: "inline"}}>Справочники</h2>
-                            
+                            <h2
+                                className="navButton"
+                                style={{ display: "inline" }}
+                            >
+                                Справочники
+                            </h2>
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
@@ -92,6 +81,9 @@ const NavAuthBar = (props) => {
                         <h2 className="navButton">Выйти</h2>
                     </a>
                 </div>
+                {/* <div className="col">
+                    <h2 style={aStyle}>Профиль Эксперт.</h2>
+                </div> */}
             </div>
         </div>
     );

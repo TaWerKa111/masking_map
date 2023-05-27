@@ -52,6 +52,7 @@ const LoginForm = ({ onLogin }) => {
                                         setUsername(event.target.value)
                                     }
                                     className="form-control"
+                                    placeholder="имя пользователя"
                                 />
                             </div>
                             <div class="mb-3">
@@ -63,9 +64,13 @@ const LoginForm = ({ onLogin }) => {
                                         setPassword(event.target.value)
                                     }
                                     className="form-control"
+                                    placeholder="пароль"
                                 />
                             </div>
-                            <button type="submit" class="btn btn-primary">
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-blue"
+                            >
                                 Войти
                             </button>
                         </form>

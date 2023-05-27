@@ -1,5 +1,5 @@
 # Base settings
-import logging
+import logging.config
 import os
 import sys
 from typing import Type
@@ -56,7 +56,7 @@ class PostgresConfig(BaseSetting):
 
 
 class UrlData(BaseSetting):
-    VALIDATE_FILE = "http://app:5000/"
+    VALIDATE_FILE = "http://app:5000/api/check-masking-map-file/_private/"
 
 
 class AppConfig(BaseSetting):

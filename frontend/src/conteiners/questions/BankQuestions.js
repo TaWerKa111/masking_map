@@ -83,13 +83,13 @@ export default function BankQuestions() {
 
     return (
         <div className="container">
-            <div className="row">
-                <div className="col-md-1">
+            <div className="row header-block">
+                <div className="col-md-2">
                     <button
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-blue"
                         onClick={() => setAddModalQuestion(true)}
                     >
-                        Создать новый
+                        Создать новый вопрос
                     </button>
                     <ModalQuestion
                         isModal={isAddModalQuestion}
@@ -97,8 +97,8 @@ export default function BankQuestions() {
                         handleClickAdd={addClick}
                     ></ModalQuestion>
                 </div>
-                <div className="col-md-11">
-                    <h1 className="text-center">Банк вопросов</h1>
+                <div className="col-md-9">
+                    <h1 className="text-center center-header">Банк вопросов</h1>
                 </div>
             </div>
             <div className="row">
@@ -126,7 +126,7 @@ export default function BankQuestions() {
                                 </td>
                                 <td className="td-btn">
                                     <button
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-edit"
                                         onClick={() => setModalQuestion(true)}
                                     >
                                         Изменить
@@ -139,7 +139,7 @@ export default function BankQuestions() {
                                     ></ModalQuestion>
                                 </td>
                                 <td className="td-btn">
-                                    <button className="btn btn-danger">
+                                    <button className="btn btn-danger btn-red">
                                         Удалить
                                     </button>
                                 </td>

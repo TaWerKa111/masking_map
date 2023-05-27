@@ -18,11 +18,11 @@ export default function ParentLocation() {
     const [searchTextOneLocation, setsearchTextOneLocation] = useState("");
     const [searchTextSecLocation, setsearchTextSecLocation] = useState("");
 
-    const fetchLocations = (params=null) => {
+    const fetchLocations = (params = null) => {
         apiInst
-          .get("/masking/location-list/", { params: params })
-          .then((resp) => {
-            setSelectedItems(resp.data.locations);
+            .get("/masking/location-list/", { params: params })
+            .then((resp) => {
+                setSelectedItems(resp.data.locations);
             });
     };
 
@@ -44,11 +44,9 @@ export default function ParentLocation() {
     // Функция для фильтрации второго списка
     const filteredListSecLocation = locations.filter((item) =>
         item.name.toLowerCase().includes(searchTextSecLocation.toLowerCase())
-        )
-        // .sort(
-        //     (a, b) => selectedItems.find(i => i.id === a.id) - selectedItems.find(i => i.id === b.id))
-        ;
-
+    );
+    // .sort(
+    //     (a, b) => selectedItems.find(i => i.id === a.id) - selectedItems.find(i => i.id === b.id))
     useEffect(() => {
         let params = {
             limit: 100,
@@ -105,7 +103,7 @@ export default function ParentLocation() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center header-list">
                     <p>
-                        <h2>
+                        <h2 className="center-header header-block">
                             Связать место проведения работ и с его компонентами
                         </h2>
                     </p>
@@ -123,7 +121,10 @@ export default function ParentLocation() {
                             <li key={index}>{item.name}</li>
                         ))}
                     </ul>
-                    <button className="btn btn-primary" onClick={addClick}>
+                    <button
+                        className="btn btn-primary btn-blue"
+                        onClick={addClick}
+                    >
                         Добавить связь
                     </button>
                 </div>
@@ -166,7 +167,10 @@ export default function ParentLocation() {
                                 <div className="check-item">
                                     <input
                                         type="checkbox"
-                                        checked={selectedItems.find(sel_item => sel_item.id === item.id)}
+                                        checked={selectedItems.find(
+                                            (sel_item) =>
+                                                sel_item.id === item.id
+                                        )}
                                         onChange={(event) =>
                                             handleCheckboxChange(event, item)
                                         }

@@ -5,3 +5,6 @@ PyYAML==6.0
 psycopg2-binary==2.9.3
 requests==2.25.1
 SQLAlchemy==1.4.27
+Jinja2==3.0.0
+itsdangerous==1.1.0
+werkzeug==2.0.3

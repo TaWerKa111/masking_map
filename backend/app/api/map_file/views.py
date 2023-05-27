@@ -9,13 +9,13 @@ from app.api.helpers.utils import serialize_paginate_object
 from app.api.map_file.helpers import (
     generate_file,
     render_masking_map,
-    get_filtered_files,
+    get_filtered_files, add_masking_file,
 )
 from app.api.map_file.schemas import (
     GetListFilesMaskingSchema,
     ListFileMaskingSchema,
     GenerateMaskingPlanSchema,
-    MaskingResponseFileSchema,
+    MaskingResponseFileSchema, CheckMaskingFileSchema,
 )
 from app.api.map_file.helpers import check_generate_masking_plan
 
@@ -216,14 +216,25 @@ def generate_masking_view():
 
     current_app.logger.debug(f"mask data - {data_for_masking}")
 
-    masking_uuid, descriptions = check_generate_masking_plan(
+    result, descriptions, protections = check_generate_masking_plan(
         locations=data_for_masking.get("locations"),
         type_works=data_for_masking.get("type_works"),
         questions=data_for_masking.get("questions"),
-        is_test=data_for_masking.get("is_test"),
+
+    )
+    current_app.logger.debug(
+        f"result - {result}\n"
+        f"desc - {descriptions}\n"
+        f"protections - {protections}\n"
     )
 
-    if masking_uuid:
+    if result:
+        masking_uuid = add_masking_file(
+            protections,
+            descriptions,
+            is_test=data_for_masking.get("is_test"),
+        )
+
         return (
             MaskingResponseFileSchema().dump(
                 {
@@ -242,6 +253,56 @@ def generate_masking_view():
                 "message": "Нет. Невозможно сделать карту маскирования!",
                 "result": False,
                 "descriptions": descriptions,
+            }
+        ),
+        http.HTTPStatus.BAD_REQUEST,
+    )
+
+
+@bp.route("/check-masking-map-file/_private/", methods=["POST"])
+def check_masking_map_file_view():
+    """
+
+    :return:
+    """
+
+    data = request.json
+
+    try:
+        data_for_masking = CheckMaskingFileSchema().load(data)
+    except ValidationError as err:
+        current_app.logger.debug(f"Validation error - {err}")
+        return (
+            BinaryResponseSchema().dump(
+                {"message": f"{err}", "result": False}
+            ),
+            http.HTTPStatus.BAD_REQUEST,
+        )
+
+    current_app.logger.debug(f"mask data - {data_for_masking}")
+
+    result, descriptions, protections = check_generate_masking_plan(
+        locations=data_for_masking.get("locations"),
+        type_works=data_for_masking.get("type_works"),
+        questions=data_for_masking.get("questions"),
+    )
+
+    if result:
+        return (
+            BinaryResponseSchema().dump(
+                {
+                    "message": "Карта маскирования действительная!",
+                    "result": True,
+                }
+            ),
+            http.HTTPStatus.OK,
+        )
+
+    return (
+        BinaryResponseSchema().dump(
+            {
+                "message": "Карта маскирования НЕ действительная!",
+                "result": False,
             }
         ),
         http.HTTPStatus.BAD_REQUEST,

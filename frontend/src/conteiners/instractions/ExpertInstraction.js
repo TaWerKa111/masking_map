@@ -7,7 +7,9 @@ export default function ExpertInstraction() {
                 <div className="col-md">
                     <div>
                         <p>
-                            <h1 className="text-center">Инструкция</h1>
+                            <h1 className="text-center center-header header-block">
+                                Инструкция
+                            </h1>
                         </p>
                     </div>
                     <div>

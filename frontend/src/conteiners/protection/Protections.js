@@ -123,7 +123,7 @@ export default function Protections() {
             <div className="row">
                 <div className="col-md d-flex justify-content-center">
                     <p>
-                        <h2>Защиты</h2>
+                        <h1 className="center-header header-block">Защиты</h1>
                     </p>
                 </div>
             </div>
@@ -159,7 +159,6 @@ export default function Protections() {
                                                       protection.id_type_protection
                                               ).name
                                             : "Отсутсвует"}
-
                                     </td>
                                     <td>{protection.status}</td>
                                     <td>
@@ -177,7 +176,7 @@ export default function Protections() {
                                     </td>
                                     <td className="td-btn">
                                         <button
-                                            className="btn btn-danger"
+                                            className="btn btn-danger btn-red"
                                             onClick={(el) =>
                                                 deleteClick(el, protection.id)
                                             }
