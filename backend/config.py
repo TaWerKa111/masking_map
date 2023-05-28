@@ -89,3 +89,5 @@ class AppConfig(BaseSetting):
     FLASK_ENV = "development"
     FILES_PATHS = FilesData
     ROLE = Role
+    MPSA = "МПСА"
+    CSPA = "ЦПСА"

@@ -1,6 +1,7 @@
 import datetime
 import os
 import uuid
+from dataclasses import dataclass
 from itertools import groupby
 from operator import attrgetter
 
@@ -9,6 +10,7 @@ from flask_sqlalchemy import Pagination
 from sqlalchemy import and_, desc, or_
 
 from app import db
+from app.api.map_file.classes import HANDLERS
 from common.postgres.models import (
     MaskingMapFile,
     TypeWork,
@@ -23,6 +25,14 @@ from common.postgres.models import (
     CriteriaQuestion,
 )
 from config import AppConfig
+
+
+@dataclass
+class ResultGenerateMap:
+    result: bool
+    logic_machine_answer: list[str]
+    protections: list
+    description: str = ""
 
 
 def render_masking_map(map_uuid: str) -> str:
@@ -89,18 +99,19 @@ def get_filtered_files(page: int, limit: int) -> Pagination:
 
 
 def check_generate_masking_plan(
-    locations, type_works, questions
-) -> uuid.UUID or None:
+        locations, type_works, questions
+) -> ResultGenerateMap:
     """
     Проверка возможности сгенерировать карту для заданных критериев
 
     :return:
     """
 
-    descriptions = []
+    logic_machine_answer = []
     tw_criteria = (
         db.session.query(Criteria)
-        .outerjoin(CriteriaTypeWork, Criteria.id == CriteriaTypeWork.id_criteria)
+        .outerjoin(CriteriaTypeWork,
+                   Criteria.id == CriteriaTypeWork.id_criteria)
         .filter(
             or_(
                 CriteriaTypeWork.id_type_work.in_(
@@ -124,14 +135,15 @@ def check_generate_masking_plan(
         )
         .all()
     )
-    
-    descriptions.append(
+
+    logic_machine_answer.append(
         f"Правила выбранные по работам: {[rule.id for rule in rules_tw] or 'отсутствуют'}")
-    
+
     current_app.logger.debug(f"rule type work - {rules_tw}")
     criteria_location = (
         db.session.query(Criteria)
-        .outerjoin(CriteriaLocation, Criteria.id == CriteriaLocation.id_criteria)
+        .outerjoin(CriteriaLocation,
+                   Criteria.id == CriteriaLocation.id_criteria)
         .filter(
             or_(
                 CriteriaLocation.id_location.in_(
@@ -158,13 +170,14 @@ def check_generate_masking_plan(
         .all()
     )
 
-    descriptions.append(
+    logic_machine_answer.append(
         f"Правила выбранные по работам и местам их проведения: "
         f"{[rule.id for rule in rules] or 'отсутствуют'}"
     )
 
     current_app.logger.debug(f"cr location - {criteria_location}")
-    current_app.logger.debug(f"rule type work and loc - {[r.id for r in rules]}")
+    current_app.logger.debug(
+        f"rule type work and loc - {[r.id for r in rules]}")
     rule_ids = [rule.id for rule in rules]
 
     rule_questions = dict()
@@ -183,13 +196,15 @@ def check_generate_masking_plan(
     if rule_questions:
         answers_d = {int(q.get("id")): q.get("answer_id") for q in questions}
         current_app.logger.debug(f"answers_d - {answers_d}")
-        descriptions.append(f"Список вопросов для правил: {rule_ids or 'отсутствует'}")
+        logic_machine_answer.append(
+            f"Список вопросов для правил: {rule_ids or 'отсутствует'}")
         for rule_id in rule_questions:
             for cr_qu in rule_questions.get(rule_id, []):
                 if (
-                    answers_d[cr_qu.id_question] != cr_qu.id_right_answer
+                        answers_d[cr_qu.id_question] != cr_qu.id_right_answer
                 ):
-                    descriptions.append(f"правило №{rule_id} не подходит, ответ неверный на вопрос ''")
+                    logic_machine_answer.append(
+                        f"правило №{rule_id} не подходит, ответ неверный на вопрос ''")
                     break
             else:
                 rule_right_ids.append(rule_id)
@@ -198,7 +213,7 @@ def check_generate_masking_plan(
     rule_ids = rule_right_ids or rule_ids
     current_app.logger.debug(f"rule right ids = {rule_ids}")
 
-    descriptions.append(f"Итоговый список правил: {rule_ids}")
+    logic_machine_answer.append(f"Итоговый список правил: {rule_ids}")
 
     protections = (
         db.session.query(Protection)
@@ -213,52 +228,42 @@ def check_generate_masking_plan(
         f"protections relationship - {[p.id for p in protections]}"
     )
 
+    description = "Маскирование нужно."
     if protections:
-        descriptions.append(
+        logic_machine_answer.append(
             f" Маскирование нужно. Используемые правила: "
             f"{' '.join(list(map(str, rule_ids))) or 'не было подходящих правил'}"
         )
-        return True, descriptions, protections
+        return ResultGenerateMap(
+            result=True,
+            logic_machine_answer=logic_machine_answer,
+            protections=protections,
+            description=description
+        )
     else:
-        descriptions.append(" Нет необходимости маскирования. ")
+        logic_machine_answer.append(" Нет необходимости маскирования. ")
 
-    return None, descriptions, None
+    description = "Маскирования не нужно."
+
+    return ResultGenerateMap(
+        result=False,
+        logic_machine_answer=logic_machine_answer,
+        protections=protections,
+        description=description
+    )
 
 
 def add_masking_file(
-        protections, descriptions, is_test=False):
-    protection_names = []
-    for protection in protections:
-        protection_names.append({
-            "name": protection.name
-        })
-    masking_uuid = uuid.uuid4()
-    masking_data = {
-        "number_pril": "",
-        "number_project": "",
-        "date": datetime.date.today().strftime("%d.%m.%Y"),
-        "name_nps": "",
-        "protection_cspa": [
-            {
-                "name": protection_names,
-            }
-        ],
-    }
+        protections, description, logic_machine_answer, is_test=False):
 
-    masking_map = MaskingMapFile(
-        description='\n'.join(descriptions),
-        filename=(
-            f"Карта Маскирования от "
-            f"{datetime.date.today().strftime('%d_%m_%Y')}"
-        ),
-        data_masking=masking_data,
-        masking_uuid=masking_uuid,
-        logic_machine_answer={
-            "list": descriptions
-        },
-        is_test=is_test,
-        is_valid=True
+    if AppConfig.MPSA in protections[0].type_protection.name:
+        hand_name = "mpsa"
+    else:
+        hand_name = "cspa"
+
+    handler_cls = HANDLERS.get(hand_name)
+    handler = handler_cls(
+        protections, description, logic_machine_answer, is_test=False
     )
-    db.session.add(masking_map)
-    db.session.commit()
-    return masking_map.masking_uuid
+
+    return handler.generate_map()

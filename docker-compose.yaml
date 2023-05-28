@@ -19,16 +19,16 @@ services:
     depends_on:
       - db
 
-  # client:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '3000:80'
-  #   links:
-  #     - app
-  #   depends_on:
-  #     - app
+   client:
+     build:
+       context: ./frontend
+       dockerfile: Dockerfile
+     ports:
+       - '3000:80'
+     links:
+       - app
+     depends_on:
+       - app
 
   # The DataBase
   db:

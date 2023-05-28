@@ -216,22 +216,23 @@ def generate_masking_view():
 
     current_app.logger.debug(f"mask data - {data_for_masking}")
 
-    result, descriptions, protections = check_generate_masking_plan(
+    result_gen_map = check_generate_masking_plan(
         locations=data_for_masking.get("locations"),
         type_works=data_for_masking.get("type_works"),
         questions=data_for_masking.get("questions"),
-
     )
+
     current_app.logger.debug(
-        f"result - {result}\n"
-        f"desc - {descriptions}\n"
-        f"protections - {protections}\n"
+        f"result - {result_gen_map.result}\n"
+        f"logic_machine_answer - {result_gen_map.logic_machine_answer}\n"
+        f"protections - {result_gen_map.protections}\n"
     )
 
-    if result:
+    if result_gen_map.result:
         masking_uuid = add_masking_file(
-            protections,
-            descriptions,
+            result_gen_map.protections,
+            result_gen_map.description,
+            logic_machine_answer=result_gen_map.logic_machine_answer,
             is_test=data_for_masking.get("is_test"),
         )
 
@@ -241,7 +242,8 @@ def generate_masking_view():
                     "message": "Возможно сделать карту маскирования!",
                     "masking_uuid": masking_uuid,
                     "result": True,
-                    "descriptions": descriptions,
+                    "description": result_gen_map.description,
+                    "logic_machine_answer": result_gen_map.logic_machine_answer
                 }
             ),
             http.HTTPStatus.OK,
@@ -252,7 +254,8 @@ def generate_masking_view():
             {
                 "message": "Нет. Невозможно сделать карту маскирования!",
                 "result": False,
-                "descriptions": descriptions,
+                "description": result_gen_map.description,
+                "logic_machine_answer": result_gen_map.logic_machine_answer
             }
         ),
         http.HTTPStatus.BAD_REQUEST,
@@ -281,13 +284,13 @@ def check_masking_map_file_view():
 
     current_app.logger.debug(f"mask data - {data_for_masking}")
 
-    result, descriptions, protections = check_generate_masking_plan(
+    result_gen_map = check_generate_masking_plan(
         locations=data_for_masking.get("locations"),
         type_works=data_for_masking.get("type_works"),
         questions=data_for_masking.get("questions"),
     )
 
-    if result:
+    if result_gen_map.result:
         return (
             BinaryResponseSchema().dump(
                 {

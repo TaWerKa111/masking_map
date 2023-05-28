@@ -13,7 +13,8 @@ const URL = "http:localhost:5001/api/masking/get-file/";
 export default function MaskingMap() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [resultGenerating, setResultGenerating] = useState({
-        descriptions: [],
+        description: [],
+        logic_machine_answer: [],
     });
     const [mapHtml, setMapHtml] = useState("");
     const [mapUuid, setMapUuid] = useState("");
@@ -336,9 +337,11 @@ export default function MaskingMap() {
             ) : (
                 <> </>
             )}
-            {resultGenerating.descriptions.length > 0 ? (
+            {resultGenerating.logic_machine_answer.length > 0 ? (
                 <div className="row">
                     <div className="col-md">
+                        <h2>Описание карты маскирования</h2>
+                        <p>{resultGenerating.description}</p>
                         <button
                             className="btn btn-full btn-primary btn-blue"
                             onClick={() => setIsModalDesriptions(true)}
@@ -347,7 +350,7 @@ export default function MaskingMap() {
                         </button>
                         <ModalDescriptions
                             onClose={() => setIsModalDesriptions(false)}
-                            descriptions={resultGenerating.descriptions}
+                            descriptions={resultGenerating.logic_machine_answer}
                             isModal={isModalDesriptions}
                         ></ModalDescriptions>
                     </div>

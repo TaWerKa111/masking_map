@@ -484,7 +484,7 @@ def get_filter_questions_for_gen_map(
             rules = query_loc_rule.filter(
                 Rule.id.in_(rule_ids)
             )
-        rule_ids.extend([rule.id for rule in rules.all()])
+            rule_ids.extend([rule.id for rule in rules.all()])
         descriptions.append(
             f"Правила подходящие под вид работы и места их проведения: {rule_ids}"
         )
@@ -499,16 +499,18 @@ def get_filter_questions_for_gen_map(
             rules_questions.setdefault(rule_id, data_question)
 
     questions = list()
-
+    exists_questions = set()
     for rule_id in rules_questions:
         for question, cr_que in rules_questions.get(rule_id):
-            questions.append({
-                "id": question.id,
-                "text": question.text,
-                "answers": question.answers,
-                "id_right_answer": cr_que.id_right_answer,
-                "rule_id": rule_id
-            })
+            if question.id not in exists_questions:
+                exists_questions.add(question.id)
+                questions.append({
+                    "id": question.id,
+                    "text": question.text,
+                    "answers": question.answers,
+                    "id_right_answer": cr_que.id_right_answer,
+                    "rule_id": rule_id
+                })
 
     if not questions:
         descriptions.append("Нет вопросов")
