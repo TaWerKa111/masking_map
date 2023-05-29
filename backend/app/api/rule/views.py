@@ -3,6 +3,7 @@ import http
 from flask import Blueprint, request, current_app, jsonify
 from marshmallow import ValidationError
 
+from app import db
 from app.api.helpers.events.map_file import MapFileEvent
 from app.api.helpers.exceptions import SqlAlchemyException
 from app.api.helpers.messages import MESSAGES_DICT
@@ -21,7 +22,7 @@ from app.api.rule.helpers import (
     add_question_answer,
     update_question,
     get_locations_work_types_location_types,
-    delete_rule,
+    delete_rule, get_questions_by_rule,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -38,6 +39,8 @@ from app.api.rule.schema import (
     FilterQuestionsSchema,
     UpdateQuestionSchema,
 )
+from common.postgres.models import Criteria
+from config import TypeCriteria
 
 bp = Blueprint("rules_api", __name__, url_prefix="/api/rule/")
 
@@ -69,20 +72,6 @@ def add_rule_view() -> tuple[dict, int]:
         tags:
             - rule
     """
-
-    # def get_list_value(key, type_cr):
-    #     criteria = [
-    #         cr.get(key)
-    #         for cr in rule.get("criteria")
-    #         if cr.get("selected_type_criteria")
-    #         and cr.get("selected_type_criteria").get("value") == type_cr
-    #     ]
-    #     result = []
-
-    #     for tw in criteria:
-    #         if tw:
-    #             result.extend(tw)
-    #     return result
 
     if not request.json:
         return (
@@ -190,8 +179,16 @@ def get_rule_view() -> tuple[dict, int]:
         )
 
     rule = get_rule(valid_data.get("rule_id"))
-
-    return RuleSchema().dump(rule), http.HTTPStatus.OK
+    questions = get_questions_by_rule(rule.id)
+    result = {
+        "criteria": rule.criteria,
+        "id": rule.id,
+        "name": rule.name,
+        "protections": rule.protections,
+        "compensatory_measures": rule.compensatory_measures,
+        "questions": questions
+    }
+    return RuleSchema().dump(result), http.HTTPStatus.OK
 
 
 @bp.route("/rules/", methods=["GET"])
@@ -252,12 +249,8 @@ def get_rules_view() -> tuple[dict, int]:
         protection_ids=valid_data.get("protection_ids"),
         type_location_ids=valid_data.get("type_location_ids"),
     )
-
     rules_ser, pagination = serialize_paginate_object(rules)
     result = {"rules": rules_ser, "pagination": pagination}
-    # current_app.logger.debug(
-    #     f"cr - {rules_ser[0].criteria[3].questions[0].answers[0].__dict__}"
-    # )
     return RuleListSchema().dump(result), http.HTTPStatus.OK
 
 

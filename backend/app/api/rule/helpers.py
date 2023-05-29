@@ -516,7 +516,8 @@ def get_filter_questions_for_gen_map(
         descriptions.append("Нет вопросов")
     else:
         descriptions.append(
-            f"Вопросы подходящие под вид работы и места их проведения: {questions}"
+            f"Вопросы подходящие под вид работы и места их проведения: "
+            f"{[que.get('text') for que in questions]}"
         )
 
     return questions, descriptions
@@ -583,3 +584,41 @@ def delete_rule(rule_id):
     except Exception as err:
         current_app.logger.info(f"Error del rule - {err}", exc_info=True)
         return False
+
+
+def get_questions_by_rule(rule_id):
+    questions_list = (
+        db.session.query(Question, CriteriaQuestion)
+        .join(
+            CriteriaQuestion, CriteriaQuestion.id_question == Question.id
+        )
+        .join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
+        .filter(Criteria.rule_id == rule_id).all()
+    )
+    current_app.logger.debug(f"que_list - {questions_list}")
+    questions = list()
+    exists_questions = set()
+    for question, cr_que in questions_list:
+        if question.id not in exists_questions:
+            exists_questions.add(question.id)
+            answers = list()
+            for answer in question.answers:
+                if answer.id == cr_que.id_right_answer:
+                    is_right = True
+                else:
+                    is_right = False
+                answers.append(
+                    {
+                        "text": answer.text,
+                        "id": answer.id,
+                        "is_right": is_right
+                    }
+                )
+            questions.append({
+                "id": question.id,
+                "text": question.text,
+                "answers": answers,
+                "id_right_answer": cr_que.id_right_answer,
+                "rule_id": rule_id
+            })
+    return questions

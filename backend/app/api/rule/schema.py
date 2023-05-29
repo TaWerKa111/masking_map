@@ -159,6 +159,7 @@ class RuleSchema(Schema):
     criteria = fields.List(fields.Nested(CriteriaSchema()))
     protections = fields.List(fields.Nested(ProtectionSchema()))
     compensatory_measures = fields.String(allow_none=True)
+    questions = fields.List(fields.Dict())
 
 
 class RuleListSchema(Schema):

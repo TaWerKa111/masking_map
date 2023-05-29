@@ -37,7 +37,31 @@ export default function AddRule() {
                         (item) => item.type_criteria === "type_location"
                     ).locations_type,
                     compensatory_measures: res.data.compensatory_measures,
-                    criteria: res.data.criteria.map(item => ({...item, selected_type_criteria:{ value: item.type_criteria, label: item.name}})),
+                    criteria: res.data.criteria.map((item) => {
+                        if (item.type_criteria === "question") {
+                            return {
+                                ...item,
+                                questions: res.data.questions.map(
+                                    (que_item) => ({
+                                        ...que_item,
+                                        value: item.id,
+                                        label: item.text,
+                                    })
+                                ),
+                                selected_type_criteria: {
+                                    value: item.type_criteria,
+                                    label: item.name,
+                                },
+                            };
+                        }
+                        return {
+                            ...item,
+                            selected_type_criteria: {
+                                value: item.type_criteria,
+                                label: item.name,
+                            },
+                        };
+                    }),
                 });
                 console.log(res.data);
                 console.log(searchParams.get("id"));

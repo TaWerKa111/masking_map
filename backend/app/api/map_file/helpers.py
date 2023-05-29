@@ -7,7 +7,8 @@ from operator import attrgetter
 
 from flask import render_template, current_app
 from flask_sqlalchemy import Pagination
-from sqlalchemy import and_, desc, or_
+from sqlalchemy import and_, desc, or_, Integer, func, text, String
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from app import db
 from app.api.map_file.classes import HANDLERS
@@ -79,7 +80,10 @@ def generate_file(map_uuid: str) -> str:
     return filename
 
 
-def get_filtered_files(page: int, limit: int) -> Pagination:
+def get_filtered_files(
+        protection_ids, type_location_ids, type_work_ids,
+        page: int, limit: int = 1000
+) -> Pagination:
     """
     Получение списка файлов с пагинацией
 
@@ -89,7 +93,25 @@ def get_filtered_files(page: int, limit: int) -> Pagination:
         количество элементов на странице
     :return: Pagination
     """
+
     query = db.session.query(MaskingMapFile)
+
+    if protection_ids:
+        query = query.filter(
+            MaskingMapFile.params_masking.contains({"protections": protection_ids})
+        )
+        current_app.logger.debug(f"q - {query}")
+    if type_location_ids:
+        query = query.filter(
+            MaskingMapFile.params_masking.contains({"protections": protection_ids})
+        )
+    if type_work_ids:
+        tw = []
+        for tw_id in type_work_ids:
+            tw.append({"id": tw_id})
+        query = query.filter(
+            MaskingMapFile.params_masking.contains({"type_works": tw})
+        )
 
     result = query.order_by(desc(MaskingMapFile.id)).paginate(
         page, limit, False
@@ -254,16 +276,16 @@ def check_generate_masking_plan(
 
 
 def add_masking_file(
-        protections, description, logic_machine_answer, is_test=False):
+        protections, description, logic_machine_answer, is_test=False, params=None):
 
     if AppConfig.MPSA in protections[0].type_protection.name:
-        hand_name = "mpsa"
+        hand_name = AppConfig.MPSA
     else:
-        hand_name = "cspa"
+        hand_name = AppConfig.CSPA
 
     handler_cls = HANDLERS.get(hand_name)
     handler = handler_cls(
-        protections, description, logic_machine_answer, is_test=False
+        protections, description, logic_machine_answer, is_test, params
     )
 
     return handler.generate_map()

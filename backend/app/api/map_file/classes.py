@@ -15,12 +15,13 @@ class MapAbstract(ABC):
 
 class MpsaMap(MapAbstract):
     def __init__(
-        self, protections, description, logic_machine_answer, is_test=False
+        self, protections, description, logic_machine_answer, is_test=False, params_masking=None
     ):
         self.protections = protections
         self.description = description
         self.logic_machine_answer = logic_machine_answer
         self.is_test = is_test
+        self.params_masking = params_masking
 
     def generate_map(self):
         protection_names = []
@@ -36,11 +37,7 @@ class MpsaMap(MapAbstract):
             "number_project": "",
             "date": datetime.date.today().strftime("%d.%m.%Y"),
             "name_nps": "",
-            "protection_cspa": [
-                {
-                    "name": protection_names,
-                }
-            ],
+            "protection_cspa": protection_names,
         }
 
         masking_map = MaskingMapFile(
@@ -55,7 +52,8 @@ class MpsaMap(MapAbstract):
                 "list": self.logic_machine_answer
             },
             is_test=self.is_test,
-            is_valid=True
+            is_valid=True,
+            params_masking=self.params_masking
         )
 
         db.session.add(masking_map)
@@ -65,12 +63,13 @@ class MpsaMap(MapAbstract):
 
 class CspaMap(MapAbstract):
     def __init__(
-        self, protections, description, logic_machine_answer, is_test=False
+        self, protections, description, logic_machine_answer, is_test=False, params_masking=None
     ):
         self.protections = protections
         self.description = description
         self.logic_machine_answer = logic_machine_answer
         self.is_test = is_test
+        self.params_masking = params_masking
 
     def generate_map(self):
         protection_names = []
@@ -105,7 +104,8 @@ class CspaMap(MapAbstract):
                 "list": self.logic_machine_answer
             },
             is_test=self.is_test,
-            is_valid=True
+            is_valid=True,
+            params_masking=self.params_masking
         )
 
         db.session.add(masking_map)

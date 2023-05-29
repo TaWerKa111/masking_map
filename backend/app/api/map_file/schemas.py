@@ -15,6 +15,12 @@ class GetListFilesMaskingSchema(PaginationSchema):
     """
     Схема для фильтрации списка файлов, пока ток пагинация
     """
+    type_location_ids = fields.List(
+        fields.Integer(), allow_none=True, data_key="type_location_ids[]")
+    type_work_ids = fields.List(
+        fields.Integer(), allow_none=True, data_key="type_work_ids[]")
+    protection_ids = fields.List(
+        fields.Integer(), allow_none=True, data_key="protection_ids[]")
 
 
 class FileMaskingSchema(Schema):
@@ -61,6 +67,9 @@ class GenerateMaskingPlanSchema(Schema):
     )
     questions = fields.List(fields.Nested(Question()))
     is_test = fields.Boolean()
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class CheckMaskingFileSchema(GenerateMaskingPlanSchema):

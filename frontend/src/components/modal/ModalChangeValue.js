@@ -36,7 +36,7 @@ const ModalChangeValue = (props) => {
                     isModal={props.isModalCondition}
                     onClose={props.handleModalQuestion}
                     handleClickAdd={props.handleConditions}
-                    conditions={props.criteria.conditions}
+                    conditions={props.criteria.questions}
                 ></ModalQuestions>
             );
         }

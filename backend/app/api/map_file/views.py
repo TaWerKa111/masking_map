@@ -145,7 +145,10 @@ def get_files_views() -> tuple[dict, int]:
             - map_files
     """
 
-    data = request.args
+    data = dict()
+    data["protection_ids[]"] = request.args.getlist("protection_ids[]")
+    data["type_work_ids[]"] = request.args.getlist("type_work_ids[]")
+    data["type_location_ids[]"] = request.args.getlist("type_location_ids[]")
 
     try:
         filter_data = GetListFilesMaskingSchema().load(data)
@@ -155,11 +158,13 @@ def get_files_views() -> tuple[dict, int]:
             BinaryResponseSchema().dump({"message": "", "result": False}),
             http.HTTPStatus.BAD_REQUEST,
         )
-
+    current_app.logger.debug(f"filter data - {filter_data}")
     files = get_filtered_files(
-        page=filter_data.get("page", 1), limit=filter_data.get("limit", 10)
+        protection_ids=filter_data.get("protection_ids"),
+        type_work_ids=filter_data.get("type_work_ids"),
+        type_location_ids=filter_data.get("type_location_ids"),
+        page=filter_data.get("page", 1), limit=filter_data.get("limit", 1000)
     )
-
     files_ser, pagination = serialize_paginate_object(files)
     result = {"files": files_ser, "pagination": pagination}
 
@@ -229,11 +234,14 @@ def generate_masking_view():
     )
 
     if result_gen_map.result:
+        data_for_masking["protections"] = [
+            protection.id for protection in result_gen_map.protections]
         masking_uuid = add_masking_file(
             result_gen_map.protections,
             result_gen_map.description,
             logic_machine_answer=result_gen_map.logic_machine_answer,
             is_test=data_for_masking.get("is_test"),
+            params=data_for_masking
         )
 
         return (
