@@ -8,6 +8,7 @@ import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
 import send_notify from "../../utils/toast";
 import FilterButton from "../forms/FilterForm";
+import LoadingSpinner from "../../components/main/LoadingSpinner";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -15,6 +16,7 @@ export default function Protections() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [protections, setProtections] = useState([]);
     const [typeProtections, setTypeProtections] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const fetchProtections = () => {
         let params = {
@@ -34,6 +36,7 @@ export default function Protections() {
             .get("/masking/type-protection/")
             .then((resp) => {
                 setTypeProtections(resp.data);
+                setIsLoading(false);
             })
             .catch((e) => console.log(e));
     }, []);
@@ -108,88 +111,90 @@ export default function Protections() {
             });
     };
 
-    return (
-        <div className="container">
-            <div className="row">
-                <div className="col-md header-list">
-                    <AddElementButton
-                        name={"Добавить защиту"}
-                        type_form="protection"
-                        types={typeProtections}
-                        onSubmit={addClick}
-                    ></AddElementButton>
+    return isLoading ? 
+            (<LoadingSpinner></LoadingSpinner>)
+            : (
+                <div className="container">
+                <div className="row">
+                    <div className="col-md header-list">
+                        <AddElementButton
+                            name={"Добавить защиту"}
+                            type_form="protection"
+                            types={typeProtections}
+                            onSubmit={addClick}
+                        ></AddElementButton>
+                    </div>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col-md d-flex justify-content-center">
-                    <p>
-                        <h1 className="center-header header-block">Защиты</h1>
-                    </p>
-                </div>
-            </div>
-            <FilterButton
-                typeProtections={typeProtections}
-                onClickFiltered={handleFiltered}
-                name="protections"
-            ></FilterButton>
-            <div className="row">
-                <div className="col-md">
-                    {protections == null ? (
+                <div className="row">
+                    <div className="col-md d-flex justify-content-center">
                         <p>
-                            <h2>Нет защит!</h2>
+                            <h1 className="center-header header-block">Защиты</h1>
                         </p>
-                    ) : (
-                        <table>
-                            <tr>
-                                <th>Название защиты</th>
-                                <th>Название АСУТП</th>
-                                <th>Статус</th>
-                                <th>Вход/Выход</th>
-                                <th>Изменить</th>
-                                <th>Удалить</th>
-                            </tr>
-                            {protections.map((protection) => (
-                                <tr key={protection.id}>
-                                    <td>{protection.name}</td>
-                                    <td>
-                                        {protection.id_type_protection
-                                            ? typeProtections.find(
-                                                  (item) =>
-                                                      item.id ===
-                                                      protection.id_type_protection
-                                              ).name
-                                            : "Отсутсвует"}
-                                    </td>
-                                    <td>{protection.status}</td>
-                                    <td>
-                                        {protection.is_end ? "Выход" : "Вход"}
-                                    </td>
-                                    <td className="td-btn">
-                                        <AddElementButton
-                                            type_form="protection"
-                                            className="btn"
-                                            onSubmit={editClick}
-                                            name={"Изменить"}
-                                            value={protection}
-                                            types={typeProtections}
-                                        ></AddElementButton>
-                                    </td>
-                                    <td className="td-btn">
-                                        <button
-                                            className="btn btn-danger btn-red"
-                                            onClick={(el) =>
-                                                deleteClick(el, protection.id)
-                                            }
-                                        >
-                                            Удалить
-                                        </button>
-                                    </td>
+                    </div>
+                </div>
+                <FilterButton
+                    typeProtections={typeProtections}
+                    onClickFiltered={handleFiltered}
+                    name="protections"
+                ></FilterButton>
+                <div className="row">
+                    <div className="col-md">
+                        {protections == null ? (
+                            <p>
+                                <h2>Нет защит!</h2>
+                            </p>
+                        ) : (
+                            <table>
+                                <tr>
+                                    <th>Название защиты</th>
+                                    <th>Название АСУТП</th>
+                                    <th>Статус</th>
+                                    <th>Вход/Выход</th>
+                                    <th>Изменить</th>
+                                    <th>Удалить</th>
                                 </tr>
-                            ))}
-                        </table>
-                    )}
+                                {protections.map((protection) => (
+                                    <tr key={protection.id}>
+                                        <td>{protection.name}</td>
+                                        <td>
+                                            {protection.id_type_protection
+                                                ? typeProtections.find(
+                                                      (item) =>
+                                                          item.id ===
+                                                          protection.id_type_protection
+                                                  ).name
+                                                : "Отсутсвует"}
+                                        </td>
+                                        <td>{protection.status}</td>
+                                        <td>
+                                            {protection.is_end ? "Выход" : "Вход"}
+                                        </td>
+                                        <td className="td-btn">
+                                            <AddElementButton
+                                                type_form="protection"
+                                                className="btn"
+                                                onSubmit={editClick}
+                                                name={"Изменить"}
+                                                value={protection}
+                                                types={typeProtections}
+                                            ></AddElementButton>
+                                        </td>
+                                        <td className="td-btn">
+                                            <button
+                                                className="btn btn-danger btn-red"
+                                                onClick={(el) =>
+                                                    deleteClick(el, protection.id)
+                                                }
+                                            >
+                                                Удалить
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </table>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+            )
 }

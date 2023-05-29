@@ -31,7 +31,7 @@ const NavAuthBar = (props) => {
                         <h2 className="navButton">Правила</h2>
                     </a>
                 </div>
-                <div className="col navButton" style={aStyle}>
+                <div className="col" style={aStyle}>
                     <Dropdown>
                         <Dropdown.Toggle
                             id="dropdown-basic"
@@ -74,6 +74,29 @@ const NavAuthBar = (props) => {
                                 Связать места проведения работ и их защиты
                             </Dropdown.Item>
                         </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+                <div className="col">
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            id="dropdown-basic"
+                            className="btn btn-nav"
+                        >
+                            <h2
+                                className="navButton"
+                                style={{ display: "inline" }}
+                            >
+                                Карта маскирования
+                            </h2>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="/list-masking-map/">
+                                Список существующих карт маскирования
+                            </Dropdown.Item>
+                            <Dropdown.Item href="/masking-map/">
+                                Сформировать карту маскирования
+                            </Dropdown.Item>
+                            </Dropdown.Menu>
                     </Dropdown>
                 </div>
                 <div className="col">

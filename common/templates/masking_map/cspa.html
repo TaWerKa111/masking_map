@@ -1,0 +1,108 @@
+<html lang="ru">
+<header>
+
+</header>
+{#<link rel="stylesheet" href="../styles/main.css">#}
+<style>
+    .iksweb{
+    width: 100%;
+    border-collapse:collapse;
+    border-spacing:0;
+    height: auto;
+    }
+    table.iksweb,table.iksweb td, table.iksweb th {
+        border: 1px solid #595959;
+    }
+    table.iksweb td,table.iksweb th {
+        padding: 3px;
+        width: 30px;
+        height: 35px;
+    }
+    table.iksweb th {
+        background: #347c99;
+        color: #fff;
+        font-weight: normal;
+    }
+    .right {
+        text-align: right;
+    }
+    h1 {
+        font-size: 20px;
+        text-align: center;
+    }
+    .center {
+        text-align: center;
+    }
+    .protection-mask {
+        width: 10%;
+    }
+    .protection-list {
+        width: 30%;
+    }
+    .protection-mark {
+        width: 20%;
+    }
+    td {
+        width: 10%;
+        max-width: 12%;
+    }
+</style>
+<div>
+    <h1>Форма карты маскирования защит ЦСПА</h1>
+    <p class="right" >Приложение № {{number_pril}}</p>
+    <p class="right">к проекту разрешения на производство работ</p>
+    <p class="right">№{{number_project}} от {{date}}г.</p>
+    <h1>Карта маскирования защит ЦСПА технологического участка {{name_tu}}
+        магистрального трубопровода {{name_mn}}
+    </h1>
+    <table class="iksweb">
+        <tbody>
+            <tr class="center">
+                <td rowspan="2">№</td>
+                <td rowspan="2" class="protection-list">Наименование защит/готовностей подлежащих маскированию</td>
+                <td rowspan="2" class="protection-mask">Маскирование выхода защиты</td>
+                <td rowspan="2" class="protection-mask">Маскирование входов защиты</td>
+                <td colspan="2" class="protection-mark">Установка режима маскирования</td>
+                <td colspan="2" class="protection-mark">Снятие режима маскирования</td>
+            </tr>
+            <tr class="center">
+                <td>Отметка о выполнении</td>
+                <td>Отметка о проверке</td>
+                <td>Отметка о выполнении</td>
+                <td>Отметка о проверке</td>
+            </tr>
+            <tr>
+                <td colspan="8" class="center">На период производства работ на АРМ ЦСПА устанавливается ражим "Маскирования" на следующие защиты</td>
+            </tr>
+            {% for protection in protection_cspa %}
+                <tr class="center">
+                    <td>1.{{loop.index}}</td>
+                    <td>{{protection["name"]}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td></td>
+                <td colspan="3">выполнил </td>
+                <td>подпись/дата</td>
+                <td></td>
+                <td>подпись/дата</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="3">проверил</td>
+                <td></td>
+                <td>подпись/дата</td>
+                <td></td>
+                <td>подпись/дата</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</html>

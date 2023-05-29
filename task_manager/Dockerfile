@@ -10,7 +10,6 @@ RUN apt update && apt -y install postgresql-client
 
 # copy project
 ADD . consumer
-ADD ../common/ consumer/common/
 WORKDIR consumer/
 
 CMD ["python", "manage.py", "launch", "consumer"]

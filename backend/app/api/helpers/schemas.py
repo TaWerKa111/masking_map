@@ -10,7 +10,7 @@ class PaginationSchema(Schema):
     page = fields.Integer(
         example=1, validate=validate.Range(min=0), load_default=1
     )
-    limit = fields.Integer(example=10, load_default=10)
+    limit = fields.Integer(example=10, load_default=1000)
 
 
 class PaginationResponseSchema(Schema):

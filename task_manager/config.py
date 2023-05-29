@@ -56,7 +56,7 @@ class PostgresConfig(BaseSetting):
 
 
 class UrlData(BaseSetting):
-    VALIDATE_FILE = "http://app:5000/api/check-masking-map-file/_private/"
+    VALIDATE_FILE = "http://app:5000/api/files/check-masking-map-file/_private/"
 
 
 class AppConfig(BaseSetting):

@@ -30,6 +30,7 @@ class FileMaskingSchema(Schema):
     user_id = fields.Integer()
     is_test = fields.Boolean()
     is_valid = fields.Boolean()
+    masking_uuid = fields.UUID()
 
 
 class ListFileMaskingSchema(Schema):

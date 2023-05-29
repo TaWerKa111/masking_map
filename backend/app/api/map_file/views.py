@@ -260,13 +260,13 @@ def generate_masking_view():
     return (
         MaskingResponseFileSchema().dump(
             {
-                "message": "Нет. Невозможно сделать карту маскирования!",
+                "message": "Маскирование не нужно!",
                 "result": False,
                 "description": result_gen_map.description,
                 "logic_machine_answer": result_gen_map.logic_machine_answer
             }
         ),
-        http.HTTPStatus.BAD_REQUEST,
+        http.HTTPStatus.OK,
     )
 
 
@@ -278,7 +278,7 @@ def check_masking_map_file_view():
     """
 
     data = request.json
-
+    current_app.logger.debug(f"mask data - {data}")
     try:
         data_for_masking = CheckMaskingFileSchema().load(data)
     except ValidationError as err:
@@ -298,16 +298,17 @@ def check_masking_map_file_view():
         questions=data_for_masking.get("questions"),
     )
 
-    if result_gen_map.result:
-        return (
-            BinaryResponseSchema().dump(
-                {
-                    "message": "Карта маскирования действительная!",
-                    "result": True,
-                }
-            ),
-            http.HTTPStatus.OK,
-        )
+    for protection in result_gen_map.protections:
+        if protection.id not in data_for_masking.get("protections"):
+            return (
+                BinaryResponseSchema().dump(
+                    {
+                        "message": "Карта маскирования действительная!",
+                        "result": True,
+                    }
+                ),
+                http.HTTPStatus.OK,
+            )
 
     return (
         BinaryResponseSchema().dump(
@@ -316,5 +317,5 @@ def check_masking_map_file_view():
                 "result": False,
             }
         ),
-        http.HTTPStatus.BAD_REQUEST,
+        http.HTTPStatus.OK,
     )

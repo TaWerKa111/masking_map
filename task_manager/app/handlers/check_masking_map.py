@@ -23,16 +23,16 @@ class MaskingMapFileHandler(AbstractHandler):
         for map_file in map_files:
             response = requests.post(
                 AppConfig.URLS.VALIDATE_FILE,
-                map_file.params_masking
+                json=map_file.params_masking
             )
 
-            if response.status_code != 200:
-                db.session.rollback()
-                raise DontValidateFile()
+            # if response.status_code != 200:
+            #     db.session.rollback()
+            #     raise DontValidateFile()
 
             data = response.json()
-            if not data.get("is_valid"):
-                map_file.is_valid = False
+            if not data.get("result"):
+                map_file.result = False
                 db.session.commit()
 
         return True

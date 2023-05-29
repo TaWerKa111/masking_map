@@ -8,6 +8,7 @@ from app import db
 from app.handlers import HANDLERS
 from app.transport.consumer.abstract import ConsumerAbc
 from common.postgres.models import TaskCheckMapFile
+from app.helpers.exeptions import DontValidateFile
 
 
 class DataBaseConsumer(ConsumerAbc):
@@ -26,6 +27,8 @@ class DataBaseConsumer(ConsumerAbc):
             if task:
                 try:
                     result = self.on_task(task)
+                except DontValidateFile: 
+                    self.reject(task)
                 except Exception as err:
                     self.logger.error(err, exc_info=True)
                     self.reject(task)

@@ -38,6 +38,7 @@ class MpsaMap(MapAbstract):
             "date": datetime.date.today().strftime("%d.%m.%Y"),
             "name_nps": "",
             "protection_cspa": protection_names,
+            "path_template": "masking_map/mpsa.html"
         }
 
         masking_map = MaskingMapFile(
@@ -85,11 +86,8 @@ class CspaMap(MapAbstract):
             "number_project": "",
             "date": datetime.date.today().strftime("%d.%m.%Y"),
             "name_nps": "",
-            "protection_cspa": [
-                {
-                    "name": protection_names,
-                }
-            ],
+            "protection_cspa": protection_names,
+            "path_template": "masking_map/cspa.html"
         }
 
         masking_map = MaskingMapFile(

@@ -264,15 +264,16 @@ def filter_list_rule(
         query = query.filter(
             CriteriaTypeLocation.id_type_location.in_(type_location_ids)
         )
+
     if type_work_ids:
         query = query.join(
             Criteria,
         ).join(CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id)
         query = query.filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
     if protection_ids:
-        query = query.filter(RuleProtection.id_protection.in_(protection_ids))
+        query = query.join(RuleProtection).filter(RuleProtection.id_protection.in_(protection_ids))
 
-    result = query.paginate(page=page, per_page=limit, error_out=False)
+    result = query.order_by(Rule.id).paginate(page=page, per_page=limit, error_out=False)
     return result
 
 

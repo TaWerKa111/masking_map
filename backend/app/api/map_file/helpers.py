@@ -51,7 +51,7 @@ def render_masking_map(map_uuid: str) -> str:
     )
 
     render_file = render_template(
-        "masking_map/mpsa.html", **file_params.data_masking
+        file_params.data_masking["path_template"], **file_params.data_masking
     )
     return render_file
 

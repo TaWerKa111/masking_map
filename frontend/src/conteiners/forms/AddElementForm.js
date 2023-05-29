@@ -97,6 +97,9 @@ function AddLocElementForm(props) {
     const [types, setTypes] = useState(props.types);
 
     const handleSubmit = (event) => {
+        if (value.ind === ""){
+            value.ind = null;
+        }
         event.preventDefault();
         props.onSubmit(value);
     };

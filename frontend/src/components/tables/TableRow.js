@@ -13,7 +13,7 @@ const TableRow = ({ data, condition, handleClick }) => {
                 <div className="d-flex justify-content-center">
                     <button
                         className="btn btn-primary btn-blue float-end "
-                        onClick={(el) => handleClick(el, data.id)}
+                        onClick={(el) => handleClick(el, data.masking_uuid)}
                     >
                         Скачать
                     </button>

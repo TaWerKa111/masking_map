@@ -138,6 +138,11 @@ export default function MaskingMap() {
 
     const handleGenerateMap = () => {
         // setResultGenerating({});
+        if ( typeWorks.length === 0)
+        {
+            send_toast("Заполните вид работ и место проведения", "error");
+            return;
+        }
         let generateMapData = {
             locations: locations,
             type_works: typeWorks,
