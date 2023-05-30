@@ -68,14 +68,14 @@ function AddWorkElementForm(props) {
                 className="form-control"
             />
 
-            <label>Тип:</label>
+            <label>Отдел:</label>
             <select
                 className="form-select"
                 name="type"
                 value={value.type}
                 onChange={handleChange}
             >
-                <option value="">Выберите тип</option>
+                <option value="">Выберите отдел</option>
                 {dep.map((typeEl) => (
                     <option key={typeEl.id} value={typeEl.id}>
                         {typeEl.name}
@@ -186,14 +186,14 @@ function AddProtectionElementForm(props) {
             />
 
             <label>
-                Тип:
+                Система АСУТП:
                 <select
                     className="form-select"
                     name="type"
                     value={value.type}
                     onChange={handleChange}
                 >
-                    <option value="">Выберите тип</option>
+                    <option value="">Выберите систему АСУТП</option>
                     {types.map((typeEl) => (
                         <option key={typeEl.id} value={typeEl.id}>
                             {typeEl.name}

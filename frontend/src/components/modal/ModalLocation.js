@@ -19,7 +19,7 @@ const ModalLocation = ({ isModal, onClose, handleClickAdd, locations }) => {
             <div>
                 <p className="text-center">
                     Выберите необходимые места проведения работ и нажмите на
-                    кнопку "Выбрать работы"
+                    кнопку "Применить"
                 </p>
             </div>
             <MnObjectQuestions

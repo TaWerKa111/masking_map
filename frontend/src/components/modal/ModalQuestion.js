@@ -15,7 +15,7 @@ const ModalQuestion = ({
                     className="text-center center-header"
                     style={{ display: "inline" }}
                 >
-                    Редактирование вопроса
+                    Редактирование условия
                 </h2>
                 <button
                     className="float-end btn btn-close"

@@ -89,7 +89,7 @@ export default function BankQuestions() {
                         className="btn btn-primary btn-blue"
                         onClick={() => setAddModalQuestion(true)}
                     >
-                        Создать новый вопрос
+                        Задать новое условие
                     </button>
                     <ModalQuestion
                         isModal={isAddModalQuestion}
@@ -98,14 +98,14 @@ export default function BankQuestions() {
                     ></ModalQuestion>
                 </div>
                 <div className="col-md-9">
-                    <h1 className="text-center center-header">Банк вопросов</h1>
+                    <h1 className="text-center center-header">Банк уточняющих условий проведения работ</h1>
                 </div>
             </div>
             <div className="row">
                 <div className="col-md-12">
                     <table>
                         <tr>
-                            <th>Вопрос</th>
+                            <th>Текст условия</th>
                             <th>Ответы</th>
                             <th className="td-btn">Изменить</th>
                             <th className="td-btn">Удалить</th>

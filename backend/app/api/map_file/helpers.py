@@ -159,7 +159,8 @@ def check_generate_masking_plan(
     )
 
     logic_machine_answer.append(
-        f"Правила выбранные по работам: {[rule.id for rule in rules_tw] or 'отсутствуют'}")
+        f"Список идентфикаторов правил, выбранных по работам: "
+        f"{[rule.id for rule in rules_tw] or 'отсутствуют'}")
 
     current_app.logger.debug(f"rule type work - {rules_tw}")
     criteria_location = (
@@ -193,7 +194,7 @@ def check_generate_masking_plan(
     )
 
     logic_machine_answer.append(
-        f"Правила выбранные по работам и местам их проведения: "
+        f"Список идентификаторов правил, выбранных по работам и местам их проведения: "
         f"{[rule.id for rule in rules] or 'отсутствуют'}"
     )
 
@@ -225,17 +226,17 @@ def check_generate_masking_plan(
                 if (
                         answers_d[cr_qu.id_question] != cr_qu.id_right_answer
                 ):
+                    current_app.logger.debug(f"no rules - {rule_id}")
                     logic_machine_answer.append(
                         f"правило №{rule_id} не подходит, ответ неверный на вопрос ''")
                     break
             else:
+                current_app.logger.debug(f"right rule- {rule_id}")
                 rule_right_ids.append(rule_id)
-
-    current_app.logger.debug(f"rule right ids = {rule_right_ids}")
-    rule_ids = rule_right_ids or rule_ids
+        rule_ids = rule_right_ids
     current_app.logger.debug(f"rule right ids = {rule_ids}")
 
-    logic_machine_answer.append(f"Итоговый список правил: {rule_ids}")
+    logic_machine_answer.append(f"Итоговый список идентификаторов правил: {rule_ids}")
 
     protections = (
         db.session.query(Protection)

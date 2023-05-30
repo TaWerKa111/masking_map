@@ -134,7 +134,7 @@ export default function MaskingMaps() {
                         ) : (
                             <table>
                                 <tr>
-                                    <th className="td-ind">ID</th>
+                                    <th className="td-ind">ИД</th>
                                     <th className="">Название</th>
                                     <th className="">Описание</th>
                                     <th className="text-center td-btn">

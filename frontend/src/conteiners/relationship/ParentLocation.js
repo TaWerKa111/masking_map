@@ -104,7 +104,7 @@ export default function ParentLocation() {
                 <div className="col-md d-flex justify-content-center header-list">
                     <p>
                         <h2 className="center-header header-block">
-                            Связать место проведения работ и с его компонентами
+                            Связать место проведения работ с его компонентами
                         </h2>
                     </p>
                 </div>
@@ -115,7 +115,7 @@ export default function ParentLocation() {
                         Выбранное место проведения работ:{" "}
                         {selectedItem ? selectedItem.name : ""}
                     </p>
-                    <p>Выбранное место проведения работ:</p>
+                    <p>Выбранные места проведения работ:</p>
                     <ul>
                         {selectedItems.map((item, index) => (
                             <li key={index}>{item.name}</li>

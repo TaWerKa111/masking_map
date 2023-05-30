@@ -16,8 +16,7 @@ const ModalTypeWork = ({ isModal, onClose, handleClickAdd, works }) => {
             </div>
             <div>
                 <p className="text-center">
-                    Выберите необходимы виды работ и нажмите на кнопку "Выбрать
-                    работы"
+                    Выберите необходимы виды работ и нажмите на кнопку "Применить"
                 </p>
             </div>
             <TypeWorkQuestions

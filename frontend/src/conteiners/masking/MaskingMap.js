@@ -157,9 +157,9 @@ export default function MaskingMap() {
                 setMapUuid(resp.data.masking_uuid);
                 fetchPdfDocument(resp.data.masking_uuid);
                 send_toast("Карта сформирована!", "success");
-                // setStyleBtn({
-                //     display: "none",
-                // });
+                setStyleBtn({
+                    display: "none",
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -179,7 +179,7 @@ export default function MaskingMap() {
                     </h1>
                     <p>
                         Для заполнения отдельных блоков необходимо нажимать
-                        кнопку "Изменить" и в появившемся окне необходимо
+                        кнопку <strong>"Изменить"</strong> и в появившемся окне необходимо
                         выбрать соответсвующие пункты. <br /> Настройка
                         <strong> "Тестовый запрос"</strong> используется для
                         тестирования, проверок.
@@ -351,7 +351,7 @@ export default function MaskingMap() {
                             className="btn btn-full btn-primary btn-blue"
                             onClick={() => setIsModalDesriptions(true)}
                         >
-                            Показать окно с путем формирования карты
+                            Показать окно с протоколом формирования карты
                         </button>
                         <ModalDescriptions
                             onClose={() => setIsModalDesriptions(false)}

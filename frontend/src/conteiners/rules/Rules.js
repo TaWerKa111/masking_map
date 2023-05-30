@@ -197,9 +197,9 @@ export default function Rules() {
                                                       .locations.map((item) => (
                                                           <li>{item.name}</li>
                                                       ))
-                                                : "Не задано"}
+                                                : "Любые"}
                                         </ul>
-                                        <label>Типы локаций</label>
+                                        <label>Типы мест проведения работ</label>
                                         <ul>
                                             {rule.criteria.find(
                                                 (item) =>
@@ -219,7 +219,7 @@ export default function Rules() {
                                                               </li>
                                                           )
                                                       )
-                                                : "Не задано"}
+                                                : "Любые"}
                                         </ul>
                                         <label>Условия</label>
                                         <ul>
@@ -237,7 +237,7 @@ export default function Rules() {
                                                       .questions.map((item) => (
                                                           <li>{item.text}</li>
                                                       ))
-                                                : "Не задано"}
+                                                : "Любые"}
                                         </ul>
                                     </td>
                                     <td className="td-info">

@@ -115,8 +115,8 @@ export default function MnObjectQuestions({
                             {treeList.map((item, ind) => (
                                 <div>
                                     <label>
-                                        {item.type_location
-                                            ? item.type_location.name
+                                        {item.locations && item.locations[0] && item.locations[0].type_location
+                                            ? `Выберите из списка`
                                             : ""}
                                     </label>
                                     <Select

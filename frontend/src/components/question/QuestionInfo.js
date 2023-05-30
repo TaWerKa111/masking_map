@@ -83,7 +83,7 @@ export default function QuestionInfo({
                             Применить
                         </button>
                         <div className="form-group form-row">
-                            <label htmlFor="name">Название</label>
+                            <label htmlFor="name">Текст</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -91,7 +91,7 @@ export default function QuestionInfo({
                                 name="name"
                                 value={question.text}
                                 onChange={OnChangeName}
-                                placeholder="Введите название"
+                                placeholder="Введите текст условия или вопроса"
                             />
                         </div>
                         <div className="form-group">

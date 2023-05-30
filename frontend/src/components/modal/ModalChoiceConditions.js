@@ -20,7 +20,7 @@ const ModalChoiceConditions = ({
             </div>
             <div>
                 <p className="text-center">
-                    Ответь на ряд вопросов и нажмите на кнопку Принять ответы
+                    Ответьте на ряд уточняющих вопросов и нажмите на кнопку "Применить"
                 </p>
             </div>
             <AnswerConditionList

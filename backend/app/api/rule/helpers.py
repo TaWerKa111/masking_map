@@ -459,7 +459,7 @@ def get_filter_questions_for_gen_map(
 
         rule_ids.extend([rule.id for rule in rules.all()])
         descriptions.append(
-            f"Правила подходящие под вид работы: {rule_ids}"
+            f"Количество подходящих правил под вид работы: {len(rule_ids)}"
         )
 
     if location_ids:
@@ -487,7 +487,7 @@ def get_filter_questions_for_gen_map(
             )
             rule_ids.extend([rule.id for rule in rules.all()])
         descriptions.append(
-            f"Правила подходящие под вид работы и места их проведения: {rule_ids}"
+            f"Количество подходящих правил под места их проведения: {len(rule_ids)}"
         )
 
     if rule_ids:
@@ -514,11 +514,11 @@ def get_filter_questions_for_gen_map(
                 })
 
     if not questions:
-        descriptions.append("Нет вопросов")
+        descriptions.append("Нет вопросов по найденным правилам.")
     else:
         descriptions.append(
             f"Вопросы подходящие под вид работы и места их проведения: "
-            f"{[que.get('text') for que in questions]}"
+            f"{[que.get('text') for que in questions] or 'отсутсвуют'}"
         )
 
     return questions, descriptions
