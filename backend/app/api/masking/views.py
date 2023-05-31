@@ -12,6 +12,7 @@ from app.api.masking.schemas import (
     AddTypeWorkSchema,
     AddLocationSchema,
     DepartamentListSchema,
+    FilterTypeLocationSchema,
     TypeProtectionSchema,
     LocationSchema,
     FilterParamTypeWorkSchema,
@@ -1045,6 +1046,7 @@ def get_mn_location_list_view() -> tuple[dict, int]:
     data["name"] = request.args.get("name")
     data["parent_ids[]"] = request.args.getlist("parent_ids[]", None)
     data["limit"] = request.args.get("limit", 1000)
+    data["type_work_ids[]"] = request.args.getlist("type_work_ids[]")
     current_app.logger.debug(f"mn objects data - {data}")
 
     try:
@@ -1274,7 +1276,22 @@ def get_type_location_list_view() -> tuple[dict, int]:
             - masking
     """
 
-    type_objects = get_type_location_list()
+    data = dict()
+    data["type_work_ids[]"] = request.args.getlist('type_work_ids[]')
+    
+    try:
+        valid_data = FilterTypeLocationSchema().load(data)
+    except ValidationError as e:
+        return BinaryResponseSchema().dump(
+            {
+                "message": "Неверный запрос!",
+                "result": False
+            }
+        ), 400
+    
+    type_objects = get_type_location_list(
+        valid_data.get("type_work_ids")
+    )
 
     return (
         jsonify(TypeLocationSchema().dump(type_objects, many=True)),

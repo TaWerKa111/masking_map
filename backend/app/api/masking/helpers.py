@@ -4,6 +4,11 @@ from sqlalchemy.orm import scoped_session
 
 from app.api.helpers.exceptions import SqlAlchemyException
 from common.postgres.models import (
+    Criteria,
+    CriteriaLocation,
+    CriteriaTypeLocation,
+    CriteriaTypeWork,
+    Rule,
     TypeWork,
     Protection,
     TypeProtection,
@@ -320,6 +325,7 @@ def get_location_list(
     type_protection_ids=None,
     type_location_ids=None,
     parent_ids=None,
+    type_work_ids=None,
     page: int = 1,
     limit: int = 10,
 ):
@@ -351,6 +357,20 @@ def get_location_list(
         else:
             query = query.filter(Location.id_parent.in_(parent_ids))
         current_app.logger.debug(f"parent_id - {parent_ids}")
+    
+    if type_work_ids:
+        current_app.logger.debug(f"type_work_ids - {type_work_ids}")
+        rules = (
+            db.session().query(Rule)
+            .join(Criteria)
+            .join(CriteriaTypeWork)
+            .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
+        )
+        query = (
+            query.join(CriteriaLocation, CriteriaLocation.id_location == Location.id)
+            .join(Criteria, Criteria.id == CriteriaLocation.id_criteria)
+            .filter(Criteria.rule_id.in_([rule.id for rule in rules]))
+        )
 
     current_app.logger.debug(f"query - {query}")
     result = query.order_by(Location.created_at).paginate(
@@ -391,9 +411,24 @@ def add_type_location(name: str) -> TypeLocation:
     return type_mn_object
 
 
-def get_type_location_list() -> list[TypeLocation]:
-    type_object_list = db.session.query(TypeLocation).all()
+def get_type_location_list(type_work_ids = None) -> list[TypeLocation]:
+    query = db.session.query(TypeLocation)
 
+    if type_work_ids:
+        current_app.logger.debug(f"type_work_ids - {type_work_ids}")
+        rules = (
+            db.session().query(Rule)
+            .join(Criteria)
+            .join(CriteriaTypeWork)
+            .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
+        )
+        query = (
+            query.join(CriteriaLocation, CriteriaLocation.id_location == Location.id)
+            .join(Criteria, Criteria.id == CriteriaLocation.id_criteria)
+            .filter(Criteria.rule_id.in_([rule.id for rule in rules]))
+        )
+
+    type_object_list = query.all()
     return type_object_list
 
 

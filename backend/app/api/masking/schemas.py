@@ -195,6 +195,13 @@ class TypeLocationSchema(Schema):
     name = fields.Str(example="защита 1")
 
 
+class FilterTypeLocationSchema(Schema):
+    type_work_ids = fields.List(
+        fields.Integer, allow_null=True, 
+        example=[1], data_key="type_work_ids[]"
+    )
+
+
 class AddLocationSchema(Schema):
     """ """
 
@@ -265,6 +272,12 @@ class FilterParamLocationSchema(PaginationSchema):
         allow_none=True,
         data_key="parent_ids[]",
     )
+    type_work_ids = fields.List(
+        fields.Integer(),
+        allow_none=True,
+        example=[1],
+        data_key="type_work_ids[]",
+    )
 
     @post_load
     def get_mn_object_list(self, data, **kwargs):
@@ -275,6 +288,7 @@ class FilterParamLocationSchema(PaginationSchema):
             type_protection_ids=data.get("type_protection_ids"),
             parent_ids=data.get("parent_ids"),
             limit=data.get("limit", 100000),
+            type_work_ids=data.get("type_work_ids"),
         )
 
 
@@ -286,3 +300,5 @@ class RelationshipLocationLocationSchema(Schema):
 class RelationshipLocationProtectionSchema(Schema):
     location_id = fields.Integer()
     protection_ids = fields.List(fields.Integer())
+
+
