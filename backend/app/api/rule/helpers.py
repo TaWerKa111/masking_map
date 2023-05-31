@@ -318,11 +318,23 @@ def update_rule(
 
     for criteria in rule.criteria:
         if criteria.type_criteria == Criteria.TypeCriteria.type_work:
-            criteria.type_works = type_works
+            if type_works:
+                criteria.type_works = type_works
+                criteria.is_any = False
+            else:
+                criteria.is_any = True
         if criteria.type_criteria == Criteria.TypeCriteria.location:
-            criteria.locations = locations
+            if locations:
+                criteria.locations = locations
+                criteria.is_any = False
+            else:
+                criteria.is_any = True
         if criteria.type_criteria == Criteria.TypeCriteria.type_location:
-            criteria.locations_type = type_locations
+            if type_locations:
+                criteria.locations_type = type_locations
+                criteria.is_any = False
+            else:
+                criteria.is_any = True
         if criteria.type_criteria == Criteria.TypeCriteria.question:
             criteria.questions = []
             db.session.commit()
