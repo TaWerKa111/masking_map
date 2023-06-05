@@ -146,6 +146,7 @@ export default function RuleInfo(props) {
                 answers: condition.answers,
                 right_answer_id: condition.answers.find((item) => item.is_right)
                     .id,
+                number_question: condition.number_question,
             };
         });
         setCriteriaList(
@@ -317,7 +318,7 @@ export default function RuleInfo(props) {
                         <ul>
                             {criteria.questions.map((condition) => (
                                 <p key={condition.id}>
-                                    {condition.text}{" "}
+                                    {condition.number_question} {condition.text}{" "}
                                     {condition.answers.find(
                                         (answer) => answer.is_right === true
                                     )

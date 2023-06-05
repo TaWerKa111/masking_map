@@ -7,7 +7,6 @@ import { type } from "@testing-library/user-event/dist/type";
 import ModalChoiceConditions from "../../components/modal/ModalChoiceConditions";
 import send_toast from "../../utils/toast";
 import ModalDescriptions from "../../components/modal/ModalDescriptions";
-import ModalQuestioinLocation from "../../components/modal/ModalQuestioinLocation";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -24,8 +23,6 @@ export default function MaskingMap() {
     const [isModalLocation, setModalLocation] = useState(false);
     const [isModalCondition, setModalCondition] = useState(false);
     const [locations, setLocations] = useState([]);
-    const [locationList, setLocationList] = useState([]);
-    const [typeLocationList, setTypeLocationList] = useState([]);
     const [typeWorks, setTypeWorks] = useState([]);
     const [conditions, setConditions] = useState([]);
     const [styleBtn, setStyleBtn] = useState({
@@ -34,26 +31,20 @@ export default function MaskingMap() {
     const [isTest, setIsTest] = useState(false);
     const [questionDescriptions, setQuestionDescriptions] = useState([]);
     const [isModalDesriptions, setIsModalDesriptions] = useState(false);
-    const [typeLocations, setTypeLocations] = useState([]);
 
     // const [selectedConditions, setSelectedConditions] = useState([]);
-    const fetchQuestions = (type_works = null, location_list = null, type_location_list = null) => {
+    const fetchQuestions = (type_works = null, location_list = null) => {
         let tw = null;
         let loc = null;
-        let tl = null;
         if (type_works) {
             tw = type_works.map((typeWork) => typeWork.id);
         }
         if (location_list) {
             loc = location_list.map((location) => location.id);
         }
-        if (type_location_list) {
-            tl = type_location_list.map((location) => location.id);
-        }
         let params = {
             "type_work_ids[]": tw,
             "location_ids[]": loc,
-            "type_location_ids[]": tl,
         };
         console.log("questions params", params);
         apiInst
@@ -68,40 +59,6 @@ export default function MaskingMap() {
     };
     const styleTdName = { width: "28%" };
 
-    const fetchLocations = (type_works = null) => {
-        let tw = null;
-        let loc = null;
-        if (type_works) {
-            tw = type_works.map((typeWork) => typeWork.id);
-        }
-        let params = {
-            "type_work_ids[]": tw,
-        };
-        apiInst
-            .get("/masking/location-list/", { params })
-            .then((resp) => {
-                setLocationList(resp.data.locations);
-            })
-            .catch((e) => console.log(e));
-    }
-
-    const fetchTypeLocations = (type_works = null) => {
-        let tw = null;
-        let loc = null;
-        if (type_works) {
-            tw = type_works.map((typeWork) => typeWork.id);
-        }
-        let params = {
-            "type_work_ids[]": tw,
-        };
-        apiInst
-            .get("/masking/type-location/", { params: params })
-            .then((resp) => {
-                setTypeLocationList(resp.data);
-            })
-            .catch((e) => console.log(e));
-    }
-
     useEffect(() => {
         // fetchQuestions();
     }, []);
@@ -110,29 +67,24 @@ export default function MaskingMap() {
         console.log("type_works", typeWorks);
         setModalTypeWork(false);
         setTypeWorks(selectedTypeWorks);
-        fetchQuestions(selectedTypeWorks, locations, typeLocations);
-        fetchLocations(selectedTypeWorks);
-        fetchTypeLocations(selectedTypeWorks);
+        fetchQuestions(selectedTypeWorks, locations);
     };
 
-    const handleLocations = (locations, typeLocationsList) => {
+    const handleLocations = (locations) => {
         console.log("locations", locations);
         setModalLocation(false);
         setLocations(
-            // locations.map((location) => ({
-            //     name: location.label,
-            //     id: location.value,
-            // }))
-            locations
+            locations.map((location) => ({
+                name: location.label,
+                id: location.value,
+            }))
         );
-        setTypeLocations(typeLocationsList);
         fetchQuestions(
             typeWorks,
             locations.map((location) => ({
                 name: location.label,
                 id: location.value,
-            })),
-            typeLocationsList
+            }))
         );
     };
 
@@ -186,8 +138,7 @@ export default function MaskingMap() {
 
     const handleGenerateMap = () => {
         // setResultGenerating({});
-        if ( typeWorks.length === 0)
-        {
+        if (typeWorks.length === 0) {
             send_toast("Заполните вид работ и место проведения", "error");
             return;
         }
@@ -218,7 +169,6 @@ export default function MaskingMap() {
 
     console.log("result", resultGenerating);
     console.log("desc qestions", questionDescriptions);
-    console.log("locationList", locationList);
     return (
         <div className="container">
             <div className="row">
@@ -228,10 +178,12 @@ export default function MaskingMap() {
                     </h1>
                     <p>
                         Для заполнения отдельных блоков необходимо нажимать
-                        кнопку <strong>"Изменить"</strong> и в появившемся окне необходимо
-                        выбрать соответсвующие пункты. <br /> Настройка
+                        кнопку <strong>"Изменить"</strong> и в появившемся окне
+                        необходимо выбрать соответсвующие пункты. <br />{" "}
+                        Настройка
                         <strong> "Тестовый запрос"</strong> используется для
                         тестирования, проверок.
+                        <br /> Алгоритм версии: 0.1
                     </p>
                 </div>
             </div>
@@ -290,48 +242,42 @@ export default function MaskingMap() {
                             </div>
                         </td>
                     </tr>
-                    {
-                        locationList.length > 0 || typeLocationList.length > 0 ?
-                        (                    <tr>
-                            <td style={styleTdName}>
-                                <div className="d-flex h3 justify-content-center align-items-center">
-                                    <label>Места проведения работ:</label>
-                                </div>
-                            </td>
-                            <td>
-                                <label className="h6">
-                                    Выбранные места проведения работ:
-                                </label>
-    
-                                <ul>
-                                    {locations.map((location) => (
-                                        <p key={location.id}>{location.name}</p>
-                                    ))}
-                                </ul>
-                                <ModalQuestioinLocation
-                                    isModal={isModalLocation}
-                                    onClose={() => setModalLocation(false)}
-                                    handleClickAdd={handleLocations}
-                                    locations={locationList}
-                                    type_locations={typeLocationList}
-                                ></ModalQuestioinLocation>
-                            </td>
-                            <td className="td-btn">
-                                <div className="d-flex justify-content-center">
-                                    <button
-                                        className="btn btn-primary btn-edit"
-                                        onClick={() => setModalLocation(true)}
-                                        style={styleBtn}
-                                    >
-                                        Изменить
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>)
-                        : <></>
-                    }
+                    <tr>
+                        <td style={styleTdName}>
+                            <div className="d-flex h3 justify-content-center align-items-center">
+                                <label>Места проведения работ:</label>
+                            </div>
+                        </td>
+                        <td>
+                            <label className="h6">
+                                Выбранные места проведения работ:
+                            </label>
 
-                    {(locations.length > 0 || locationList.lenght === 0) || (typeLocationList.length === 0 || typeLocations.lenght > 0) && conditions.length > 0 ? (
+                            <ul>
+                                {locations.map((location) => (
+                                    <p key={location.id}>{location.name}</p>
+                                ))}
+                            </ul>
+                            <ModalLocation
+                                isModal={isModalLocation}
+                                onClose={() => setModalLocation(false)}
+                                handleClickAdd={handleLocations}
+                                locations={locations}
+                            ></ModalLocation>
+                        </td>
+                        <td className="td-btn">
+                            <div className="d-flex justify-content-center">
+                                <button
+                                    className="btn btn-primary btn-edit"
+                                    onClick={() => setModalLocation(true)}
+                                    style={styleBtn}
+                                >
+                                    Изменить
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {conditions.length > 0 ? (
                         <tr>
                             <td style={styleTdName}>
                                 <div className="d-flex h3 justify-content-center align-items-center">

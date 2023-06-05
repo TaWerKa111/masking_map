@@ -2,20 +2,22 @@ import datetime
 import uuid
 from abc import ABC, abstractmethod
 
+from flask import current_app
+
 from app import db
+from app.api.masking.schemas import ProtectionSchema
 from common.postgres.models import MaskingMapFile
 from config import AppConfig
 
 
 class MapAbstract(ABC):
-    @abstractmethod
-    def generate_map(self):
-        pass
-
-
-class MpsaMap(MapAbstract):
     def __init__(
-        self, protections, description, logic_machine_answer, is_test=False, params_masking=None
+        self,
+        protections,
+        description,
+        logic_machine_answer,
+        is_test=False,
+        params_masking=None,
     ):
         self.protections = protections
         self.description = description
@@ -23,14 +25,43 @@ class MpsaMap(MapAbstract):
         self.is_test = is_test
         self.params_masking = params_masking
 
+        temp_protections = list()
+        for protection in self.protections:
+            if protection and not isinstance(protection, dict):
+                temp_protections.append(ProtectionSchema().dump(protection))
+            else:
+                temp_protections.append(protection)
+        self.protections = temp_protections
+
+    @abstractmethod
+    def generate_map(self):
+        pass
+
+
+class MpsaMap(MapAbstract):
+    def __init__(
+        self,
+        protections,
+        description,
+        logic_machine_answer,
+        is_test=False,
+        params_masking=None,
+    ):
+        super().__init__(
+            protections,
+            description,
+            logic_machine_answer,
+            is_test,
+            params_masking,
+        )
+
     def generate_map(self):
         protection_names = []
 
         for protection in self.protections:
-            protection_names.append({
-                "name": protection.name
-            })
-
+            protection_names.append({"name": protection.get("name")})
+        current_app.logger.debug(f"protection names gen map - {protection_names}")
+        current_app.logger.debug(f"protection gen map - {self.protections}")
         masking_uuid = uuid.uuid4()
         masking_data = {
             "number_pril": "",
@@ -38,7 +69,7 @@ class MpsaMap(MapAbstract):
             "date": datetime.date.today().strftime("%d.%m.%Y"),
             "name_nps": "",
             "protection_cspa": protection_names,
-            "path_template": "masking_map/mpsa.html"
+            "path_template": "masking_map/mpsa.html",
         }
 
         masking_map = MaskingMapFile(
@@ -49,12 +80,10 @@ class MpsaMap(MapAbstract):
             ),
             data_masking=masking_data,
             masking_uuid=masking_uuid,
-            logic_machine_answer={
-                "list": self.logic_machine_answer
-            },
+            logic_machine_answer={"list": self.logic_machine_answer},
             is_test=self.is_test,
             is_valid=True,
-            params_masking=self.params_masking
+            params_masking=self.params_masking,
         )
 
         db.session.add(masking_map)
@@ -64,21 +93,26 @@ class MpsaMap(MapAbstract):
 
 class CspaMap(MapAbstract):
     def __init__(
-        self, protections, description, logic_machine_answer, is_test=False, params_masking=None
+        self,
+        protections,
+        description,
+        logic_machine_answer,
+        is_test=False,
+        params_masking=None,
     ):
-        self.protections = protections
-        self.description = description
-        self.logic_machine_answer = logic_machine_answer
-        self.is_test = is_test
-        self.params_masking = params_masking
+        super().__init__(
+            protections,
+            description,
+            logic_machine_answer,
+            is_test,
+            params_masking,
+        )
 
     def generate_map(self):
         protection_names = []
 
         for protection in self.protections:
-            protection_names.append({
-                "name": protection.name
-            })
+            protection_names.append({"name": protection.get("name")})
 
         masking_uuid = uuid.uuid4()
         masking_data = {
@@ -87,7 +121,7 @@ class CspaMap(MapAbstract):
             "date": datetime.date.today().strftime("%d.%m.%Y"),
             "name_nps": "",
             "protection_cspa": protection_names,
-            "path_template": "masking_map/cspa.html"
+            "path_template": "masking_map/cspa.html",
         }
 
         masking_map = MaskingMapFile(
@@ -98,12 +132,10 @@ class CspaMap(MapAbstract):
             ),
             data_masking=masking_data,
             masking_uuid=masking_uuid,
-            logic_machine_answer={
-                "list": self.logic_machine_answer
-            },
+            logic_machine_answer={"list": self.logic_machine_answer},
             is_test=self.is_test,
             is_valid=True,
-            params_masking=self.params_masking
+            params_masking=self.params_masking,
         )
 
         db.session.add(masking_map)
@@ -111,7 +143,4 @@ class CspaMap(MapAbstract):
         return masking_map.masking_uuid
 
 
-HANDLERS = {
-    AppConfig.MPSA: MpsaMap,
-    AppConfig.CSPA: CspaMap
-}
+HANDLERS = {AppConfig.MPSA: MpsaMap, AppConfig.CSPA: CspaMap}

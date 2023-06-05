@@ -27,7 +27,7 @@ const Navbar = (props) => {
                     </a>
                 </div>
                 <div className="col">
-                    <a href="/masking-map/" style={aStyle}>
+                    <a href="/masking-map-v2/" style={aStyle}>
                         <h2 className="navButton">Составить карту</h2>
                     </a>
                 </div>

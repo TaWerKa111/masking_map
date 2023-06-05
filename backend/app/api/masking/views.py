@@ -1277,21 +1277,19 @@ def get_type_location_list_view() -> tuple[dict, int]:
     """
 
     data = dict()
-    data["type_work_ids[]"] = request.args.getlist('type_work_ids[]')
-    
+    data["type_work_ids[]"] = request.args.getlist("type_work_ids[]")
+
     try:
         valid_data = FilterTypeLocationSchema().load(data)
     except ValidationError as e:
-        return BinaryResponseSchema().dump(
-            {
-                "message": "Неверный запрос!",
-                "result": False
-            }
-        ), 400
-    
-    type_objects = get_type_location_list(
-        valid_data.get("type_work_ids")
-    )
+        return (
+            BinaryResponseSchema().dump(
+                {"message": "Неверный запрос!", "result": False}
+            ),
+            400,
+        )
+
+    type_objects = get_type_location_list(valid_data.get("type_work_ids"))
 
     return (
         jsonify(TypeLocationSchema().dump(type_objects, many=True)),

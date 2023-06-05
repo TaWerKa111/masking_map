@@ -357,17 +357,20 @@ def get_location_list(
         else:
             query = query.filter(Location.id_parent.in_(parent_ids))
         current_app.logger.debug(f"parent_id - {parent_ids}")
-    
+
     if type_work_ids:
         current_app.logger.debug(f"type_work_ids - {type_work_ids}")
         rules = (
-            db.session().query(Rule)
+            db.session()
+            .query(Rule)
             .join(Criteria)
             .join(CriteriaTypeWork)
             .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
         )
         query = (
-            query.join(CriteriaLocation, CriteriaLocation.id_location == Location.id)
+            query.join(
+                CriteriaLocation, CriteriaLocation.id_location == Location.id
+            )
             .join(Criteria, Criteria.id == CriteriaLocation.id_criteria)
             .filter(Criteria.rule_id.in_([rule.id for rule in rules]))
         )
@@ -411,19 +414,22 @@ def add_type_location(name: str) -> TypeLocation:
     return type_mn_object
 
 
-def get_type_location_list(type_work_ids = None) -> list[TypeLocation]:
+def get_type_location_list(type_work_ids=None) -> list[TypeLocation]:
     query = db.session.query(TypeLocation)
 
     if type_work_ids:
         current_app.logger.debug(f"type_work_ids - {type_work_ids}")
         rules = (
-            db.session().query(Rule)
+            db.session()
+            .query(Rule)
             .join(Criteria)
             .join(CriteriaTypeWork)
             .filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
         )
         query = (
-            query.join(CriteriaLocation, CriteriaLocation.id_location == Location.id)
+            query.join(
+                CriteriaLocation, CriteriaLocation.id_location == Location.id
+            )
             .join(Criteria, Criteria.id == CriteriaLocation.id_criteria)
             .filter(Criteria.rule_id.in_([rule.id for rule in rules]))
         )
@@ -458,18 +464,23 @@ def update_rel_location_location(location_id, location_ids):
     locations = (
         db.session.query(Location)
         .filter(Location.id_parent == location_id)
-        .update({"id_parent": None})
+        .update({"id_parent": None, "full_name": None})
     )
+
     current_app.logger.debug(f"locations - {locations}")
 
-    (
-        db.session.query(Location)
-        .filter(Location.id.in_(location_ids))
-        .update({"id_parent": location_id})
+    parent_location = (
+        db.session.query(Location).get(location_id)
     )
 
-    # for location in locations:
-    #     location.id_parent = location_id
+    locations: list[Location] = (
+        db.session.query(Location)
+        .filter(Location.id.in_(location_ids))
+    )
+
+    for loc in locations:
+        loc.full_name = f"{parent_location.name} {loc.name}"
+        loc.id_parent = location_id
 
     db.session.commit()
 

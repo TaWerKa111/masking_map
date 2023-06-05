@@ -175,6 +175,8 @@ components:
       properties:
         id:
           type: integer
+        is_any:
+          type: boolean
         locations:
           items:
             $ref: '#/components/schemas/Location1'
@@ -222,8 +224,34 @@ components:
           type: boolean
         is_valid:
           type: boolean
+        masking_uuid:
+          format: uuid
+          type: string
         user_id:
           type: integer
+      type: object
+    GenerateMapV2:
+      properties:
+        location_ids:
+          items:
+            type: integer
+          nullable: true
+          type: array
+        questions:
+          items:
+            $ref: '#/components/schemas/QuestionMasking'
+          nullable: true
+          type: array
+        type_location_ids:
+          items:
+            type: integer
+          nullable: true
+          type: array
+        type_work_ids:
+          items:
+            type: integer
+          nullable: true
+          type: array
       type: object
     GenerateMaskingPlan:
       properties:
@@ -254,6 +282,10 @@ components:
       type: object
     Location:
       properties:
+        full_name:
+          example: string
+          nullable: true
+          type: string
         id:
           example: 1
           type: integer
@@ -312,6 +344,27 @@ components:
           example: '12345678'
           type: string
       type: object
+    MaskingCriteria:
+      properties:
+        criteria:
+          $ref: '#/components/schemas/Criteria'
+        description:
+          type: string
+        logic_machine_answer:
+          items:
+            type: string
+          type: array
+        prev_stage:
+          type: string
+        protections:
+          items:
+            $ref: '#/components/schemas/Protection'
+          type: array
+        result:
+          type: boolean
+        stage:
+          type: string
+      type: object
     PaginationResponse:
       properties:
         limit:
@@ -346,6 +399,8 @@ components:
         name:
           example: ''
           type: string
+        type_protection:
+          $ref: '#/components/schemas/TypeProtection'
       type: object
     ProtectionList:
       properties:
@@ -374,6 +429,9 @@ components:
         id_right_answer:
           nullable: true
           type: integer
+        number_question:
+          nullable: true
+          type: integer
         text:
           type: string
       type: object
@@ -395,6 +453,13 @@ components:
           items:
             $ref: '#/components/schemas/Question1'
           type: array
+      type: object
+    QuestionMasking:
+      properties:
+        answer_id:
+          type: integer
+        id:
+          type: integer
       type: object
     RelationshipLocationLocation:
       properties:
@@ -430,6 +495,10 @@ components:
         protections:
           items:
             $ref: '#/components/schemas/Protection'
+          type: array
+        questions:
+          items:
+            type: object
           type: array
       type: object
     RuleProtection:
@@ -608,9 +677,16 @@ paths:
         \u0441\u043E\u043A \u0442\u0438\u043F\u043E\u0432 \u0440\u0430\u0431\u043E\
         \u0442"
       parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          example: Work 1
+          nullable: true
+          type: string
       - explode: true
         in: query
-        name: type_protection_ids[]
+        name: type_location_ids[]
         required: false
         schema:
           example:
@@ -632,7 +708,7 @@ paths:
         style: form
       - explode: true
         in: query
-        name: type_location_ids[]
+        name: type_protection_ids[]
         required: false
         schema:
           example:
@@ -647,13 +723,6 @@ paths:
         required: false
         schema:
           example: dep
-          nullable: true
-          type: string
-      - in: query
-        name: name
-        required: false
-        schema:
-          example: Work 1
           nullable: true
           type: string
       responses:
@@ -883,12 +952,6 @@ paths:
         \u0441\u043E\u043A \u0437\u0430\u0449\u0438\u0442"
       parameters:
       - in: query
-        name: name
-        required: false
-        schema:
-          nullable: true
-          type: string
-      - in: query
         name: page
         required: false
         schema:
@@ -907,10 +970,16 @@ paths:
           type: array
         style: form
       - in: query
+        name: name
+        required: false
+        schema:
+          nullable: true
+          type: string
+      - in: query
         name: limit
         required: false
         schema:
-          default: 10
+          default: 1000
           example: 10
           type: integer
       responses:
@@ -1273,25 +1342,34 @@ paths:
       description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
         \u0441\u043E\u043A \u043B\u043E\u043A\u0430\u0446\u0438\u0439"
       parameters:
+      - in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          example: 1
+          minimum: 0
+          type: integer
+      - in: query
+        name: name
+        required: false
+        schema:
+          example: example
+          nullable: true
+          type: string
       - explode: true
         in: query
-        name: type_protection_ids[]
+        name: parent_ids[]
         required: false
         schema:
           example:
-          - 1
+          - '1'
           items:
-            type: integer
+            nullable: true
+            type: string
           nullable: true
           type: array
         style: form
-      - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
-          type: integer
       - explode: true
         in: query
         name: type_location_ids[]
@@ -1305,30 +1383,33 @@ paths:
           type: array
         style: form
       - in: query
-        name: name
+        name: limit
         required: false
         schema:
-          example: example
-          nullable: true
-          type: string
-      - in: query
-        name: page
-        required: false
-        schema:
-          default: 1
-          example: 1
-          minimum: 0
+          default: 1000
+          example: 10
           type: integer
       - explode: true
         in: query
-        name: parent_ids[]
+        name: type_work_ids[]
         required: false
         schema:
           example:
-          - '1'
+          - 1
           items:
-            nullable: true
-            type: string
+            type: integer
+          nullable: true
+          type: array
+        style: form
+      - explode: true
+        in: query
+        name: type_protection_ids[]
+        required: false
+        schema:
+          example:
+          - 1
+          items:
+            type: integer
           nullable: true
           type: array
         style: form
@@ -1651,13 +1732,43 @@ paths:
           example: 1
           minimum: 0
           type: integer
+      - explode: true
+        in: query
+        name: protection_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          nullable: true
+          type: array
+        style: form
+      - explode: true
+        in: query
+        name: type_location_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          nullable: true
+          type: array
+        style: form
       - in: query
         name: limit
         required: false
         schema:
-          default: 10
+          default: 1000
           example: 10
           type: integer
+      - explode: true
+        in: query
+        name: type_work_ids[]
+        required: false
+        schema:
+          items:
+            type: integer
+          nullable: true
+          type: array
+        style: form
       responses:
         '200':
           content:
@@ -1824,6 +1935,14 @@ paths:
       description: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0441\u043F\u0438\
         \u0441\u043E\u043A \u043F\u0440\u0430\u0432\u0438\u043B"
       parameters:
+      - in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          example: 1
+          minimum: 0
+          type: integer
       - explode: true
         in: query
         name: protection_ids[]
@@ -1833,16 +1952,9 @@ paths:
             type: integer
           type: array
         style: form
-      - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
-          type: integer
       - explode: true
         in: query
-        name: type_location_ids[]
+        name: rule_ids[]
         required: false
         schema:
           items:
@@ -1855,23 +1967,22 @@ paths:
         schema:
           nullable: true
           type: string
-      - in: query
-        name: page
-        required: false
-        schema:
-          default: 1
-          example: 1
-          minimum: 0
-          type: integer
       - explode: true
         in: query
-        name: rule_ids[]
+        name: type_location_ids[]
         required: false
         schema:
           items:
             type: integer
           type: array
         style: form
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 1000
+          example: 10
+          type: integer
       - explode: true
         in: query
         name: type_work_ids[]
@@ -1910,19 +2021,6 @@ paths:
         \u0430\u0441\u043A\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0437\u0430\
         \u0449\u0438\u0442"
       parameters:
-      - in: query
-        name: text
-        required: false
-        schema:
-          nullable: true
-          type: string
-      - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
-          type: integer
       - explode: true
         in: query
         name: location_ids[]
@@ -1951,6 +2049,19 @@ paths:
           nullable: true
           type: array
         style: form
+      - in: query
+        name: text
+        required: false
+        schema:
+          nullable: true
+          type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 1000
+          example: 10
+          type: integer
       - explode: true
         in: query
         name: type_work_ids[]
@@ -1991,19 +2102,6 @@ paths:
         \u0430\u0441\u043A\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0437\u0430\
         \u0449\u0438\u0442"
       parameters:
-      - in: query
-        name: text
-        required: false
-        schema:
-          nullable: true
-          type: string
-      - in: query
-        name: limit
-        required: false
-        schema:
-          default: 10
-          example: 10
-          type: integer
       - explode: true
         in: query
         name: location_ids[]
@@ -2032,6 +2130,19 @@ paths:
           nullable: true
           type: array
         style: form
+      - in: query
+        name: text
+        required: false
+        schema:
+          nullable: true
+          type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 1000
+          example: 10
+          type: integer
       - explode: true
         in: query
         name: type_work_ids[]
@@ -2092,6 +2203,37 @@ paths:
         \u0438\u044F \u0437\u0430\u0449\u0438\u0442"
       tags:
       - rule
+  /api/files/generate-masking-v2/:
+    post:
+      description: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u043A\u0430\
+        \u0440\u0442\u044B \u043C\u0430\u0441\u043A\u0438\u0440\u043E\u0432\u0430\u043D\
+        \u0438\u044F"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateMapV2'
+        description: "\u041F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B"
+      responses:
+        '200':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/MaskingCriteria'
+          description: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043F\
+            \u0440\u043E\u0432\u0435\u0440\u043A\u0438"
+        '400':
+          content:
+            app/json:
+              schema:
+                $ref: '#/components/schemas/BinaryResponse'
+          description: "\u041A\u0430\u0440\u0442\u0430 \u043D\u0435 \u043D\u0443\u0436\
+            \u043D\u0430"
+      summary: "\u0421\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\
+        \u0442\u044C \u043A\u0430\u0440\u0442\u0443 \u043C\u0430\u0441\u043A\u0438\
+        \u0440\u043E\u0432\u0430\u043D\u0438\u044F"
+      tags:
+      - map_files
 servers:
 - description: "\u0422\u0435\u0441\u0442\u043E\u0432\u044B\u0439 \u0441\u0435\u0440\
     \u0432\u0435\u0440"

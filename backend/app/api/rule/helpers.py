@@ -156,6 +156,10 @@ def add_new_rule(
     criteria_question = add_criteria(
         "Критерий вопросов", Criteria.TypeCriteria.question
     )
+    if questions:
+        criteria_question.is_any = False
+    else:
+        criteria_question.is_any = True
     rule.criteria.append(criteria_question)
 
     for question in questions:
@@ -163,6 +167,7 @@ def add_new_rule(
             id_question=question.get("id"),
             id_criteria=criteria_question.id,
             id_right_answer=question.get("right_answer_id"),
+            number_question=question.get("number_question"),
         )
         db.session.add(qu_ans)
         db.session.commit()
@@ -271,9 +276,13 @@ def filter_list_rule(
         ).join(CriteriaTypeWork, CriteriaTypeWork.id_criteria == Criteria.id)
         query = query.filter(CriteriaTypeWork.id_type_work.in_(type_work_ids))
     if protection_ids:
-        query = query.join(RuleProtection).filter(RuleProtection.id_protection.in_(protection_ids))
+        query = query.join(RuleProtection).filter(
+            RuleProtection.id_protection.in_(protection_ids)
+        )
 
-    result = query.order_by(Rule.id).paginate(page=page, per_page=limit, error_out=False)
+    result = query.order_by(Rule.id).paginate(
+        page=page, per_page=limit, error_out=False
+    )
     return result
 
 
@@ -338,20 +347,25 @@ def update_rule(
         if criteria.type_criteria == Criteria.TypeCriteria.question:
             criteria.questions = []
             db.session.commit()
-            for question in questions:
-                qu_ans = CriteriaQuestion(
-                    id_question=question.get("id"),
-                    id_criteria=criteria.id,
-                    id_right_answer=question.get("right_answer_id"),
-                )
-                db.session.add(qu_ans)
-                db.session.commit()
+            if questions:
+                criteria.is_any = False
+                for question in questions:
+                    qu_ans = CriteriaQuestion(
+                        id_question=question.get("id"),
+                        id_criteria=criteria.id,
+                        id_right_answer=question.get("right_answer_id"),
+                        number_question=question.get("number_question"),
+                    )
+                    db.session.add(qu_ans)
+                    db.session.commit()
+            else:
+                criteria.is_any = True
 
     if protections:
         (
-            db.session.query(RuleProtection).filter(
-                RuleProtection.id_rule == rule.id
-            ).delete()
+            db.session.query(RuleProtection)
+            .filter(RuleProtection.id_rule == rule.id)
+            .delete()
         )
         db.session.commit()
 
@@ -424,7 +438,6 @@ def filter_list_question(
         ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
         query = query.filter(Criteria.rule_id.in_(rule_ids))
 
-
     current_app.logger.info(f"qu - {query}")
     result = query.paginate(page=page, per_page=limit, error_out=False)
     return result
@@ -435,12 +448,13 @@ def get_filter_questions_for_gen_map(
     location_ids=None,
 ):
     """
-    Получение отфильтрованного списка вопросов по правилам, 
+    Получение отфильтрованного списка вопросов по правилам,
     в которые входят работы и локации.
     На выходе выдается список вопросов, отфильтрованных по важности,
     т.е. те которые чаще всего встречаются.
 
     """
+
     def append_to_tree():
         pass
 
@@ -458,13 +472,12 @@ def get_filter_questions_for_gen_map(
             )
             .filter(
                 or_(
-                    CriteriaTypeWork.id_type_work.in_(
-                        type_work_ids
-                    ),
+                    CriteriaTypeWork.id_type_work.in_(type_work_ids),
                     and_(
-                        Criteria.type_criteria == Criteria.TypeCriteria.type_work,
+                        Criteria.type_criteria
+                        == Criteria.TypeCriteria.type_work,
                         Criteria.is_any.is_(True),
-                    )
+                    ),
                 )
             )
         )
@@ -483,20 +496,17 @@ def get_filter_questions_for_gen_map(
             )
             .filter(
                 or_(
-                    CriteriaLocation.id_location.in_(
-                        location_ids
-                    ),
+                    CriteriaLocation.id_location.in_(location_ids),
                     and_(
-                        Criteria.type_criteria == Criteria.TypeCriteria.location,
+                        Criteria.type_criteria
+                        == Criteria.TypeCriteria.location,
                         Criteria.is_any.is_(True),
-                    )
+                    ),
                 ),
             )
         )
         if rule_ids:
-            rules = query_loc_rule.filter(
-                Rule.id.in_(rule_ids)
-            )
+            rules = query_loc_rule.filter(Rule.id.in_(rule_ids))
             rule_ids.extend([rule.id for rule in rules.all()])
         descriptions.append(
             f"Количество подходящих правил под места их проведения: {len(rule_ids)}"
@@ -508,7 +518,9 @@ def get_filter_questions_for_gen_map(
             temp_query = query.join(
                 CriteriaQuestion, CriteriaQuestion.id_question == Question.id
             ).join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
-            data_question = temp_query.filter(Criteria.rule_id == rule_id).all()
+            data_question = temp_query.filter(
+                Criteria.rule_id == rule_id
+            ).all()
             rules_questions.setdefault(rule_id, data_question)
 
     questions = list()
@@ -517,13 +529,15 @@ def get_filter_questions_for_gen_map(
         for question, cr_que in rules_questions.get(rule_id):
             if question.id not in exists_questions:
                 exists_questions.add(question.id)
-                questions.append({
-                    "id": question.id,
-                    "text": question.text,
-                    "answers": question.answers,
-                    "id_right_answer": cr_que.id_right_answer,
-                    "rule_id": rule_id
-                })
+                questions.append(
+                    {
+                        "id": question.id,
+                        "text": question.text,
+                        "answers": question.answers,
+                        "id_right_answer": cr_que.id_right_answer,
+                        "rule_id": rule_id,
+                    }
+                )
 
     if not questions:
         descriptions.append("Нет вопросов по найденным правилам.")
@@ -602,11 +616,10 @@ def delete_rule(rule_id):
 def get_questions_by_rule(rule_id):
     questions_list = (
         db.session.query(Question, CriteriaQuestion)
-        .join(
-            CriteriaQuestion, CriteriaQuestion.id_question == Question.id
-        )
+        .join(CriteriaQuestion, CriteriaQuestion.id_question == Question.id)
         .join(Criteria, Criteria.id == CriteriaQuestion.id_criteria)
-        .filter(Criteria.rule_id == rule_id).all()
+        .filter(Criteria.rule_id == rule_id)
+        .all()
     )
     current_app.logger.debug(f"que_list - {questions_list}")
     questions = list()
@@ -624,14 +637,17 @@ def get_questions_by_rule(rule_id):
                     {
                         "text": answer.text,
                         "id": answer.id,
-                        "is_right": is_right
+                        "is_right": is_right,
                     }
                 )
-            questions.append({
-                "id": question.id,
-                "text": question.text,
-                "answers": answers,
-                "id_right_answer": cr_que.id_right_answer,
-                "rule_id": rule_id
-            })
+            questions.append(
+                {
+                    "id": question.id,
+                    "text": question.text,
+                    "answers": answers,
+                    "id_right_answer": cr_que.id_right_answer,
+                    "rule_id": rule_id,
+                    "number_question": cr_que.number_question,
+                }
+            )
     return questions

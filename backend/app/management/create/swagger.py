@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app
 
 from app import db
+from app.api.map_file_v2.classes import StateCache, UserParams
 from app.api.swagger.helpers import create_spec
 import sys
 
@@ -55,3 +56,27 @@ def create_user(
 
     db.session.add(user)
     db.session.commit()
+
+
+@bp.cli.command("map")
+def mapping():
+    # masking_uuid = str(uuid.uuid4())
+    # print(masking_uuid)
+    masking_uuid = "0cae6cf9-bfd4-4452-bf9a-4536a86b2867"
+    state = StateCache(masking_uuid)
+
+    user_params = {
+        "type_work_ids": [5],
+        "location_ids": [],
+        "type_location_ids": [],
+        "questions": [],
+    }
+
+    user_params = UserParams(**user_params)
+    print(user_params)
+    data = state.check_rule(user_params)
+    # for i in data:
+    #     print(f"{i.get('id')} {i.get('name')}")
+    #     if i.get("description"):
+    #         print(i.get("description"))
+    print(f"data - {data}")

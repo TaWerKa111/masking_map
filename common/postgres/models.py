@@ -144,6 +144,7 @@ class Location(Base, TimestampsMixin):
     ind_location = Column(
         Integer, nullable=True
     )
+    full_name = Column(String(255))
 
     # relationship
     parent = relationship(
@@ -280,7 +281,8 @@ class Criteria(Base):
         lazy="select",
         uselist=True,
         back_populates="criteria",
-        secondary="question_criteria"
+        secondary="question_criteria",
+        order_by='CriteriaQuestion.number_question.desc()'
     )
 
 
@@ -388,6 +390,7 @@ class CriteriaQuestion(Base):
     id_criteria = Column(Integer, ForeignKey("criteria.id"))
     id_question = Column(Integer, ForeignKey("question.id"))
     id_right_answer = Column(Integer)
+    number_question = Column(Integer)
 
 
 class TaskCheckMapFile(Base, TimestampsMixin):

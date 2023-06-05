@@ -94,9 +94,12 @@ const NavAuthBar = (props) => {
                                 Список существующих карт маскирования
                             </Dropdown.Item>
                             <Dropdown.Item href="/masking-map/">
-                                Сформировать карту маскирования
+                                Сформировать карту маскирования первия версия
                             </Dropdown.Item>
-                            </Dropdown.Menu>
+                            <Dropdown.Item href="/masking-map-v2/">
+                                Сформировать карту маскирования вторая версия
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
                     </Dropdown>
                 </div>
                 <div className="col">
@@ -104,9 +107,6 @@ const NavAuthBar = (props) => {
                         <h2 className="navButton">Выйти</h2>
                     </a>
                 </div>
-                {/* <div className="col">
-                    <h2 style={aStyle}>Профиль Эксперт.</h2>
-                </div> */}
             </div>
         </div>
     );

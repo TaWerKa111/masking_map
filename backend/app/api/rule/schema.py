@@ -50,6 +50,7 @@ class QuestionSchema(Schema):
     text = fields.String()
     answers = fields.List(fields.Nested(QuestionAnswerSchema()))
     id_right_answer = fields.Integer(allow_none=True)
+    number_question = fields.Integer(allow_none=True)
 
 
 class CriteriaSchema(Schema):
@@ -60,9 +61,23 @@ class CriteriaSchema(Schema):
     type_works = fields.List(fields.Nested(WorkSchema()))
     locations_type = fields.List(fields.Nested(LocationTypeSchema()))
     questions = fields.List(fields.Nested(QuestionSchema()))
+    is_any = fields.Bool()
 
     def get_criteria_type(self, obj):
-        return obj.type_criteria.value
+        try:
+            return obj.type_criteria.value
+        except:
+            return obj.get("type_criteria")
+
+
+class MaskingCriteriaSchema(Schema):
+    criteria = fields.Nested(CriteriaSchema())
+    result = fields.Bool()
+    description = fields.String()
+    stage = fields.String()
+    prev_stage = fields.String()
+    logic_machine_answer = fields.List(fields.String())
+    protections = fields.List(fields.Nested(ProtectionSchema()))
 
 
 class QuestionListSchema(Schema):
@@ -145,6 +160,7 @@ class AddRuleSchema(Schema):
     criteria = fields.List(fields.Dict())
     protections = fields.List(fields.Nested(RuleProtectionSchema()))
     compensatory_measures = fields.String(allow_none=True)
+
     class Meta:
         unknown = EXCLUDE
 

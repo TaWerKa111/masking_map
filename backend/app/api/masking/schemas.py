@@ -23,9 +23,6 @@ from app.api.masking.validators import (
 from common.postgres.models import Location
 
 
-# Todo дописать логику для схем (добавление и изменение данных)
-
-
 class DepartamentSchema(Schema):
     id = fields.Integer()
     name = fields.String()
@@ -135,21 +132,6 @@ class FileterParamProtectionSchema(PaginationSchema):
     )
 
 
-class ProtectionSchema(Schema):
-    id = fields.Integer(example=1)
-    name = fields.String(example="")
-    id_type_protection = fields.Integer()
-    # type_protection = fields.List(fields.Dict())
-    is_end = fields.Boolean(example=True)
-    is_masking = fields.Boolean(example=True)
-    is_demasking = fields.Boolean(example=True)
-
-
-class ProtectionListSchema(Schema):
-    protections = fields.List(fields.Nested(ProtectionSchema()))
-    pagination = fields.Nested(PaginationResponseSchema())
-
-
 class AddTypeProtectionSchema(Schema):
     """"""
 
@@ -177,6 +159,21 @@ class TypeProtectionSchema(Schema):
     name = fields.String(example="")
 
 
+class ProtectionSchema(Schema):
+    id = fields.Integer(example=1)
+    name = fields.String(example="")
+    id_type_protection = fields.Integer()
+    type_protection = fields.Nested(TypeProtectionSchema())
+    is_end = fields.Boolean(example=True)
+    is_masking = fields.Boolean(example=True)
+    is_demasking = fields.Boolean(example=True)
+
+
+class ProtectionListSchema(Schema):
+    protections = fields.List(fields.Nested(ProtectionSchema()))
+    pagination = fields.Nested(PaginationResponseSchema())
+
+
 class AddTypeLocationSchema(Schema):
     name = fields.String()
 
@@ -197,8 +194,10 @@ class TypeLocationSchema(Schema):
 
 class FilterTypeLocationSchema(Schema):
     type_work_ids = fields.List(
-        fields.Integer, allow_null=True, 
-        example=[1], data_key="type_work_ids[]"
+        fields.Integer,
+        allow_null=True,
+        example=[1],
+        data_key="type_work_ids[]",
     )
 
 
@@ -239,6 +238,7 @@ class LocationSchema(Schema):
     id_type = fields.Integer(allow_none=True)
     type_location = fields.Nested(TypeLocationSchema())
     ind_location = fields.Integer(example=1, allow_none=True)
+    full_name = fields.String(example="string", allow_none=True)
 
     @post_dump
     def post_process(self, data, **kwargs):
@@ -300,5 +300,3 @@ class RelationshipLocationLocationSchema(Schema):
 class RelationshipLocationProtectionSchema(Schema):
     location_id = fields.Integer()
     protection_ids = fields.List(fields.Integer())
-
-

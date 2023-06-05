@@ -539,3 +539,15 @@ border-radius: 0;
     margin: 20px;
     padding: 10px;
 }
+
+
+.list-child {
+    margin: 2%;
+    border: #1B527C solid 2px ;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.characters {
+    background-color: white;
+}

@@ -30,6 +30,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import LoadingSpinner from "./components/main/LoadingSpinner";
 import InstructionModal from "./components/modal/InstractionModal";
+import MaskingMapV2 from "./conteiners/masking/MaskinMapV2";
+import NextConditions from "./conteiners/questions/NextVersionQuestion";
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
@@ -136,7 +138,11 @@ function App() {
                         path="/list-masking-map/"
                         element={<MaskingMaps />}
                     />
-
+                    <Route
+                        exact
+                        path="/masking-map-v2/"
+                        element={<MaskingMapV2 />}
+                    />
                     {/* <Route path='/rules/' element={ 
                 <ProtectedRoute user={user}>
                   <Rules />

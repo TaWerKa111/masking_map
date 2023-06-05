@@ -81,8 +81,11 @@ def generate_file(map_uuid: str) -> str:
 
 
 def get_filtered_files(
-        protection_ids, type_location_ids, type_work_ids,
-        page: int, limit: int = 1000
+    protection_ids,
+    type_location_ids,
+    type_work_ids,
+    page: int,
+    limit: int = 1000,
 ) -> Pagination:
     """
     Получение списка файлов с пагинацией
@@ -98,12 +101,16 @@ def get_filtered_files(
 
     if protection_ids:
         query = query.filter(
-            MaskingMapFile.params_masking.contains({"protections": protection_ids})
+            MaskingMapFile.params_masking.contains(
+                {"protections": protection_ids}
+            )
         )
         current_app.logger.debug(f"q - {query}")
     if type_location_ids:
         query = query.filter(
-            MaskingMapFile.params_masking.contains({"protections": protection_ids})
+            MaskingMapFile.params_masking.contains(
+                {"protections": protection_ids}
+            )
         )
     if type_work_ids:
         tw = []
@@ -121,7 +128,7 @@ def get_filtered_files(
 
 
 def check_generate_masking_plan(
-        locations, type_works, questions
+    locations, type_works, questions
 ) -> ResultGenerateMap:
     """
     Проверка возможности сгенерировать карту для заданных критериев
@@ -132,8 +139,9 @@ def check_generate_masking_plan(
     logic_machine_answer = []
     tw_criteria = (
         db.session.query(Criteria)
-        .outerjoin(CriteriaTypeWork,
-                   Criteria.id == CriteriaTypeWork.id_criteria)
+        .outerjoin(
+            CriteriaTypeWork, Criteria.id == CriteriaTypeWork.id_criteria
+        )
         .filter(
             or_(
                 CriteriaTypeWork.id_type_work.in_(
@@ -142,10 +150,9 @@ def check_generate_masking_plan(
                 and_(
                     Criteria.type_criteria == Criteria.TypeCriteria.type_work,
                     Criteria.is_any.is_(True),
-                )
+                ),
             )
         )
-
     )
     current_app.logger.debug(f"tw cr query - {tw_criteria}")
     tw_criteria = tw_criteria.all()
@@ -160,13 +167,15 @@ def check_generate_masking_plan(
 
     logic_machine_answer.append(
         f"Список идентфикаторов правил, выбранных по работам: "
-        f"{[rule.id for rule in rules_tw] or 'отсутствуют'}")
+        f"{[rule.id for rule in rules_tw] or 'отсутствуют'}"
+    )
 
     current_app.logger.debug(f"rule type work - {rules_tw}")
     criteria_location = (
         db.session.query(Criteria)
-        .outerjoin(CriteriaLocation,
-                   Criteria.id == CriteriaLocation.id_criteria)
+        .outerjoin(
+            CriteriaLocation, Criteria.id == CriteriaLocation.id_criteria
+        )
         .filter(
             or_(
                 CriteriaLocation.id_location.in_(
@@ -175,7 +184,7 @@ def check_generate_masking_plan(
                 and_(
                     Criteria.type_criteria == Criteria.TypeCriteria.location,
                     Criteria.is_any.is_(True),
-                )
+                ),
             ),
         )
         .all()
@@ -200,7 +209,8 @@ def check_generate_masking_plan(
 
     current_app.logger.debug(f"cr location - {criteria_location}")
     current_app.logger.debug(
-        f"rule type work and loc - {[r.id for r in rules]}")
+        f"rule type work and loc - {[r.id for r in rules]}"
+    )
     rule_ids = [rule.id for rule in rules]
 
     rule_questions = dict()
@@ -220,15 +230,15 @@ def check_generate_masking_plan(
         answers_d = {int(q.get("id")): q.get("answer_id") for q in questions}
         current_app.logger.debug(f"answers_d - {answers_d}")
         logic_machine_answer.append(
-            f"Список вопросов для правил: {rule_ids or 'отсутствует'}")
+            f"Список вопросов для правил: {rule_ids or 'отсутствует'}"
+        )
         for rule_id in rule_questions:
             for cr_qu in rule_questions.get(rule_id, []):
-                if (
-                        answers_d[cr_qu.id_question] != cr_qu.id_right_answer
-                ):
+                if answers_d[cr_qu.id_question] != cr_qu.id_right_answer:
                     current_app.logger.debug(f"no rules - {rule_id}")
                     logic_machine_answer.append(
-                        f"правило №{rule_id} не подходит, ответ неверный на вопрос ''")
+                        f"правило №{rule_id} не подходит, ответ неверный на вопрос ''"
+                    )
                     break
             else:
                 current_app.logger.debug(f"right rule- {rule_id}")
@@ -236,7 +246,9 @@ def check_generate_masking_plan(
         rule_ids = rule_right_ids
     current_app.logger.debug(f"rule right ids = {rule_ids}")
 
-    logic_machine_answer.append(f"Итоговый список идентификаторов правил: {rule_ids}")
+    logic_machine_answer.append(
+        f"Итоговый список идентификаторов правил: {rule_ids}"
+    )
 
     protections = (
         db.session.query(Protection)
@@ -261,7 +273,7 @@ def check_generate_masking_plan(
             result=True,
             logic_machine_answer=logic_machine_answer,
             protections=protections,
-            description=description
+            description=description,
         )
     else:
         logic_machine_answer.append(" Нет необходимости маскирования. ")
@@ -272,14 +284,21 @@ def check_generate_masking_plan(
         result=False,
         logic_machine_answer=logic_machine_answer,
         protections=protections,
-        description=description
+        description=description,
     )
 
 
 def add_masking_file(
-        protections, description, logic_machine_answer, is_test=False, params=None):
+    protections, description, logic_machine_answer, is_test=False, params=None,
+    is_object=False
+):
 
-    if AppConfig.MPSA in protections[0].type_protection.name:
+    if is_object:
+        type_protection = protections[0].type_protection.name
+    else:
+        type_protection = protections[0].get("type_protection", {}).get("name")
+
+    if AppConfig.MPSA in type_protection:
         hand_name = AppConfig.MPSA
     else:
         hand_name = AppConfig.CSPA

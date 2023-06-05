@@ -9,13 +9,15 @@ from app.api.helpers.utils import serialize_paginate_object
 from app.api.map_file.helpers import (
     generate_file,
     render_masking_map,
-    get_filtered_files, add_masking_file,
+    get_filtered_files,
+    add_masking_file,
 )
 from app.api.map_file.schemas import (
     GetListFilesMaskingSchema,
     ListFileMaskingSchema,
     GenerateMaskingPlanSchema,
-    MaskingResponseFileSchema, CheckMaskingFileSchema,
+    MaskingResponseFileSchema,
+    CheckMaskingFileSchema,
 )
 from app.api.map_file.helpers import check_generate_masking_plan
 
@@ -163,7 +165,8 @@ def get_files_views() -> tuple[dict, int]:
         protection_ids=filter_data.get("protection_ids"),
         type_work_ids=filter_data.get("type_work_ids"),
         type_location_ids=filter_data.get("type_location_ids"),
-        page=filter_data.get("page", 1), limit=filter_data.get("limit", 1000)
+        page=filter_data.get("page", 1),
+        limit=filter_data.get("limit", 1000),
     )
     files_ser, pagination = serialize_paginate_object(files)
     result = {"files": files_ser, "pagination": pagination}
@@ -235,13 +238,14 @@ def generate_masking_view():
 
     if result_gen_map.result:
         data_for_masking["protections"] = [
-            protection.id for protection in result_gen_map.protections]
+            protection.id for protection in result_gen_map.protections
+        ]
         masking_uuid = add_masking_file(
             result_gen_map.protections,
             result_gen_map.description,
             logic_machine_answer=result_gen_map.logic_machine_answer,
             is_test=data_for_masking.get("is_test"),
-            params=data_for_masking
+            params=data_for_masking,
         )
 
         return (
@@ -251,7 +255,7 @@ def generate_masking_view():
                     "masking_uuid": masking_uuid,
                     "result": True,
                     "description": result_gen_map.description,
-                    "logic_machine_answer": result_gen_map.logic_machine_answer
+                    "logic_machine_answer": result_gen_map.logic_machine_answer,
                 }
             ),
             http.HTTPStatus.OK,
@@ -263,7 +267,7 @@ def generate_masking_view():
                 "message": "Маскирование не нужно!",
                 "result": False,
                 "description": result_gen_map.description,
-                "logic_machine_answer": result_gen_map.logic_machine_answer
+                "logic_machine_answer": result_gen_map.logic_machine_answer,
             }
         ),
         http.HTTPStatus.OK,

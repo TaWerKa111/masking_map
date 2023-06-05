@@ -126,24 +126,28 @@ export default function ChoiceProtections({ selProtections, handleClickAdd }) {
                         <ul className="list-protection">
                             {filteredListProtection.map((item) => (
                                 <div>
-                                    <input
-                                        type="checkbox"
-                                        checked={
-                                            selectedProtections.filter(
-                                                (i) => i.id == item.id
-                                            ).length > 0
-                                        }
-                                        onChange={(event) =>
-                                            handleCheckboxChange(event, item)
-                                        }
-                                        class="form-check-input"
-                                        value=""
-                                        id="flexCheckDefault"
-                                    ></input>
                                     <label
                                         class="form-check-label protection-label"
-                                        for="flexCheckDefault"
+                                        // for="flexCheckDefault"
                                     >
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                selectedProtections.filter(
+                                                    (i) => i.id == item.id
+                                                ).length > 0
+                                            }
+                                            onChange={(event) =>
+                                                handleCheckboxChange(
+                                                    event,
+                                                    item
+                                                )
+                                            }
+                                            class="form-check-input"
+                                            value=""
+                                            id="flexCheckDefault"
+                                        ></input>
+
                                         {item.name}
                                     </label>
                                 </div>

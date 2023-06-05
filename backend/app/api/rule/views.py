@@ -22,7 +22,8 @@ from app.api.rule.helpers import (
     add_question_answer,
     update_question,
     get_locations_work_types_location_types,
-    delete_rule, get_questions_by_rule,
+    delete_rule,
+    get_questions_by_rule,
 )
 from app.api.rule.schema import (
     AddRuleSchema,
@@ -186,7 +187,7 @@ def get_rule_view() -> tuple[dict, int]:
         "name": rule.name,
         "protections": rule.protections,
         "compensatory_measures": rule.compensatory_measures,
-        "questions": questions
+        "questions": questions,
     }
     return RuleSchema().dump(result), http.HTTPStatus.OK
 
@@ -307,7 +308,7 @@ def update_rule_view():
             BinaryResponseSchema().dump({"message": err, "result": False}),
             http.HTTPStatus.BAD_REQUEST,
         )
-    
+
     type_works = get_list_value(rule, "type_works", "type_work")
     questions = get_list_value(rule, "questions", "question")
     type_locations = get_list_value(rule, "type_locations", "type_location")
@@ -328,7 +329,7 @@ def update_rule_view():
         type_work_ids=[tw["id"] for tw in type_works],
         type_location_ids=[tl["id"] for tl in type_locations if tl],
     )
-    
+
     update_rule(
         rule_id=rule.get("id"),
         name_rule=rule.get("name"),
@@ -454,7 +455,7 @@ def get_questions_view() -> tuple[dict, int]:
 @bp.route("/filter-question-rule/", methods=["GET"])
 def get_filter_question_rule_view() -> tuple[dict, int]:
     """
-    
+
     :return:
     ---
     get:

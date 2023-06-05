@@ -73,6 +73,18 @@ class TypeCriteria(BaseSetting):
     question = "question"
 
 
+class RedisSettings(BaseSetting):
+    HOST = SettingField(
+        "REDIS_HOST", default="localhost"
+    )
+    PORT = SettingField(
+        "REDIS_PORT", type_=int, default=6379
+    )
+    PASSWORD = SettingField(
+        "REDIS_PASSWORD", default="pass2"
+    )
+
+
 class AppConfig(BaseSetting):
     # Postgres settings
     SECRET_KEY = "123"
@@ -91,3 +103,6 @@ class AppConfig(BaseSetting):
     ROLE = Role
     MPSA = "МПСА"
     CSPA = "ЦПСА"
+    REDIS = RedisSettings
+    USER_MASKING_UUID = "USER-MASKING-UUID"
+    ANY_ID = -1

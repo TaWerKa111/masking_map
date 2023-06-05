@@ -15,12 +15,16 @@ class GetListFilesMaskingSchema(PaginationSchema):
     """
     Схема для фильтрации списка файлов, пока ток пагинация
     """
+
     type_location_ids = fields.List(
-        fields.Integer(), allow_none=True, data_key="type_location_ids[]")
+        fields.Integer(), allow_none=True, data_key="type_location_ids[]"
+    )
     type_work_ids = fields.List(
-        fields.Integer(), allow_none=True, data_key="type_work_ids[]")
+        fields.Integer(), allow_none=True, data_key="type_work_ids[]"
+    )
     protection_ids = fields.List(
-        fields.Integer(), allow_none=True, data_key="protection_ids[]")
+        fields.Integer(), allow_none=True, data_key="protection_ids[]"
+    )
 
 
 class FileMaskingSchema(Schema):
@@ -83,3 +87,11 @@ class MaskingResponseFileSchema(BinaryResponseSchema):
     is_end = fields.Boolean()
     rule_ids = fields.List(fields.Integer())
     logic_machine_answer = fields.List(fields.String())
+
+
+class ObjectSchema(Schema):
+    name = fields.String()
+    id = fields.Integer()
+    result = fields.Bool()
+    protections = fields.List(fields.Dict())
+    description = fields.String()

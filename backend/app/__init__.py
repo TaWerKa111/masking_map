@@ -20,6 +20,7 @@ CORS(
     app,
     resources={r"/api/*": {"origins": "*"}},
     supports_credentials=AppConfig.Access_Control_Allow_Credentials,
+    expose_headers="*",
 )
 
 
@@ -34,6 +35,7 @@ from app.api.swagger.views import (
 from app.api.auth.views import bp as api_auth  # noqa:
 from app.api.map_file.views import bp as api_files  # noqa:
 from app.api.rule.views import bp as api_rules  # noqa:
+from app.api.map_file_v2.views import bp as api_map_v2  # noqa:
 
 
 app.register_blueprint(cli_create)
@@ -44,3 +46,4 @@ app.register_blueprint(api_swagger_ui)
 app.register_blueprint(api_auth)
 app.register_blueprint(api_files)
 app.register_blueprint(api_rules)
+app.register_blueprint(api_map_v2)

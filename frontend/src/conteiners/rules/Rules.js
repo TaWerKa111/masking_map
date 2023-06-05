@@ -8,6 +8,7 @@ import { apiInst } from "../../utils/axios";
 import AddElementButton from "../forms/AddElementForm";
 import FilterButton from "../forms/FilterForm";
 import send_notify from "../../utils/toast";
+import LoadingSpinner from "../../components/main/LoadingSpinner";
 
 const URL = "http:localhost:5001/api/masking/get-file/";
 
@@ -17,20 +18,25 @@ export default function Rules() {
     const [typeWorks, setTypeWorks] = useState([]);
     const [typeLocations, setTypeLocations] = useState([]);
     const [protections, setProtections] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     const fetchRules = () => {
         let params = {};
+        setIsLoading(true);
         apiInst
             .get("/rule/rules/", { params })
             .then((resp) => {
                 setRules(resp.data.rules);
+                setIsLoading(false);
             })
-            .catch((e) => console.log(e));
+            .catch((e) => {
+                console.log(e);
+                setIsLoading(false);
+            });
     };
 
     useEffect(() => {
-        fetchRules();
         apiInst
             .get("/masking/type-work/")
             .then((resp) => {
@@ -49,6 +55,7 @@ export default function Rules() {
                 setTypeLocations(resp.data);
             })
             .catch((e) => console.log(e));
+        fetchRules();
     }, []);
 
     const onClick = (event, key) => {
@@ -84,7 +91,6 @@ export default function Rules() {
                     send_notify(e.response.data.message, "error");
                     console.log(e.response.data.message);
                 });
-            fetchRules();
         }
     };
 
@@ -120,7 +126,9 @@ export default function Rules() {
             });
     };
 
-    return (
+    return isLoading ? (
+        <LoadingSpinner></LoadingSpinner>
+    ) : (
         <div className="container-fluid">
             <div className="row">
                 <div className="col-md header-list">
@@ -199,7 +207,9 @@ export default function Rules() {
                                                       ))
                                                 : "Любые"}
                                         </ul>
-                                        <label>Типы мест проведения работ</label>
+                                        <label>
+                                            Типы мест проведения работ
+                                        </label>
                                         <ul>
                                             {rule.criteria.find(
                                                 (item) =>
