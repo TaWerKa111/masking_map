@@ -686,12 +686,12 @@ def update_protection_view() -> tuple[dict, int]:
             ),
             http.HTTPStatus.BAD_REQUEST,
         )
-
+    current_app.logger.debug(f"prot data - {protection_data}")
     result_update = update_protection(
-        protection_data.get("id"),
-        protection_data.get("name"),
-        protection_data.get("id_type_protection"),
-        protection_data.get("id_location"),
+        protection_id=protection_data.get("id"),
+        name=protection_data.get("name"),
+        id_type_protection=protection_data.get("id_type_protection"),
+        location_id=protection_data.get("id_location"),
     )
 
     if not result_update:

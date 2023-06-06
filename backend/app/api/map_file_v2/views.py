@@ -80,7 +80,7 @@ def generate_masking_v2_view():
     current_app.logger.debug(f"user_params - {user_params}")
     data = state.check_rule(user_params)
     current_app.logger.debug(f"view data - {data}")
-    if data["result"] is True and data["stage"] == "result":
+    if data["result"] is True and data["stage"] == "result" and data["protections"]:
         data_for_masking["protections"] = [
             protection.get("id") for protection in data["protections"]
         ]

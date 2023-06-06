@@ -32,6 +32,7 @@ import LoadingSpinner from "./components/main/LoadingSpinner";
 import InstructionModal from "./components/modal/InstractionModal";
 import MaskingMapV2 from "./conteiners/masking/MaskinMapV2";
 import NextConditions from "./conteiners/questions/NextVersionQuestion";
+import MaskingMapV3 from "./conteiners/masking/MaskinMapV3";
 
 function App() {
     const [user, setUser] = useState(localStorage.getItem("is_login"));
@@ -143,6 +144,12 @@ function App() {
                         path="/masking-map-v2/"
                         element={<MaskingMapV2 />}
                     />
+                    <Route
+                        exact
+                        path="/masking-map-v3/"
+                        element={<MaskingMapV3 />}
+                    />
+
                     {/* <Route path='/rules/' element={ 
                 <ProtectedRoute user={user}>
                   <Rules />

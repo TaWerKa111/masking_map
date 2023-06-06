@@ -86,7 +86,7 @@ const NavAuthBar = (props) => {
                                 className="navButton"
                                 style={{ display: "inline" }}
                             >
-                                Карта маскирования
+                                Карта
                             </h2>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
@@ -98,6 +98,9 @@ const NavAuthBar = (props) => {
                             </Dropdown.Item>
                             <Dropdown.Item href="/masking-map-v2/">
                                 Сформировать карту маскирования вторая версия
+                            </Dropdown.Item>
+                            <Dropdown.Item href="/masking-map-v3/">
+                                Сформировать карту маскирования третья версия
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>

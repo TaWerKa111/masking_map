@@ -105,4 +105,4 @@ class AppConfig(BaseSetting):
     CSPA = "ЦПСА"
     REDIS = RedisSettings
     USER_MASKING_UUID = "USER-MASKING-UUID"
-    ANY_ID = -1
+    ANOTHER_ID = -1

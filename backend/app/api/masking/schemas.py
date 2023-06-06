@@ -109,8 +109,8 @@ class AddProtectionSchema(Schema):
     """"""
 
     name = fields.String(example="Защита агрегата №1")
-    id_type_protection = fields.Integer(example=1)
-    id_location = fields.Integer(example=1)
+    id_type_protection = fields.Integer(example=1, allow_none=True)
+    id_location = fields.Integer(example=1, allow_none=True)
     is_end = fields.Boolean(example=True)
 
     class Meta:

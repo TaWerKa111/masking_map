@@ -1,16 +1,12 @@
-import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiInst } from "../../utils/axios";
-import ModalTypeWork from "../../components/modal/ModalTypeWork";
-import ModalLocation from "../../components/modal/ModalLocation";
-import ModalChoiceConditions from "../../components/modal/ModalChoiceConditions";
 import send_toast from "../../utils/toast";
 import ModalDescriptions from "../../components/modal/ModalDescriptions";
 import Select from "react-select";
 
 const USER_MASKING_UUID = "USER-MASKING-UUID".toLowerCase();
 
-export default function MaskingMapV2() {
+export default function MaskingMapV3() {
     const [isTest, setIsTest] = useState(false);
     const [cacheUuid, setCacheUuid] = useState(null);
 
@@ -18,7 +14,6 @@ export default function MaskingMapV2() {
     const [selectedLocations, setSelectedLocations] = useState([]);
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
     const [answeredQuestions, setAnsweredQuestions] = useState([]);
-    // const [stage, setStage] = useState(null);
     const [stageData, setStageData] = useState({});
 
     const [criteria, setCriteria] = useState([]);
@@ -26,6 +21,10 @@ export default function MaskingMapV2() {
     const [isModalDesriptions, setIsModalDesriptions] = useState(false);
     const [mapHtml, setMapHtml] = useState("");
     const [mapUuid, setMapUuid] = useState("");
+    const [isDisabledTW, setIsDisabledTW] = useState(false);
+    const [isDisabledLoc, setIsDisabledLoc] = useState(false);
+    const [isDisabledTL, setIsDisabledTL] = useState(false);
+    const [isDisabledQuestion, setIsDisabledQuestion] = useState([]);
 
     const fetchData = (tw = null, loc = null, tl = null, que = null) => {
         let params = {};
@@ -85,10 +84,6 @@ export default function MaskingMapV2() {
 
     useEffect(() => {}, []);
 
-    const deleteResultFromCriteria = () => {
-        setCriteria(criteria.filter((cr) => cr.stage != "result"));
-    };
-
     const handlerClick = () => {
         let data = {
             test: true,
@@ -103,27 +98,27 @@ export default function MaskingMapV2() {
     const handlerSelectTypeWork = (data) => {
         setSelectedTypeWorks(data);
         setAnsweredQuestions([]);
-        setSelectedLocations([]);
-        setSelectedTypeLocations([]);
-        setStageData({});
-        fetchData(data);
+        setSelectedLocations(null);
+        setSelectedTypeLocations(null);
+        // setStageData({});
+        // fetchData(data);
         setMapHtml("");
         setMapUuid(null);
     };
 
     const handlerSelectLocation = (data) => {
         setSelectedLocations(data);
-        setSelectedTypeLocations([]);
         setAnsweredQuestions([]);
-        setStageData({});
-        fetchData(selectedTypeWorks, data);
+        setSelectedTypeLocations(null);
+        // setStageData({});
+
+        // fetchData(selectedTypeWorks, data);
     };
 
     const handlerSelectTypeLocation = (data) => {
         setSelectedLocations(data);
         setAnsweredQuestions([]);
-        setStageData({});
-        fetchData(selectedTypeWorks, selectedLocations, data);
+        // setStageData({});
     };
 
     const handlerSelectedAnswer = (question, answer, _criteria) => {
@@ -156,11 +151,12 @@ export default function MaskingMapV2() {
             setAnsweredQuestions(temp);
         }
 
-        let secLoc = selectedLocations;
-        if (secLoc.length === 0) secLoc = null;
-        let secTypeLoc = selectedTypeLocations;
-        if (secTypeLoc.length === 0) secTypeLoc = null;
-        fetchData(selectedTypeWorks, secLoc, secTypeLoc, temp);
+        // let secLoc = selectedLocations;
+        // if (secLoc.length === 0) secLoc = null;
+        // let secTypeLoc = selectedTypeLocations;
+        // if (secTypeLoc.length === 0) secTypeLoc = null;
+        // fetchData(selectedTypeWorks, secLoc, secTypeLoc, temp);
+        // setIsDisabledQuestion(true);
     };
 
     const tableRow = (_criteria) => {
@@ -187,6 +183,7 @@ export default function MaskingMapV2() {
                                 value={selectedTypeWorks}
                                 onChange={handlerSelectTypeWork}
                                 isMulti
+                                isDisabled={isDisabledTW}
                             ></Select>
                         </td>
                     </tr>
@@ -207,6 +204,7 @@ export default function MaskingMapV2() {
                                 value={selectedLocations}
                                 onChange={handlerSelectLocation}
                                 isMulti
+                                isDisabled={isDisabledLoc}
                             ></Select>
                         </td>
                     </tr>
@@ -228,6 +226,7 @@ export default function MaskingMapV2() {
                                 value={selectedTypeLocations}
                                 onChange={handlerSelectTypeLocation}
                                 isMulti
+                                isDisabled={isDisabledTL}
                             ></Select>
                         </td>
                     </tr>
@@ -259,6 +258,16 @@ export default function MaskingMapV2() {
                                                         )
                                                     }
                                                     className="form-check-input"
+                                                    disabled={
+                                                        isDisabledQuestion.find(
+                                                            (qu) =>
+                                                                qu.includes(
+                                                                    `question.${que.id}`
+                                                                )
+                                                        )
+                                                            ? "disabled"
+                                                            : ""
+                                                    }
                                                 />
                                                 {answer.text}
                                             </label>
@@ -309,9 +318,42 @@ export default function MaskingMapV2() {
             });
     };
 
+    const handleNextClick = () => {
+        switch (stageData.stage) {
+            case "type_work":
+                setIsDisabledTW(true);
+                break;
+            case "location":
+                setIsDisabledLoc(true);
+                break;
+            case "type_location":
+                setIsDisabledTL(true);
+                break;
+            default:
+                if (stageData.stage.includes("question")) {
+                    setIsDisabledQuestion([
+                        ...isDisabledQuestion,
+                        stageData.stage,
+                    ]);
+                }
+                break;
+        }
+
+        fetchData(
+            selectedTypeWorks,
+            selectedLocations,
+            selectedTypeLocations,
+            answeredQuestions
+        );
+        setStageData({});
+    };
+
     console.log("selectedTypeWorks", selectedTypeWorks);
     console.log("answeredQuestions", answeredQuestions);
     console.log("criteria", criteria);
+    console.log("stageData", stageData);
+    console.log("isDisabledQuestion", isDisabledQuestion);
+
     return (
         <div className="container">
             <div className="row">
@@ -415,6 +457,13 @@ export default function MaskingMapV2() {
                 style={isStarted ? { display: "none" } : { display: "inline" }}
             >
                 Начать
+            </button>
+            <button
+                className="btn btn-submit btn-full btn-blue"
+                onClick={handleNextClick}
+                style={isStarted ? { display: "inline" } : { display: "none" }}
+            >
+                Далее
             </button>
         </div>
     );

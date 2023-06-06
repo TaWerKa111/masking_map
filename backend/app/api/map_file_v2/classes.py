@@ -263,7 +263,7 @@ class StateCache:
         if result_criteria:
             self.logger.debug(f"cr loc - {result_criteria}")
             result_criteria["locations"].append(
-                {"name": "Любая", "id": AppConfig.ANY_ID}
+                {"name": "Другое", "id": AppConfig.ANOTHER_ID}
             )
             self.state_data[self.logic_key][self.state_data[self.stage]] = (
                 f"Осталось правил: {count_rules}. По ним подобрано "
@@ -284,7 +284,7 @@ class StateCache:
         for cr in criteria:
             type_locations.extend(cr.get("locations_type"))
         if type_locations:
-            type_locations.append({"name": "Любая", "id": AppConfig.ANY_ID})
+            type_locations.append({"name": "Другой", "id": AppConfig.ANOTHER_ID})
             self.state_data[self.logic_key][self.state_data[self.stage]] = (
                 f"Осталось правил: {count_rules}. По ним подобрано "
                 f"{len(type_locations)} типов мест проведения работ"
@@ -325,7 +325,7 @@ class StateCache:
                     },
                 )
         sorted_questions = dict(
-            sorted(used_questions.items(), key=lambda item: item[1]["count"])
+            sorted(used_questions.items(), key=lambda item: item[1]["count"], reverse=True)
         )
         self.logger.debug(f"sorted_question - {sorted_questions}")
         # criteria_data = criteria[0]
@@ -508,9 +508,9 @@ class StateCache:
                     if (
                         criteria.get("type_criteria") == stage
                         and criteria.get("is_any") is False
-                    ) :
+                    ):
                         criteria_list.append(criteria)
-                return criteria_list
+            return criteria_list
 
         def get_question_criteria():
             self.logger.debug(f"get cr - {stage}")
@@ -631,6 +631,11 @@ class StateCache:
 
         if self.state_data["stage"] != StageEnum.type_work.value:
             for param in user_params:
+                if not user_params[param] and isinstance(user_params[param], list):
+                    self.recovery_rules(self.state_data[self.stage])
+                    stage = PREV_STAGES[STAGE_PARAMS[param]]
+                    self.logger.debug(f"not user params [] - {user_params[param]}")
+                    break
                 self.logger.debug(f"param - {param}")
                 if state_params.get(param):
                     self.logger.debug(
@@ -655,18 +660,22 @@ class StateCache:
                                     self.recovery_rules(stage)
                                     break
                     else:
+                        l1 = user_params[param]
+                        l2 = state_params[param]
                         if (
-                            user_params[param].sort()
-                            != state_params[param].sort()
+                            [x for x in l1 + l2 if x not in l1 or x not in l2]
                         ):
                             self.logger.debug(f"param is - {param}")
                             stage = STAGE_PARAMS[param]
                             self.recovery_rules(stage)
                             break
                 else:
-                    if isinstance(user_params[param], list):
+                    if isinstance(user_params[param], list) and (
+                        user_params in ["location_ids", "type_location_ids"]
+                    ):
                         self.logger.debug(f"param is - {param}")
-                        # stage = PREV_STAGES[STAGE_PARAMS[param]]
+                        stage = STAGE_PARAMS[param]
+                        self.recovery_rules(stage)
                         break
 
         self.logger.debug(
@@ -794,7 +803,7 @@ class StateCache:
                     self.logger.debug(
                         f"protections - {list(self.protections.values())}")
 
-                    if list(self.protections.values()):
+                    if list(protections_list):
                         description = (
                             f"Маскирование нужно для защит "
                             f"{[p.get('name') for p in protections_list]}"
