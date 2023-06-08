@@ -345,7 +345,7 @@ export default function MaskingMapV3() {
             selectedTypeLocations,
             answeredQuestions
         );
-        setStageData({});
+        // setStageData({});
     };
 
     console.log("selectedTypeWorks", selectedTypeWorks);
@@ -433,8 +433,19 @@ export default function MaskingMapV3() {
                             <iframe
                                 title="MAP"
                                 srcDoc={mapHtml}
-                                style={{ width: "100%", height: "100vh" }}
+                                style={{
+                                    width: "100%",
+                                    height: "80vh",
+                                    border: "1px solid black",
+                                    borderRadius: "5px",
+                                }}
                             />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md">
+                            <h2>Сопровождающие мероприятия</h2>
+                            <p>{stageData.compensatory_measures}</p>
                         </div>
                     </div>
                     <div className="row">
@@ -461,7 +472,11 @@ export default function MaskingMapV3() {
             <button
                 className="btn btn-submit btn-full btn-blue"
                 onClick={handleNextClick}
-                style={isStarted ? { display: "inline" } : { display: "none" }}
+                style={
+                    isStarted && stageData.stage != "result"
+                        ? { display: "inline" }
+                        : { display: "none" }
+                }
             >
                 Далее
             </button>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "../../style/main.css";
 import { Dropdown } from "react-bootstrap";
+import NotificationList from "../../conteiners/Notifications/Notifications";
 
 const NavAuthBar = (props) => {
     const divStyle = {
@@ -104,6 +105,9 @@ const NavAuthBar = (props) => {
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
+                </div>
+                <div className="col">
+                    <NotificationList></NotificationList>
                 </div>
                 <div className="col">
                     <a href="/logout/" style={aStyle}>

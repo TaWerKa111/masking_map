@@ -408,3 +408,20 @@ class TaskCheckMapFile(Base, TimestampsMixin):
     status = Column(
         Enum(StatusTask, values_callable=lambda obj: [x.value for x in obj]))
     attempts = Column(Integer, default=0)
+
+
+class Notification(Base, TimestampsMixin):
+    __tablename__ = "notification"
+
+    id = Column(Integer, primary_key=True)
+    text = Column(Text)
+    is_reading = Column(Boolean, default=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete='SET NULL'), nullable=True)
+    is_for_all = Column(Boolean)
+
+    user = relationship(
+        "User",
+        lazy="select",
+        backref="notifications"
+    )

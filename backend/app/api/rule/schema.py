@@ -78,6 +78,7 @@ class MaskingCriteriaSchema(Schema):
     prev_stage = fields.String()
     logic_machine_answer = fields.List(fields.String())
     protections = fields.List(fields.Nested(ProtectionSchema()))
+    compensatory_measures = fields.String()
 
 
 class QuestionListSchema(Schema):

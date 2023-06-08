@@ -566,6 +566,18 @@ class StateCache:
                 protections[rule["id"]] = rule.get("protections")
         return protections
 
+    def get_compensatory_measures_by_rules_result(self):
+        """
+        Получение compensatory_measures для оставшихся правил.
+        :return:
+        """
+        for rule in self.state_data.get("rules"):
+            if rule.get("id") not in self.state_data.get(
+                "not_valid_rule", {}
+            ).get("rule_ids", []):
+                return rule.get("compensatory_measures")
+        return None
+
     def get_prev_stage(self):
         if self.state_data.get("stages"):
             if len(self.state_data["stages"]) >= 1:
@@ -741,6 +753,7 @@ class StateCache:
         stage = None
         result = None
         protections_list = list()
+        cm = None
         if not self.state_data or not user_params.type_work_ids:
             self.add_rules_by_type_work(user_params.type_work_ids)
             self.state_data["stage"] = StageEnum.type_work.value
@@ -797,6 +810,7 @@ class StateCache:
                     # то они и подходят под запрос пользователя
                     self.protections = self.get_protections_by_rules_result()
                     protections_list = list()
+                    cm = self.get_compensatory_measures_by_rules_result()
                     for pr in list(self.protections.values()):
                         protections_list.extend(pr)
 
@@ -862,6 +876,7 @@ class StateCache:
             "logic_machine_answer": list(
                 self.state_data[self.logic_key].values()
             ),
+            "compensatory_measures": cm
         }
 
         return MaskingCriteriaSchema().dump(result)

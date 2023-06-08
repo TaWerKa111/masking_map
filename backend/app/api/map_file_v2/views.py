@@ -4,6 +4,7 @@ import uuid
 from flask import Blueprint, request, current_app
 from marshmallow import ValidationError
 
+from app.api.helpers.events.map_file import MapFileEvent
 from app.api.helpers.messages import MESSAGES_DICT
 from app.api.helpers.schemas import BinaryResponseSchema
 from app.api.map_file.helpers import add_masking_file
@@ -92,5 +93,11 @@ def generate_masking_v2_view():
             params=data_for_masking,
         )
         data["map_uuid"] = map_uuid
+
+    if data["result"] is False and data["stage"] == "result":
+        text = "Не удалось выбрать правило для следующих параметров: "
+        MapFileEvent.process_after_generate_map_views(
+            text
+        )
 
     return (data, 200, {AppConfig.USER_MASKING_UUID: masking_uuid})

@@ -36,6 +36,7 @@ from app.api.auth.views import bp as api_auth  # noqa:
 from app.api.map_file.views import bp as api_files  # noqa:
 from app.api.rule.views import bp as api_rules  # noqa:
 from app.api.map_file_v2.views import bp as api_map_v2  # noqa:
+from app.api.notification.views import bp as api_nofity  # noqa:
 
 
 app.register_blueprint(cli_create)
@@ -47,3 +48,4 @@ app.register_blueprint(api_auth)
 app.register_blueprint(api_files)
 app.register_blueprint(api_rules)
 app.register_blueprint(api_map_v2)
+app.register_blueprint(api_nofity)
